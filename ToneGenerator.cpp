@@ -17,7 +17,7 @@ ToneGenerator::ToneGenerator(QObject *parent) : QThread(parent)
 //        if (sampleRates.empty()) {
 //            continue;
 //        }
-//        qDebug() << "Device name: " << info.deviceName() << sampleRates
+//        qDebug() << "Device output name: " << info.deviceName() << sampleRates
 //                 << info.supportedCodecs() << info.supportedSampleTypes()
 //                 << info.supportedByteOrders() << info.supportedChannelCounts()
 //                 << info.supportedSampleSizes();
@@ -104,7 +104,7 @@ void ToneGenerator::stateChanged(QAudio::State state)
 {
     Q_ASSERT(m_audioOutput);
     QAudio::Error error = m_audioOutput->error();
-    qDebug() << "Metronome::stateChanged State =" << state << "Error =" << error;
+    qDebug() << "Metronome::stateChanged State=" << state << ", Error=" << error;
     qDebug() << "Metronome::stateChanged" << m_audioOutput->bufferSize() << m_audioOutput->bytesFree() << m_audioOutput->periodSize();
     qDebug() << "elapsedUSecs = " << m_audioOutput->elapsedUSecs()
                << ", " << "processedUSecs = " << m_audioOutput->processedUSecs();

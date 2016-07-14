@@ -8,6 +8,7 @@ class MainWindow;
 }
 
 class ToneGenerator;
+class AudioCapture;
 
 class MainWindow : public QMainWindow
 {
@@ -23,6 +24,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     ToneGenerator *m_gen;
+    AudioCapture *m_capture;
 };
 
 #endif // MAINWINDOW_H

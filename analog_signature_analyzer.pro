@@ -8,9 +8,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    ToneGenerator.cpp
+    ToneGenerator.cpp \
+    audiocapture.cpp
 
 HEADERS  += mainwindow.h \
-    ToneGenerator.h
+    ToneGenerator.h \
+    audiocapture.h
 
 FORMS    += mainwindow.ui
