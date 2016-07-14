@@ -20,11 +20,16 @@ public:
 
 private slots:
     void on_pushButton_clicked();
+    void draw(const QVector<double> &values);
 
 private:
     Ui::MainWindow *ui;
     ToneGenerator *m_gen;
     AudioCapture *m_capture;
+
+    QVector<double> m_dataX;
+    QVector<double> m_dataY;
+    double m_triggerLevel;
 };
 
 #endif // MAINWINDOW_H

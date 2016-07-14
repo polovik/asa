@@ -8,19 +8,19 @@
 
 AudioCapture::AudioCapture(QObject *parent) : QThread(parent)
 {
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
-        if (info.isNull()) {
-            continue;
-        }
-        QList<int> sampleRates = info.supportedSampleRates();
-        if (sampleRates.empty()) {
-            continue;
-        }
-        qDebug() << "Device input name: " << info.deviceName() << sampleRates
-                 << info.supportedCodecs() << info.supportedSampleTypes()
-                 << info.supportedByteOrders() << info.supportedChannelCounts()
-                 << info.supportedSampleSizes();
-    }
+//    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
+//        if (info.isNull()) {
+//            continue;
+//        }
+//        QList<int> sampleRates = info.supportedSampleRates();
+//        if (sampleRates.empty()) {
+//            continue;
+//        }
+//        qDebug() << "Device input name: " << info.deviceName() << sampleRates
+//                 << info.supportedCodecs() << info.supportedSampleTypes()
+//                 << info.supportedByteOrders() << info.supportedChannelCounts()
+//                 << info.supportedSampleSizes();
+//    }
     m_inputBuffer = new QBuffer();
 }
 

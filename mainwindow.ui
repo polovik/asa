@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>807</width>
+    <height>490</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>100</y>
+      <x>20</x>
+      <y>40</y>
       <width>80</width>
       <height>23</height>
      </rect>
@@ -27,13 +27,23 @@
      <string>PushButton</string>
     </property>
    </widget>
+   <widget class="OscilloscopeView" name="oscilloscope" native="true">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>20</y>
+      <width>401</width>
+      <height>381</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
+     <width>807</width>
      <height>20</height>
     </rect>
    </property>
@@ -49,6 +59,14 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>OscilloscopeView</class>
+   <extends>QWidget</extends>
+   <header location="global">OscilloscopeView.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
