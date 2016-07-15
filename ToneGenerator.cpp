@@ -74,8 +74,8 @@ void ToneGenerator::run()
         qint32 val = v * amplitude;
 //        val = qrand();
         int sample = i * 4;
-        data[sample + 0] = data[sample + 2] = (val & 0xFF00) >> 8;
-        data[sample + 1] = data[sample + 3] = (val & 0x00FF);
+        data[sample + 0] = data[sample + 2] = (val & 0x00FF);
+        data[sample + 1] = data[sample + 3] = (val >> 8) & 0x00FF;
     }
 
     QBuffer outputBuffer;
@@ -86,18 +86,7 @@ void ToneGenerator::run()
     m_audioOutput->start(&outputBuffer);
 //    outputBuffer.close();
 
-//    QMediaPlayer *player = new QMediaPlayer;
-//    connect(player, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
-//    player->setMedia(QUrl::fromLocalFile("/mnt/archive/Music/Moby/01.mp3"));
-//    player->setVolume(50);
-//    player->play();
-    QEventLoop loop;
-    loop.exec();
-    forever {
-//        outputBuffer.write(data);
-        outputBuffer.close();
-        up++;
-    }
+    exec();
 }
 
 void ToneGenerator::stateChanged(QAudio::State state)

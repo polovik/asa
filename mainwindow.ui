@@ -14,27 +14,46 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="buttonGenerate">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>40</y>
+      <y>30</y>
       <width>80</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>Generate</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="OscilloscopeView" name="oscilloscope" native="true">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>20</y>
-      <width>401</width>
-      <height>381</height>
+      <x>10</x>
+      <y>190</y>
+      <width>781</width>
+      <height>211</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="buttonCupture">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>30</y>
+      <width>80</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Capture</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>

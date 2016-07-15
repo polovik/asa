@@ -9,14 +9,14 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     ToneGenerator.cpp \
-    audiocapture.cpp \
     qcustomplot/qcustomplot.cpp \
-    OscilloscopeView.cpp
+    OscilloscopeView.cpp \
+    audioinputdevice.cpp
 
 HEADERS  += mainwindow.h \
     ToneGenerator.h \
-    audiocapture.h \
     qcustomplot/qcustomplot.h \
-    OscilloscopeView.h
+    OscilloscopeView.h \
+    audioinputdevice.h
 
 FORMS    += mainwindow.ui
