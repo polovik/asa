@@ -10,11 +10,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     m_gen = new ToneGenerator;
+    m_gen->start();
 
     m_capture = new AudioInputThread;
     connect(m_capture, SIGNAL (initiated (int)),
              SLOT (captureDeviceInitiated (int)), Qt::QueuedConnection); // wait while main window initiated
-    m_capture->start ();
+//    m_capture->start ();
 
     // create plot (from quadratic plot example):
     QVector<double> x(1024), y(1024);
@@ -56,7 +57,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::startToneGenerator(bool start)
 {
-    m_gen->start();
+    m_gen->runGenerator(start);
 }
 
 void MainWindow::captureDeviceInitiated (int samplingRate)
