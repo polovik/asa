@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QTime>
+#include <QEventLoop>
 #include <QtCore/qendian.h>
 #include "audioinputdevice.h"
 
@@ -8,123 +9,11 @@ Q_DECLARE_METATYPE (SamplesList)
 AudioInputDevice::AudioInputDevice(QObject *parent) :
     QIODevice(parent)
 {
-    samplesReaded = 0;
-    setFormat();
-//    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
-//        if (info.isNull()) {
-//            continue;
-//        }
-//        QList<int> sampleRates = info.supportedSampleRates();
-//        if (sampleRates.empty()) {
-//            continue;
-//        }
-//        qDebug() << "Device input name: " << info.deviceName() << sampleRates
-//                 << info.supportedCodecs() << info.supportedSampleTypes()
-//                 << info.supportedByteOrders() << info.supportedChannelCounts()
-//                 << info.supportedSampleSizes();
-//    }
 }
 
 AudioInputDevice::~AudioInputDevice()
 {
-    stopRecording();
 }
-
-void AudioInputDevice::stopRecording()
-{
-    audio->stop();
-    audio->disconnect();
-    delete audio;
-}
-
-void AudioInputDevice::setFormat()
-{
-    QAudioFormat format;
-    // set up the format you want, eg.
-    format.setSampleRate(44100); //8000
-    format.setChannelCount(2);
-    format.setSampleSize(16);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
-    qDebug() << __FUNCTION__ << format.byteOrder() << format.channelCount() << format.codec()
-             << format.sampleRate() << format.sampleSize() << format.sampleType();
-
-    QAudioDeviceInfo info = QAudioDeviceInfo::defaultInputDevice();
-    qDebug() << info.deviceName();
-    foreach (QAudioDeviceInfo deviceInfo, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
-        if (deviceInfo.deviceName() == "alsa_input.usb-046d_0825_36D88820-02-U0x46d0x825.analog-mono") {
-            info = deviceInfo;
-        }
-    }
-    qDebug() << info.deviceName();
-    if (!info.isFormatSupported(format))
-    {
-        qDebug() << "Metronome::Metronome default format not supported try to use nearest";
-        qDebug() << info.deviceName();
-        Q_ASSERT(false);
-        return;
-    }
-
-    if (!info.isFormatSupported(format))
-    {
-        qDebug() << info.deviceName();
-        qWarning() << "default format not supported try to use nearest";
-        format = info.nearestFormat(format);
-        qDebug() << format.byteOrder() << format.channelCount() << format.codec()
-                << format.sampleRate() << format.sampleSize() << format.sampleType();
-
-        foreach (QAudioDeviceInfo deviceInfo, QAudioDeviceInfo::availableDevices(QAudio::AudioInput))
-            qDebug() << "Device name: " << deviceInfo.deviceName();
-        foreach (QString codec, info.supportedCodecs())
-            qDebug() << "Supported codec: " << codec;
-        foreach (int freq, info.supportedSampleRates())
-            qDebug() << "Supported freq: " << freq;
-        foreach (int sampleSize, info.supportedSampleSizes())
-            qDebug() << "Supported sample size: " << sampleSize;
-        foreach (int channels, info.supportedChannelCounts())
-            qDebug() << "Supported channels: " << channels;
-        foreach (int byteOrder, info.supportedByteOrders())
-            qDebug() << "Supported byte orders: " << byteOrder;
-        foreach (int sampleTypes, info.supportedSampleTypes())
-            qDebug() << "Supported sample types: " << sampleTypes;
-    }
-
-    samplingRate = format.sampleRate();
-    audio = new QAudioInput (info, format);
-    connect (audio, SIGNAL(stateChanged(QAudio::State)), SLOT(stateChanged(QAudio::State)));
-}
-
-void AudioInputDevice::startReading (bool start)
-{
-    Q_ASSERT (audio);
-    if (audio)
-    {
-        if (start)
-        {
-            timer.start ();
-            audio->start (this);
-            qDebug() << "AudioInputDevice::startReading" << audio->periodSize() << audio->bufferSize();
-        }
-        else
-        {
-            qDebug() << "AudioInputDevice::stopReading";
-            audio->stop ();
-        }
-    }
-}
-
-void AudioInputDevice::stateChanged(QAudio::State newState)
- {
-    Q_ASSERT (audio);
-    qDebug() << "QAudio stateChanged" << newState;
-    if (audio->error() != QAudio::NoError)
-    {
-        qDebug() << "QAudio error" << audio->error();
-        Q_ASSERT (false);
-    }
-}
-
 
 qint64 AudioInputDevice::readData (char* data, qint64 maxSize)
 {
@@ -170,7 +59,8 @@ AudioInputThread::AudioInputThread () :
     qRegisterMetaType <SamplesList> ();
     m_captureEnabled = false;
     // set up the format you want, eg.
-    m_audioFormat.setSampleRate(44100); //8000
+    m_sampleRate = 44100;
+    m_audioFormat.setSampleRate(m_sampleRate);
     m_audioFormat.setChannelCount(2);
     m_audioFormat.setSampleSize(16);
     m_audioFormat.setCodec("audio/pcm");
@@ -182,26 +72,56 @@ AudioInputThread::AudioInputThread () :
 
 void AudioInputThread::run ()
 {
-    // Prepare audio device
-    audioDevice = new AudioInputDevice;
-    if (!audioDevice)
+    m_inputBuffer = new AudioInputDevice();
+    m_inputBuffer->open(QIODevice::ReadWrite | QIODevice::Truncate);
+    connect(m_inputBuffer, SIGNAL (samplesReceived (SamplesList)), SLOT (updateBuffers (SamplesList)), Qt::QueuedConnection);
+
+    bool captureStarted = false;
+    QEventLoop loop;
+    forever {
+        msleep(1);
+        loop.processEvents();
+        if (!m_captureEnabled) {
+            if (captureStarted == true) {
+                qDebug() << "Stop audio capture";
+                m_audioInput->disconnect();
+                m_audioInput->stop();
+                m_audioInput->deleteLater();
+                m_audioInput = NULL;
+                captureStarted = false;
+            }
+            continue;
+        }
+        if (captureStarted == false) {
+            qDebug() << "Start audio capture";
+            m_audioInput = new QAudioInput (m_curAudioDeviceInfo, m_audioFormat);
+            connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), SLOT(stateChanged(QAudio::State)));
+            m_audioInput->start(m_inputBuffer);
+            captureStarted = true;
+            emit initiated (m_sampleRate);
+        }
+//        qDebug() << "AudioInputThread::run" << m_audioOutput->bufferSize() << m_audioOutput->bytesFree() << m_audioOutput->periodSize();
+//        qDebug() << "AudioInputThread::run" << m_outputBuffer->pos();
+    }
+}
+
+void AudioInputThread::stateChanged(QAudio::State newState)
+ {
+    Q_ASSERT (m_audioInput);
+    qDebug() << "QAudio stateChanged" << newState;
+    if (m_audioInput->error() != QAudio::NoError)
     {
+        qDebug() << "QAudio error" << m_audioInput->error();
         Q_ASSERT (false);
     }
-    Q_ASSERT (audioDevice->open (QIODevice::ReadWrite | QIODevice::Truncate));
-    connect (audioDevice, SIGNAL (samplesReceived (SamplesList)), SLOT (updateBuffers (SamplesList)), Qt::QueuedConnection);
-    int samplingRate = audioDevice->samplingRate;
-    emit initiated (samplingRate);
-
-    exec ();
 }
+
 
 /*  Start or stop capture   */
 void AudioInputThread::startCapturing (bool start)
 {
-    Q_ASSERT (audioDevice);
-    if (audioDevice)
-        QMetaObject::invokeMethod (audioDevice, "startReading", Q_ARG (bool, start));
+    qDebug() << "run audio capture process:" << start;
+    m_captureEnabled = start;
 }
 
 /*
@@ -265,7 +185,7 @@ QStringList AudioInputThread::enumerateDevices()
                  << info.supportedSampleSizes();
         QString name = info.deviceName();
         if (info.deviceName() == "alsa_input.usb-046d_0825_36D88820-02-U0x46d0x825.analog-mono") {
-            name.prepend("- ");
+//            name.prepend("- ");
         }
         if (info.deviceName() == defaultDevice.deviceName()) {
             name.prepend("* ");
