@@ -56,6 +56,7 @@ public:
     void run ();
     void startCapturing (bool start);
     void changeFrameSize (ThreadPurpose purpose, int size);
+    QStringList enumerateDevices();
 
 private:
     int compressorFrameSize;
@@ -69,9 +70,14 @@ private:
     SamplesList bufferOscilloscope;
 
     AudioInputDevice* audioDevice;
+    QAudioFormat m_audioFormat;
+    bool m_captureEnabled;
+    QAudioDeviceInfo m_curAudioDeviceInfo;
+    QList<QAudioDeviceInfo> m_audioDeviceInfos;
 
 public slots:
     void updateBuffers (SamplesList samples);
+    void switchInputDevice(QString name);
 
 signals:
     void initiated (int);

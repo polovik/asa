@@ -168,6 +168,16 @@ AudioInputThread::AudioInputThread () :
         compressorFrameSize (0), volumeIndicatorFrameSize (0), tunerFrameSize (0), oscilloscopeFrameSize(0)
 {
     qRegisterMetaType <SamplesList> ();
+    m_captureEnabled = false;
+    // set up the format you want, eg.
+    m_audioFormat.setSampleRate(44100); //8000
+    m_audioFormat.setChannelCount(2);
+    m_audioFormat.setSampleSize(16);
+    m_audioFormat.setCodec("audio/pcm");
+    m_audioFormat.setByteOrder(QAudioFormat::LittleEndian);
+    m_audioFormat.setSampleType(QAudioFormat::SignedInt);
+    qDebug() << "AudioInputThread::AudioInputThread " << m_audioFormat.byteOrder() << m_audioFormat.channelCount() << m_audioFormat.codec()
+             << m_audioFormat.sampleRate() << m_audioFormat.sampleSize() << m_audioFormat.sampleType();
 }
 
 void AudioInputThread::run ()
@@ -233,6 +243,41 @@ void AudioInputThread::changeFrameSize (ThreadPurpose purpose, int size)
     }
 }
 
+QStringList AudioInputThread::enumerateDevices()
+{
+    QStringList devices;
+    if (m_captureEnabled) {
+        qWarning() << "Devices can't be enumerated' - some of them is already in use";
+        return devices;
+    }
+    m_audioDeviceInfos.clear();
+    QAudioDeviceInfo defaultDevice = QAudioDeviceInfo::defaultInputDevice();
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
+        if (info.isNull()) {
+            continue;
+        }
+        if (!info.isFormatSupported(m_audioFormat)) {
+            continue;
+        }
+        qDebug() << "Device input name:" << info.deviceName() << info.supportedSampleRates()
+                 << info.supportedCodecs() << info.supportedSampleTypes()
+                 << info.supportedByteOrders() << info.supportedChannelCounts()
+                 << info.supportedSampleSizes();
+        QString name = info.deviceName();
+        if (info.deviceName() == "alsa_input.usb-046d_0825_36D88820-02-U0x46d0x825.analog-mono") {
+            name.prepend("- ");
+        }
+        if (info.deviceName() == defaultDevice.deviceName()) {
+            name.prepend("* ");
+        }
+        devices.append(name);
+        m_audioDeviceInfos.append(info);
+    }
+
+    qDebug() << "Detected audio input devices:" << devices;
+    return devices;
+}
+
 /*
     After appropriated buffer filled then samples emit.
     If certain frame size equal to 0 - do not store samples in this buffer
@@ -278,6 +323,21 @@ void AudioInputThread::updateBuffers (SamplesList samples)
             SamplesList data = bufferOscilloscope.mid (0, oscilloscopeFrameSize);
             bufferOscilloscope = bufferOscilloscope.mid (oscilloscopeFrameSize);
             emit dataForOscilloscope (data);
+        }
+    }
+}
+
+void AudioInputThread::switchInputDevice(QString name)
+{
+    if (m_captureEnabled) {
+        qWarning() << "Input audio device can't be changed - it is already in use";
+        return;
+    }
+    qDebug() << "Switch audio input device to" << name;
+    foreach (const QAudioDeviceInfo &info, m_audioDeviceInfos) {
+        if (info.deviceName() == name) {
+            m_curAudioDeviceInfo = info;
+            break;
         }
     }
 }

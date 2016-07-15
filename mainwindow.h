@@ -25,6 +25,7 @@ private slots:
     void processOscilloscopeData (SamplesList samples);
     void startAudioCapture(bool start);
     void switchOutputAudioDevice(int index);
+    void switchInputAudioDevice(int index);
 
 private:
     Ui::MainWindow *ui;

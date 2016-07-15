@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    //  Tone generation
     m_gen = new ToneGenerator;
     QStringList outputDeviceNames = m_gen->enumerateDevices();
     QString outputDeviceName;
@@ -28,10 +30,27 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     m_gen->start();
 
+    // Audio capture
     m_capture = new AudioInputThread;
     connect(m_capture, SIGNAL (initiated (int)),
              SLOT (captureDeviceInitiated (int)), Qt::QueuedConnection); // wait while main window initiated
-//    m_capture->start ();
+    QStringList inputDeviceNames = m_capture->enumerateDevices();
+    QString inputDeviceName;
+    ui->boxAudioInputDevice->clear();
+    index = 0;
+    foreach (QString name, inputDeviceNames) {
+        if (name.startsWith("* ")) {
+            inputDeviceName = name;
+            inputDeviceName.remove(0, 2);
+            ui->boxAudioInputDevice->addItem(name, QVariant(inputDeviceName));
+            ui->boxAudioInputDevice->setCurrentIndex(index);
+            switchInputAudioDevice(index);
+        } else {
+            ui->boxAudioInputDevice->addItem(name, QVariant(name));
+        }
+        index++;
+    }
+    m_capture->start ();
 
     // create plot (from quadratic plot example):
     QVector<double> x(1024), y(1024);
@@ -62,11 +81,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->oscilloscope->setXaxisRange(0, 1000 * 8000. / 44100);
     draw(m_dataY);
 
-    connect(ui->buttonCupture, SIGNAL(toggled(bool)), this, SLOT(startAudioCapture(bool)));
     connect(ui->buttonGenerate, SIGNAL(toggled(bool)), this, SLOT(startToneGenerator(bool)));
     connect(ui->boxFrequency, SIGNAL(valueChanged(int)), m_gen, SLOT(changeFrequency(int)));
     connect(ui->buttonGenerate, SIGNAL(toggled(bool)), ui->boxAudioOutputDevice, SLOT(setDisabled(bool)));
     connect(ui->boxAudioOutputDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputAudioDevice(int)));
+
+    connect(ui->buttonCupture, SIGNAL(toggled(bool)), this, SLOT(startAudioCapture(bool)));
+    connect(ui->buttonCupture, SIGNAL(toggled(bool)), ui->boxAudioInputDevice, SLOT(setDisabled(bool)));
+    connect(ui->boxAudioInputDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(switchInputAudioDevice(int)));
 }
 
 MainWindow::~MainWindow()
@@ -121,7 +143,7 @@ void MainWindow::draw(const QVector<double> &values)
 
 void MainWindow::processOscilloscopeData (SamplesList samples)
 {
-    qDebug() << "Got" << samples.length() << "samples";
+//    qDebug() << "Got" << samples.length() << "samples";
     QVector<double> values;
     values = values.fromList(samples);
     draw(values);
@@ -137,4 +159,11 @@ void MainWindow::switchOutputAudioDevice(int index)
     QVariant cleanName = ui->boxAudioOutputDevice->itemData(index);
     QString name = cleanName.toString();
     m_gen->switchOutputDevice(name);
+}
+
+void MainWindow::switchInputAudioDevice(int index)
+{
+    QVariant cleanName = ui->boxAudioInputDevice->itemData(index);
+    QString name = cleanName.toString();
+    m_capture->switchInputDevice(name);
 }

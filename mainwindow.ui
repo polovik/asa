@@ -17,7 +17,7 @@
    <widget class="QPushButton" name="buttonGenerate">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>230</x>
       <y>30</y>
       <width>80</width>
       <height>23</height>
@@ -43,7 +43,7 @@
    <widget class="QPushButton" name="buttonCupture">
     <property name="geometry">
      <rect>
-      <x>530</x>
+      <x>620</x>
       <y>30</y>
       <width>80</width>
       <height>23</height>
@@ -59,7 +59,7 @@
    <widget class="QSpinBox" name="boxFrequency">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>330</x>
       <y>30</y>
       <width>91</width>
       <height>24</height>
@@ -85,6 +85,16 @@
     <property name="geometry">
      <rect>
       <x>20</x>
+      <y>30</y>
+      <width>191</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="boxAudioInputDevice">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
       <y>30</y>
       <width>161</width>
       <height>23</height>
