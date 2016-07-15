@@ -24,6 +24,7 @@ private slots:
     void draw(const QVector<double> &values);
     void processOscilloscopeData (SamplesList samples);
     void startAudioCapture(bool start);
+    void switchOutputAudioDevice(int index);
 
 private:
     Ui::MainWindow *ui;

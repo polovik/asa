@@ -28,7 +28,7 @@ void AudioOutputDevice::configure(qint32 samplingRate, qint32 frequency)
 
 qint64 AudioOutputDevice::readData(char *data, qint64 maxSize)
 {
-    qDebug() << "AudioOutputDevice::readData" << maxSize << m_sampleIndex;
+//    qDebug() << "AudioOutputDevice::readData" << maxSize << m_sampleIndex;
 
     qint32 amplitude = 65536 / 2 - 1;
     int channelCount = 2;
@@ -37,8 +37,6 @@ qint64 AudioOutputDevice::readData(char *data, qint64 maxSize)
     // fill less data if maxSize isn't divisible by (channelCount * sampleLength)
     qint64 samplesCount = maxSize / channelCount / sampleLength;
     maxSize = samplesCount * channelCount * sampleLength;
-//    m_buffer.clear();
-//    m_buffer.resize(maxSize);
     for (qint64 i = 0; i < samplesCount; ++i) {
         qint64 pos = i * channelCount * sampleLength;
         double angle = 360. * m_sampleIndex / periodLength;
@@ -48,7 +46,6 @@ qint64 AudioOutputDevice::readData(char *data, qint64 maxSize)
         data[pos + 1] = data[pos + 3] = (val >> 8) & 0x00FF;
         ++m_sampleIndex;
     }
-//    memcpy(data, m_buffer.data(), maxSize);
 
     return maxSize;
 }
@@ -64,25 +61,62 @@ ToneGenerator::ToneGenerator(QObject *parent) : QThread(parent)
 {
     m_generationEnabled = false;
     m_audioOutput = NULL;
-//    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
-//        if (info.isNull()) {
-//            continue;
-//        }
-//        QList<int> sampleRates = info.supportedSampleRates();
-//        if (sampleRates.empty()) {
-//            continue;
-//        }
-//        qDebug() << "Device output name: " << info.deviceName() << sampleRates
-//                 << info.supportedCodecs() << info.supportedSampleTypes()
-//                 << info.supportedByteOrders() << info.supportedChannelCounts()
-//                 << info.supportedSampleSizes();
-//    }
 
+    // Set up the format, eg.
+    m_sampleRate = 44100;
+    m_toneFrequency = 440;
+    m_audioFormat.setSampleRate(m_sampleRate);
+    m_audioFormat.setChannelCount(2);
+    m_audioFormat.setSampleSize(16);
+    m_audioFormat.setCodec("audio/pcm");
+    m_audioFormat.setByteOrder(QAudioFormat::LittleEndian);
+    m_audioFormat.setSampleType(QAudioFormat::SignedInt);
+    qDebug() << "ToneGenerator::ToneGenerator " << m_audioFormat.byteOrder() << m_audioFormat.channelCount()
+            << m_audioFormat.codec() << m_audioFormat.sampleRate() << m_audioFormat.sampleSize()
+            << m_audioFormat.sampleType();
 }
 
 ToneGenerator::~ToneGenerator()
 {
 
+}
+
+QStringList ToneGenerator::enumerateDevices()
+{
+    QStringList devices;
+    if (m_generationEnabled) {
+        qWarning() << "Devices can't be enumerated' - some of them is already in use";
+        return devices;
+    }
+    m_audioDeviceInfos.clear();
+    QAudioDeviceInfo defaultDevice = QAudioDeviceInfo::defaultOutputDevice();
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
+        if (info.isNull()) {
+            continue;
+        }
+        if (!info.isFormatSupported(m_audioFormat)) {
+            continue;
+        }
+//        QList<int> sampleRates = info.supportedSampleRates();
+//        if (sampleRates.empty()) {
+//            continue;
+//        }
+        qDebug() << "Device output name:" << info.deviceName() << info.supportedSampleRates()
+                 << info.supportedCodecs() << info.supportedSampleTypes()
+                 << info.supportedByteOrders() << info.supportedChannelCounts()
+                 << info.supportedSampleSizes();
+//        if ("default" == deviceInfo.deviceName())
+//            info = deviceInfo;
+        QString name = info.deviceName();
+        if (info.deviceName() == defaultDevice.deviceName()) {
+            name.prepend("* ");
+        }
+        devices.append(name);
+        m_audioDeviceInfos.append(info);
+    }
+
+    qDebug() << "Detected audio output devices:" << devices;
+    return devices;
 }
 
 void ToneGenerator::runGenerator(bool start)
@@ -91,38 +125,30 @@ void ToneGenerator::runGenerator(bool start)
     m_generationEnabled = start;
 }
 
+void ToneGenerator::changeFrequency(int freq)
+{
+    m_toneFrequency = freq;
+    m_outputBuffer->configure(m_sampleRate, m_toneFrequency);
+}
+
+void ToneGenerator::switchOutputDevice(QString name)
+{
+    if (m_generationEnabled) {
+        qWarning() << "Output audio device can't be changed - it is already in use";
+        return;
+    }
+    qDebug() << "Switch audio output device to" << name;
+    foreach (const QAudioDeviceInfo &info, m_audioDeviceInfos) {
+        if (info.deviceName() == name) {
+            m_curAudioDeviceInfo = info;
+            break;
+        }
+    }
+}
+
 void ToneGenerator::run()
 {
     m_outputBuffer = new AudioOutputDevice();
-    /*  Prepare audio output device */
-    QAudioFormat format;
-    // Set up the format, eg.
-    m_sampleRate = 44100;
-    m_toneFrequency = 440;
-    format.setSampleRate(m_sampleRate);
-    format.setChannelCount(2);
-    format.setSampleSize(16);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
-    qDebug() << "ToneGenerator::run" << format.byteOrder() << format.channelCount()
-            << format.codec() << format.sampleRate() << format.sampleSize()
-            << format.sampleType();
-
-    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
-    qDebug() << info.deviceName();
-//    foreach (QAudioDeviceInfo deviceInfo, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput))
-//    {
-//        if ("default" == deviceInfo.deviceName())
-//            info = deviceInfo;
-//    }
-    if (!info.isFormatSupported(format))
-    {
-        qDebug() << "Metronome::Metronome default format not supported try to use nearest";
-        qDebug() << info.deviceName();
-        Q_ASSERT(false);
-        return;
-    }
     m_outputBuffer->open(QIODevice::ReadOnly);
 
     bool generationStarted = false;
@@ -143,7 +169,7 @@ void ToneGenerator::run()
         }
         if (generationStarted == false) {
             qDebug() << "Start tone generation";
-            m_audioOutput = new QAudioOutput(info, format);
+            m_audioOutput = new QAudioOutput(m_curAudioDeviceInfo, m_audioFormat);
             connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), SLOT(stateChanged(QAudio::State)));
             m_outputBuffer->configure(m_sampleRate, m_toneFrequency);
             m_audioOutput->start(m_outputBuffer);

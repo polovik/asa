@@ -10,6 +10,22 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     m_gen = new ToneGenerator;
+    QStringList outputDeviceNames = m_gen->enumerateDevices();
+    QString outputDeviceName;
+    ui->boxAudioOutputDevice->clear();
+    int index = 0;
+    foreach (QString name, outputDeviceNames) {
+        if (name.startsWith("* ")) {
+            outputDeviceName = name;
+            outputDeviceName.remove(0, 2);
+            ui->boxAudioOutputDevice->addItem(name, QVariant(outputDeviceName));
+            ui->boxAudioOutputDevice->setCurrentIndex(index);
+            switchOutputAudioDevice(index);
+        } else {
+            ui->boxAudioOutputDevice->addItem(name, QVariant(name));
+        }
+        index++;
+    }
     m_gen->start();
 
     m_capture = new AudioInputThread;
@@ -48,6 +64,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->buttonCupture, SIGNAL(toggled(bool)), this, SLOT(startAudioCapture(bool)));
     connect(ui->buttonGenerate, SIGNAL(toggled(bool)), this, SLOT(startToneGenerator(bool)));
+    connect(ui->boxFrequency, SIGNAL(valueChanged(int)), m_gen, SLOT(changeFrequency(int)));
+    connect(ui->buttonGenerate, SIGNAL(toggled(bool)), ui->boxAudioOutputDevice, SLOT(setDisabled(bool)));
+    connect(ui->boxAudioOutputDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputAudioDevice(int)));
 }
 
 MainWindow::~MainWindow()
@@ -111,4 +130,11 @@ void MainWindow::processOscilloscopeData (SamplesList samples)
 void MainWindow::startAudioCapture(bool start)
 {
     m_capture->startCapturing(start);
+}
+
+void MainWindow::switchOutputAudioDevice(int index)
+{
+    QVariant cleanName = ui->boxAudioOutputDevice->itemData(index);
+    QString name = cleanName.toString();
+    m_gen->switchOutputDevice(name);
 }
