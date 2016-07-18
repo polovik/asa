@@ -95,7 +95,7 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     addItem(m_triggerLevelLine);
     m_triggerLevelLine->setPen(triggerPen);
     m_triggerLevelLine->point1->setCoords(-100.0, 1.0);
-    m_triggerLevelLine->point2->setCoords(1024. * 0.016, 1.0);
+    m_triggerLevelLine->point2->setCoords(100.0, 1.0);
 
     m_triggerLevelText = new QCPItemText(this);
     addItem(m_triggerLevelText);
@@ -103,7 +103,7 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_triggerLevelText->position->setParentAnchor(m_triggerLevelLine->anchor("point2"));
     m_triggerLevelText->position->setCoords(0, 0);
     double triggerVoltage = m_triggerLevelLine->point1->value();
-    QString voltage = QString::number(triggerVoltage, 'f', 1) + tr(" V");
+    QString voltage = QString::number(triggerVoltage, 'f', 3) + tr(" V");
     m_triggerLevelText->setText(voltage);
     m_triggerLevelText->setFont(QFont(font().family(), 10));
     m_triggerLevelText->setBrush(Qt::white);
@@ -199,21 +199,31 @@ void OscilloscopeView::setYaxisRange(double minValue, double maxValue)
     xAxis->setRange(m_axisXminValue, m_axisXmaxValue);
 
     if (m_triggerLevelLine->point1->value() < m_axisYminValue) {
-        m_triggerLevelLine->point1->setCoords(m_triggerLevelLine->point1->key(), m_axisYminValue);
-        m_triggerLevelLine->point2->setCoords(m_triggerLevelLine->point2->key(), m_axisYminValue);
-        QString triggerVoltage = QString::number(m_axisYminValue, 'f', 1) + tr(" V");
+        setTriggerLevel(m_axisYminValue);
+        QString triggerVoltage = QString::number(m_axisYminValue, 'f', 3) + tr(" V");
         m_triggerLevelText->setText(triggerVoltage);
     }
     if (m_triggerLevelLine->point1->value() > m_axisYmaxValue) {
-        m_triggerLevelLine->point1->setCoords(m_triggerLevelLine->point1->key(), m_axisYmaxValue);
-        m_triggerLevelLine->point2->setCoords(m_triggerLevelLine->point2->key(), m_axisYmaxValue);
-        QString triggerVoltage = QString::number(m_axisYmaxValue, 'f', 1) + tr(" V");
+        setTriggerLevel(m_axisYmaxValue);
+        QString triggerVoltage = QString::number(m_axisYmaxValue, 'f', 3) + tr(" V");
         m_triggerLevelText->setText(triggerVoltage);
     }
 
     m_timeMeasurementBracket->left->setCoords(m_timeMeasurementBracket->left->key(), m_axisYmaxValue - 1.0);
     m_timeMeasurementBracket->right->setCoords(m_timeMeasurementBracket->right->key(), m_axisYmaxValue - 1.0);
 
+    replot();
+}
+
+void OscilloscopeView::setTriggerLevel(double voltage)
+{
+    m_triggerLevelLine->point1->setCoords(m_triggerLevelLine->point1->key(), voltage);
+    m_triggerLevelLine->point2->setCoords(m_triggerLevelLine->point2->key(), voltage);
+}
+
+void OscilloscopeView::showTriggerLine(bool visible)
+{
+    m_triggerLevelLine->setVisible(visible);
     replot();
 }
 
@@ -249,7 +259,7 @@ void OscilloscopeView::mousePressEvent(QMouseEvent *event)
     double voltage = data.value;
 
     if (m_movedStraightLine == m_triggerLevelLine) {
-        QString triggerVoltage = QString::number(plotY, 'f', 1) + tr(" V");
+        QString triggerVoltage = QString::number(plotY, 'f', 3) + tr(" V");
         m_triggerLevelText->setText(triggerVoltage);
         emit triggerLevelChanged(plotY);
     } else {
@@ -283,10 +293,8 @@ void OscilloscopeView::mouseMoveEvent(QMouseEvent *event)
             plotY = m_axisYminValue;
         if (plotY > m_axisYmaxValue)
             plotY = m_axisYmaxValue;
-        m_triggerLevelLine->point1->setCoords(m_triggerLevelLine->point1->key(), plotY);
-        m_triggerLevelLine->point2->setCoords(m_triggerLevelLine->point2->key(), plotY);
-
-        QString triggerVoltage = QString::number(plotY, 'f', 1) + tr(" V");
+        setTriggerLevel(plotY);
+        QString triggerVoltage = QString::number(plotY, 'f', 3) + tr(" V");
         m_triggerLevelText->setText(triggerVoltage);
         emit triggerLevelChanged(plotY);
     } else {

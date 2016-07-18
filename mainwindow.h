@@ -26,6 +26,8 @@ private slots:
     void startAudioCapture(bool start);
     void switchOutputAudioDevice(int index);
     void switchInputAudioDevice(int index);
+    void updateTriggerLevel(double voltage);
+    void changeTriggerSettings();
 
 private:
     Ui::MainWindow *ui;
@@ -36,7 +38,12 @@ private:
     QVector<double> m_dataY;
     double m_triggerLevel;
     int m_samplingRate;
+    int m_frameLength;
     bool audioCaptureReady;
+    static const int OSCILLOSCOPE_PLOT_FREQUENCY_HZ = 5;
+    OscTriggerMode m_triggerMode;
+    OscTriggerSlope m_triggerSlope;
+    SamplesList m_samplesInputBuffer;
 };
 
 #endif // MAINWINDOW_H

@@ -101,6 +101,77 @@
      </rect>
     </property>
    </widget>
+   <widget class="QGroupBox" name="groupTriggerMode">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>60</y>
+      <width>91</width>
+      <height>117</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Trigger Mode</string>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QRadioButton" name="boxTriggerAuto">
+       <property name="text">
+        <string>Auto</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="boxTriggerNormal">
+       <property name="text">
+        <string>Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="boxTriggerSingle">
+       <property name="text">
+        <string>Single</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QGroupBox" name="groupTriggerSlope">
+    <property name="geometry">
+     <rect>
+      <x>570</x>
+      <y>60</y>
+      <width>124</width>
+      <height>90</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Trigger Slope</string>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QRadioButton" name="boxSlopeRising">
+       <property name="text">
+        <string>Rising</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="boxSlopeFalling">
+       <property name="text">
+        <string>Falling</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

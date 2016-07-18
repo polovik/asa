@@ -14,6 +14,8 @@ public:
     void saveView();
     void setXaxisRange(double minValue, double maxValue);
     void setYaxisRange(double minValue, double maxValue);
+    void setTriggerLevel(double voltage);
+    void showTriggerLine(bool visible);
 
 signals:
     void triggerLevelChanged(double voltage);

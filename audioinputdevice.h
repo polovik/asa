@@ -31,6 +31,16 @@ public slots:
 private slots:
 };
 
+typedef enum {
+    TRIG_AUTO   = 0,
+    TRIG_NORMAL = 1,
+    TRIG_SINGLE = 2
+} OscTriggerMode;
+typedef enum {
+    TRIG_RISING   = 1,
+    TRIG_FALLING  = 2
+} OscTriggerSlope;
+
 class AudioInputThread : public QThread
 {
     Q_OBJECT
