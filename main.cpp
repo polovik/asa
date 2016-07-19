@@ -59,7 +59,11 @@ int main(int argc, char *argv[])
     QByteArray envVar = qgetenv("RUN_IN_QTCREATOR");   //  this variable is only set when run application in QtCreator
     if (envVar.isEmpty()) {
         g_logFilePath = QString("%1/log_InjectionPumpDiagnostic.txt").arg(QDir::currentPath());
+#ifdef Q_OS_WIN
         logStream = _wfopen(g_logFilePath.toStdWString().c_str(), L"w");
+#else
+        logStream = fopen(g_logFilePath.toUtf8().data(), "w");
+#endif
     } else {
         logStream = stderr;
     }

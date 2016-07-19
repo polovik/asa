@@ -184,6 +184,12 @@ QStringList AudioInputThread::enumerateDevices()
                  << info.supportedCodecs() << info.supportedSampleTypes()
                  << info.supportedByteOrders() << info.supportedChannelCounts()
                  << info.supportedSampleSizes();
+#if !defined(_WIN32)
+        if (!name.contains("alsa_input", Qt::CaseInsensitive)) {
+            qDebug() << "Skip non-ALSA device:" << name;
+            continue;
+        }
+#endif
         if (name == "alsa_input.usb-046d_0825_36D88820-02-U0x46d0x825.analog-mono") {
 //            name.prepend("- ");
         }
