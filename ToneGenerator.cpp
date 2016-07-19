@@ -95,10 +95,12 @@ QStringList ToneGenerator::enumerateDevices()
             continue;
         }
         QString name = info.deviceName();
+#if !defined(_WIN32)
         if (!name.contains("alsa", Qt::CaseInsensitive)) {
             qDebug() << "Skip non-ALSA device:" << name;
             continue;
         }
+#endif
         if (!info.isFormatSupported(m_audioFormat)) {
             continue;
         }

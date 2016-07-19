@@ -179,15 +179,15 @@ QStringList AudioInputThread::enumerateDevices()
         if (!info.isFormatSupported(m_audioFormat)) {
             continue;
         }
-        qDebug() << "Device input name:" << info.deviceName() << info.supportedSampleRates()
+        QString name = info.deviceName();
+        qDebug() << "Device input name:" << name << info.supportedSampleRates()
                  << info.supportedCodecs() << info.supportedSampleTypes()
                  << info.supportedByteOrders() << info.supportedChannelCounts()
                  << info.supportedSampleSizes();
-        QString name = info.deviceName();
-        if (info.deviceName() == "alsa_input.usb-046d_0825_36D88820-02-U0x46d0x825.analog-mono") {
+        if (name == "alsa_input.usb-046d_0825_36D88820-02-U0x46d0x825.analog-mono") {
 //            name.prepend("- ");
         }
-        if (info.deviceName() == defaultDevice.deviceName()) {
+        if (name == defaultDevice.deviceName()) {
             name.prepend("* ");
         }
         devices.append(name);
