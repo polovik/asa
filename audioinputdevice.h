@@ -8,12 +8,22 @@
 
 typedef QList<qreal> SamplesList;
 
+typedef enum {
+    CHANNEL_NONE   = 0,
+    CHANNEL_LEFT   = 1,
+    CHANNEL_RIGHT  = 2,
+    CHANNEL_BOTH   = 3
+} OscCapturedChannels;
+
 class AudioInputDevice : public QIODevice
 {
     Q_OBJECT
 public:
     explicit AudioInputDevice (QObject *parent = 0);
     ~AudioInputDevice();
+
+public slots:
+    void setChannels(OscCapturedChannels channels);
 
 protected:
     qint64 readData (char * /*data*/, qint64 /*maxSize*/);
@@ -22,11 +32,10 @@ protected:
 private:
     QTime timer;
     qreal samplesReaded;    // use for determinate time of current frame from start
+    OscCapturedChannels m_channels;
 
 signals:
-    void samplesReceived (SamplesList);
-
-public slots:
+    void samplesReceived(OscCapturedChannels channel, SamplesList data);
 
 private slots:
 };
@@ -59,9 +68,10 @@ public:
     void startCapturing (bool start);
     void changeFrameSize (ThreadPurpose purpose, int size);
     QStringList enumerateDevices();
+    void setCapturedChannels(OscCapturedChannels channels);
 
 public slots:
-    void updateBuffers (SamplesList samples);
+    void updateBuffers (OscCapturedChannels channel, SamplesList samples);
     void switchInputDevice(QString name);
 
 signals:
@@ -70,7 +80,7 @@ signals:
     void dataForCompressor (SamplesList);
     void dataForVolumeIndicator (SamplesList);
     void dataForTuner (SamplesList);
-    void dataForOscilloscope (SamplesList);
+    void dataForOscilloscope(OscCapturedChannels channel, SamplesList data);
 
 private slots:
     void stateChanged(QAudio::State newState);
@@ -93,7 +103,7 @@ private:
     bool m_captureEnabled;
     QAudioDeviceInfo m_curAudioDeviceInfo;
     QList<QAudioDeviceInfo> m_audioDeviceInfos;
-
+    OscCapturedChannels m_capturedChannels;
 };
 
 #endif // AUDIOINPUTDEVICE_H

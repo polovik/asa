@@ -4,18 +4,24 @@
 #include <QObject>
 #include <qcustomplot/qcustomplot.h>
 
+typedef enum {
+    GRAPH_CHANNEL_LEFT   = 30,
+    GRAPH_CHANNEL_RIGHT  = 31
+} DisplayedGraphId;
+
 class OscilloscopeView : public QCustomPlot
 {
     Q_OBJECT
 public:
     OscilloscopeView(QWidget *parent = 0);
     ~OscilloscopeView();
-    void draw(const QVector<double> &keys, const QVector<double> &values);
+    void draw(DisplayedGraphId id, const QVector<double> &keys, const QVector<double> &values);
     void saveView();
     void setXaxisRange(double minValue, double maxValue);
     void setYaxisRange(double minValue, double maxValue);
     void setTriggerLevel(double voltage);
     void showTriggerLine(bool visible);
+    void showGraph(DisplayedGraphId id, bool visible);
 
 signals:
     void triggerLevelChanged(double voltage);
@@ -41,6 +47,8 @@ private:
     QCPItemText *m_triggerLevelText;
 
     QCPItemStraightLine *m_movedStraightLine;
+    QCPGraph *m_graphChannelLeft;
+    QCPGraph *m_graphChannelRight;
 
     double m_axisXminValue;
     double m_axisXmaxValue;

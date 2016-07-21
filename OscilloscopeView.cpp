@@ -5,7 +5,10 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
 {
     m_movedStraightLine = NULL;
 
-    addGraph();
+    m_graphChannelLeft = addGraph();
+    m_graphChannelRight = addGraph();
+    m_graphChannelLeft->setPen(QColor("darkBlue"));
+    m_graphChannelRight->setPen(QColor("darkGreen"));
     xAxis->setLabel(tr("Milliseconds"));
     yAxis->setLabel(tr("Volts"));
     xAxis->setRange(0.0, 1024. * 0.016);
@@ -115,9 +118,12 @@ OscilloscopeView::~OscilloscopeView()
 
 }
 
-void OscilloscopeView::draw(const QVector<double> &keys, const QVector<double> &values)
+void OscilloscopeView::draw(DisplayedGraphId id, const QVector<double> &keys, const QVector<double> &values)
 {
-    graph(0)->setData(keys, values);
+    if (id == GRAPH_CHANNEL_LEFT)
+        m_graphChannelLeft->setData(keys, values);
+    if (id == GRAPH_CHANNEL_RIGHT)
+        m_graphChannelRight->setData(keys, values);
     replot();
 }
 
@@ -224,6 +230,15 @@ void OscilloscopeView::setTriggerLevel(double voltage)
 void OscilloscopeView::showTriggerLine(bool visible)
 {
     m_triggerLevelLine->setVisible(visible);
+    replot();
+}
+
+void OscilloscopeView::showGraph(DisplayedGraphId id, bool visible)
+{
+    if (id == GRAPH_CHANNEL_LEFT)
+        m_graphChannelLeft->setVisible(visible);
+    if (id == GRAPH_CHANNEL_RIGHT)
+        m_graphChannelRight->setVisible(visible);
     replot();
 }
 

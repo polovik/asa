@@ -36,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_capture = new AudioInputThread;
     connect(m_capture, SIGNAL (initiated (int)),
              SLOT (captureDeviceInitiated (int)), Qt::QueuedConnection); // wait while main window initiated
+    connect(m_capture, SIGNAL(dataForOscilloscope(OscCapturedChannels,SamplesList)),
+            this, SLOT(processOscilloscopeData(OscCapturedChannels,SamplesList)));
     QStringList inputDeviceNames = m_capture->enumerateDevices();
     QString inputDeviceName;
     ui->boxAudioInputDevice->clear();
@@ -89,7 +91,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->oscilloscope->setYaxisRange(-1.0, 1.0);
     ui->oscilloscope->setXaxisRange(0, 1000 * 8000. / 44100);
-    draw(m_dataY);
+    draw(CHANNEL_LEFT, m_dataY);
     connect(ui->oscilloscope, SIGNAL(triggerLevelChanged(double)), this, SLOT(updateTriggerLevel(double)));
 
     connect(ui->buttonGenerate, SIGNAL(toggled(bool)), this, SLOT(startToneGenerator(bool)));
@@ -100,6 +102,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->buttonCupture, SIGNAL(toggled(bool)), this, SLOT(startAudioCapture(bool)));
     connect(ui->buttonCupture, SIGNAL(toggled(bool)), ui->boxAudioInputDevice, SLOT(setDisabled(bool)));
     connect(ui->boxAudioInputDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(switchInputAudioDevice(int)));
+    connect(ui->boxChannelLeft, SIGNAL(toggled(bool)), this, SLOT(changeCapturedChannels()));
+    connect(ui->boxChannelRight, SIGNAL(toggled(bool)), this, SLOT(changeCapturedChannels()));
 }
 
 MainWindow::~MainWindow()
@@ -123,44 +127,62 @@ void MainWindow::captureDeviceInitiated (int samplingRate)
     double bound = 1000. * (m_frameLength / 2.) / m_samplingRate;
     ui->oscilloscope->setXaxisRange(-bound, bound);
     qDebug() << "Capture device is ready with sampling rate =" << samplingRate << "Frame len =" << m_frameLength;
-    m_capture->changeFrameSize (AudioInputThread::OSCILLOSCOPE, m_frameLength / 2);
-    connect (m_capture, SIGNAL (dataForOscilloscope (SamplesList)), this, SLOT (processOscilloscopeData (SamplesList)));
+//    m_capture->changeFrameSize (AudioInputThread::OSCILLOSCOPE, m_frameLength / 2);
+    changeCapturedChannels();
 }
 
-void MainWindow::draw(const QVector<double> &values)
+void MainWindow::draw(OscCapturedChannels channel, const QVector<double> &values)
 {
     QVector<double> keys;
     keys.resize(values.count());
     int offset = values.count() / 2;
     for (int i = 0; i < values.count(); i++) {
-        keys[i] = 1000. * (i - offset) / this->m_samplingRate;
+        keys[i] = 1000. * (i - offset) / m_samplingRate;
     }
-    ui->oscilloscope->draw(keys, values);
+    if (channel == CHANNEL_LEFT) {
+        ui->oscilloscope->draw(GRAPH_CHANNEL_LEFT, keys, values);
+    } else if (channel == CHANNEL_RIGHT) {
+        ui->oscilloscope->draw(GRAPH_CHANNEL_RIGHT, keys, values);
+    } else {
+        qWarning() << "Couldn't draw incorrect channel" << channel;
+        Q_ASSERT(false);
+        return;
+    }
 }
 
-void MainWindow::processOscilloscopeData (SamplesList samples)
+void MainWindow::processOscilloscopeData(OscCapturedChannels channel, SamplesList samples)
 {
 //    qDebug() << "Got" << samples.length() << "samples";
+    SamplesList *buffer = NULL;
+    if (channel == CHANNEL_LEFT) {
+        buffer = &m_samplesInputBufferLeft;
+    } else if (channel == CHANNEL_RIGHT) {
+        buffer = &m_samplesInputBufferRight;
+    } else {
+        qWarning() << "Got" << samples.length() << "samples from incorrect channel" << channel;
+        Q_ASSERT(false);
+        return;
+    }
     if (m_triggerMode == TRIG_AUTO) {
-        m_samplesInputBuffer.append(samples);
-        if (m_samplesInputBuffer.size() < m_frameLength) {
+        buffer->append(samples);
+        if (buffer->size() < m_frameLength) {
             return;
         }
         QVector<double> values;
-        values = values.fromList(m_samplesInputBuffer.mid(0, m_frameLength));
-        draw(values);
-        m_samplesInputBuffer = m_samplesInputBuffer.mid(m_frameLength);
+        values = values.fromList(buffer->mid(0, m_frameLength));
+        draw(channel, values);
+        *buffer = buffer->mid(m_frameLength);
         return;
     }
     if (m_triggerMode == TRIG_NORMAL) {
-        m_samplesInputBuffer.append(samples);
-        if (m_samplesInputBuffer.size() < m_frameLength * 2) {
+        buffer->append(samples);
+        if (buffer->size() < m_frameLength * 2) {
             return;
         }
         QList<int> eventsOffsets;
-        for (int offset = m_frameLength / 2 - 1;  offset < m_samplesInputBuffer.size(); ++offset) {
-            qreal cur = m_samplesInputBuffer[offset];
-            qreal prev = m_samplesInputBuffer[offset - 1];
+        for (int offset = m_frameLength / 2 - 1;  offset < buffer->size(); ++offset) {
+            qreal cur = buffer->at(offset);
+            qreal prev = buffer->at(offset - 1);
             if (m_triggerSlope == TRIG_RISING) {
                 if ((prev <= m_triggerLevel) && (cur >= m_triggerLevel)) {
                     eventsOffsets.append(offset);
@@ -182,9 +204,9 @@ void MainWindow::processOscilloscopeData (SamplesList samples)
                 }
                 if (offset >= m_frameLength / 2) {
                     QVector<double> values;
-                    values = values.fromList(m_samplesInputBuffer.mid(offset - m_frameLength / 2, m_frameLength));
-                    draw(values);
-                    m_samplesInputBuffer = m_samplesInputBuffer.mid(m_frameLength / 2);
+                    values = values.fromList(buffer->mid(offset - m_frameLength / 2, m_frameLength));
+                    draw(channel, values);
+                    *buffer = buffer->mid(m_frameLength / 2);
                     return;
                 }
             }
@@ -192,15 +214,15 @@ void MainWindow::processOscilloscopeData (SamplesList samples)
             if (eventsOffsets.size() > 0) {
                 int offset = eventsOffsets.last();
                 QVector<double> values;
-                values = values.fromList(m_samplesInputBuffer.mid(offset - m_frameLength / 2, m_frameLength));
-                draw(values);
-                m_samplesInputBuffer = m_samplesInputBuffer.mid(m_frameLength / 2);
+                values = values.fromList(buffer->mid(offset - m_frameLength / 2, m_frameLength));
+                draw(channel, values);
+                *buffer = buffer->mid(m_frameLength / 2);
                 return;
             }
         }
         // buffer is truncated
-        if (m_samplesInputBuffer.size() > m_frameLength * 2) {
-            m_samplesInputBuffer = m_samplesInputBuffer.mid(m_frameLength);
+        if (buffer->size() > m_frameLength * 2) {
+            *buffer = buffer->mid(m_frameLength);
         }
     }
 }
@@ -247,4 +269,20 @@ void MainWindow::changeTriggerSettings()
         m_triggerSlope = TRIG_RISING;
     else
         m_triggerSlope = TRIG_FALLING;
+}
+
+void MainWindow::changeCapturedChannels()
+{
+    int channels = CHANNEL_NONE;
+    channels = CHANNEL_NONE;
+    if (ui->boxChannelLeft->isChecked()) {
+        channels |= CHANNEL_LEFT;
+    }
+    ui->oscilloscope->showGraph(GRAPH_CHANNEL_LEFT, ui->boxChannelLeft->isChecked());
+    if (ui->boxChannelRight->isChecked()) {
+        channels |= CHANNEL_RIGHT;
+    }
+    ui->oscilloscope->showGraph(GRAPH_CHANNEL_RIGHT, ui->boxChannelRight->isChecked());
+    m_capturedChannels = (OscCapturedChannels)channels;
+    m_capture->setCapturedChannels(m_capturedChannels);
 }

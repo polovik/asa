@@ -83,6 +83,7 @@ ToneGenerator::~ToneGenerator()
 
 QStringList ToneGenerator::enumerateDevices()
 {
+    extern bool g_verboseOutput;
     QStringList devices;
     if (m_generationEnabled) {
         qWarning() << "Devices can't be enumerated' - some of them is already in use";
@@ -97,10 +98,18 @@ QStringList ToneGenerator::enumerateDevices()
         QString name = info.deviceName();
 #if !defined(_WIN32)
         if (!name.contains("alsa", Qt::CaseInsensitive)) {
-            qDebug() << "Skip non-ALSA device:" << name;
+            if (g_verboseOutput) {
+                qDebug() << "Skip non-ALSA device:" << name;
+            }
             continue;
         }
 #endif
+        if (g_verboseOutput) {
+            qDebug() << "Device output name:" << name << info.supportedSampleRates()
+                     << info.supportedCodecs() << info.supportedSampleTypes()
+                     << info.supportedByteOrders() << info.supportedChannelCounts()
+                     << info.supportedSampleSizes();
+        }
         if (!info.isFormatSupported(m_audioFormat)) {
             continue;
         }
@@ -108,10 +117,6 @@ QStringList ToneGenerator::enumerateDevices()
 //        if (sampleRates.empty()) {
 //            continue;
 //        }
-        qDebug() << "Device output name:" << name << info.supportedSampleRates()
-                 << info.supportedCodecs() << info.supportedSampleTypes()
-                 << info.supportedByteOrders() << info.supportedChannelCounts()
-                 << info.supportedSampleSizes();
 //        if ("default" == deviceInfo.deviceName())
 //            info = deviceInfo;
         if (name == defaultDevice.deviceName()) {

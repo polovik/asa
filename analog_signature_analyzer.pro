@@ -55,3 +55,6 @@ win32 {
     system(xcopy /V /R /Y "%QTDIR%\plugins\imageformats\qico.dll" $$resourcesTarget\imageformats\\)
     system(xcopy /V /R /Y "%QTDIR%\plugins\printsupport\windowsprintersupport.dll" $$resourcesTarget\printsupport\\)
 }
+
+RESOURCES += \
+    analog_signature_analyzer.qrc

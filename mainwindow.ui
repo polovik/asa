@@ -60,9 +60,6 @@
           </layout>
          </item>
         </layout>
-        <zorder>boxAudioOutputDevice</zorder>
-        <zorder>boxAudioOutputDevice</zorder>
-        <zorder>horizontalLayoutWidget</zorder>
        </widget>
       </item>
       <item>
@@ -81,8 +78,8 @@
              <property name="title">
               <string>Trigger Mode</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <item>
+             <layout class="QFormLayout" name="formLayout">
+              <item row="0" column="0">
                <widget class="QRadioButton" name="boxTriggerAuto">
                 <property name="text">
                  <string>Auto</string>
@@ -92,19 +89,22 @@
                 </property>
                </widget>
               </item>
-              <item>
+              <item row="1" column="0">
                <widget class="QRadioButton" name="boxTriggerNormal">
                 <property name="text">
                  <string>Normal</string>
                 </property>
                </widget>
               </item>
-              <item>
+              <item row="2" column="0">
                <widget class="QRadioButton" name="boxTriggerSingle">
                 <property name="text">
                  <string>Single</string>
                 </property>
                </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="boxTriggerChannel"/>
               </item>
              </layout>
             </widget>
@@ -129,6 +129,43 @@
                <widget class="QRadioButton" name="boxSlopeFalling">
                 <property name="text">
                  <string>Falling</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupChannels">
+             <property name="title">
+              <string>Channels</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <item>
+               <widget class="QCheckBox" name="boxChannelLeft">
+                <property name="text">
+                 <string>Left</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="analog_signature_analyzer.qrc">
+                  <normaloff>:/icons/blue_line.ico</normaloff>:/icons/blue_line.ico</iconset>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="boxChannelRight">
+                <property name="text">
+                 <string>Right</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="analog_signature_analyzer.qrc">
+                  <normaloff>:/icons/green_line.ico</normaloff>:/icons/green_line.ico</iconset>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -186,6 +223,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="analog_signature_analyzer.qrc"/>
+ </resources>
  <connections/>
 </ui>
