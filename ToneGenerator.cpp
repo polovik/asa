@@ -9,7 +9,6 @@
 
 AudioOutputDevice::AudioOutputDevice(QObject *parent) : QIODevice(parent)
 {
-    m_samplingRate = 0;
     m_frequency = 0;
     m_sampleIndex = 0;
 }
@@ -19,9 +18,9 @@ AudioOutputDevice::~AudioOutputDevice()
 
 }
 
-void AudioOutputDevice::configure(qint32 samplingRate, qint32 frequency)
+void AudioOutputDevice::configure(const QAudioFormat &format, qint32 frequency)
 {
-    m_samplingRate = samplingRate;
+    m_audioFormat = format;
     m_frequency = frequency;
     m_sampleIndex = 0;
 }
@@ -30,20 +29,39 @@ qint64 AudioOutputDevice::readData(char *data, qint64 maxSize)
 {
 //    qDebug() << "AudioOutputDevice::readData" << maxSize << m_sampleIndex;
 
-    qint32 amplitude = 65536 / 2 - 1;
-    int channelCount = 2;
-    int sampleLength = 2;
-    double periodLength = 1. * m_samplingRate / m_frequency;
+    qint64 amplitude = (qint32)qPow(2, m_audioFormat.sampleSize()) / 2 - 1;
+//    int channelCount = m_audioFormat.channelCount();
+    int sampleLength = m_audioFormat.sampleSize() / 8;
+    double periodLength = 1. * m_audioFormat.sampleRate() / m_frequency;
     // fill less data if maxSize isn't divisible by (channelCount * sampleLength)
-    qint64 samplesCount = maxSize / channelCount / sampleLength;
-    maxSize = samplesCount * channelCount * sampleLength;
+    qint64 samplesCount = maxSize / m_audioFormat.bytesPerFrame();
+    maxSize = samplesCount * m_audioFormat.bytesPerFrame();
     for (qint64 i = 0; i < samplesCount; ++i) {
-        qint64 pos = i * channelCount * sampleLength;
+        qint64 pos = i * m_audioFormat.bytesPerFrame();
         double angle = 360. * m_sampleIndex / periodLength;
         double v = qSin(qDegreesToRadians(angle));
-        qint32 val = v * amplitude;
-        data[pos + 0] = data[pos + 2] = (val & 0x00FF);
-        data[pos + 1] = data[pos + 3] = (val >> 8) & 0x00FF;
+        qint64 val = v * amplitude;
+        if (m_audioFormat.byteOrder() == QAudioFormat::LittleEndian) {
+//            data[pos + 0] = data[pos + 2] = (val & 0x00FF);
+//            data[pos + 1] = data[pos + 3] = (val >> 8) & 0x00FF;
+            for (int byte = 0; byte < m_audioFormat.bytesPerFrame(); byte++) {
+                if (byte % sampleLength == 0) {
+                    val = v * amplitude;
+                }
+                data[pos + byte] = val & 0xFF;
+                val = val >> 8;
+            }
+        } else {
+//            data[pos + 0] = data[pos + 2] = (val >> 8) & 0x00FF;
+//            data[pos + 1] = data[pos + 3] = (val & 0x00FF);
+            for (int byte = m_audioFormat.bytesPerFrame(); byte > 0; byte--) {
+                if (byte % sampleLength == 0) {
+                    val = v * amplitude;
+                }
+                data[pos + byte - 1] = val & 0xFF;
+                val = val >> 8;
+            }
+        }
         ++m_sampleIndex;
     }
 
@@ -139,7 +157,7 @@ void ToneGenerator::runGenerator(bool start)
 void ToneGenerator::changeFrequency(int freq)
 {
     m_toneFrequency = freq;
-    m_outputBuffer->configure(m_sampleRate, m_toneFrequency);
+    m_outputBuffer->configure(m_audioFormat, m_toneFrequency);
 }
 
 void ToneGenerator::switchOutputDevice(QString name)
@@ -182,7 +200,7 @@ void ToneGenerator::run()
             qDebug() << "Start tone generation";
             m_audioOutput = new QAudioOutput(m_curAudioDeviceInfo, m_audioFormat);
             connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), SLOT(stateChanged(QAudio::State)));
-            m_outputBuffer->configure(m_sampleRate, m_toneFrequency);
+            m_outputBuffer->configure(m_audioFormat, m_toneFrequency);
             m_audioOutput->start(m_outputBuffer);
             generationStarted = true;
         }

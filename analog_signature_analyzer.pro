@@ -24,6 +24,7 @@ FORMS    += mainwindow.ui
 # DEPLOY
 #translationsSource = $$PWD/languages/lang_ru_RU.qm
 #database = $$PWD/asa.accdb
+debug_bat = $$PWD/run_debug_version.bat
 resourcesTarget = $$DESTDIR
 
 win32 {
@@ -31,10 +32,12 @@ win32 {
 #    system(lrelease languages\\lang_ru_RU.ts languages\\lang_ru_RU.qm)
 #    translationsSource = $$replace(translationsSource, /, \\)
 #    database = $$replace(database, /, \\)
+    debug_bat = $$replace(debug_bat, /, \\)
     resourcesTarget = $$replace(resourcesTarget, /, \\)
     system(mkdir $$resourcesTarget)
 #    system(xcopy /Y /V $$translationsSource $$resourcesTarget\\languages\\)
 #    system(xcopy /Y /V $$database $$resourcesTarget\\)
+    system(xcopy /Y /V $$debug_bat $$resourcesTarget\\)
 
     # Qt libraries
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Core.dll" $$resourcesTarget)
@@ -58,3 +61,6 @@ win32 {
 
 RESOURCES += \
     analog_signature_analyzer.qrc
+
+DISTFILES += \
+    run_debug_version.bat

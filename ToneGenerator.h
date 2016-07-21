@@ -12,7 +12,7 @@ class AudioOutputDevice : public QIODevice
 public:
     explicit AudioOutputDevice (QObject *parent = 0);
     ~AudioOutputDevice();
-    void configure(qint32 samplingRate, qint32 frequency);
+    void configure(const QAudioFormat &format, qint32 frequency);
 
 public slots:
 
@@ -24,7 +24,7 @@ private slots:
 
 private:
     qint64 m_sampleIndex;
-    qint32 m_samplingRate;
+    QAudioFormat m_audioFormat;
     qint32 m_frequency;
 
 signals:

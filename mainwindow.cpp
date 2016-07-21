@@ -229,6 +229,10 @@ void MainWindow::processOscilloscopeData(OscCapturedChannels channel, SamplesLis
 
 void MainWindow::startAudioCapture(bool start)
 {
+    if (start) {
+        m_samplesInputBufferLeft.clear();
+        m_samplesInputBufferRight.clear();
+    }
     m_capture->startCapturing(start);
 }
 
