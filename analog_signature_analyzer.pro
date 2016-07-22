@@ -51,6 +51,7 @@ win32 {
     system(xcopy /V /R /Y "%QTDIR%\bin\libwinpthread-1.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\libstdc++-6.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\icu*.dll" $$resourcesTarget)
+    system(xcopy /V /R /Y "%QTDIR%\plugins\audio\qtaudio_windows.dll" $$resourcesTarget\audio\\)
 #    system(xcopy /V /R /Y "%QTDIR%\plugins\sqldrivers\qsqlodbc.dll" $$resourcesTarget\sqldrivers\\)
     system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qminimal.dll" $$resourcesTarget\platforms\\)
     system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qoffscreen.dll" $$resourcesTarget\platforms\\)
