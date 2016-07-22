@@ -63,4 +63,5 @@ RESOURCES += \
     analog_signature_analyzer.qrc
 
 DISTFILES += \
-    run_debug_version.bat
+    run_debug_version.bat \
+    icons/license.txt

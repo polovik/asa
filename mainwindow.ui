@@ -55,6 +55,10 @@
              <property name="text">
               <string>Generate</string>
              </property>
+             <property name="icon">
+              <iconset resource="analog_signature_analyzer.qrc">
+               <normaloff>:/icons/play_tone.ico</normaloff>:/icons/play_tone.ico</iconset>
+             </property>
              <property name="checkable">
               <bool>true</bool>
              </property>
@@ -189,6 +193,10 @@
           <widget class="QPushButton" name="buttonCupture">
            <property name="text">
             <string>Capture</string>
+           </property>
+           <property name="icon">
+            <iconset resource="analog_signature_analyzer.qrc">
+             <normaloff>:/icons/capture_data.ico</normaloff>:/icons/capture_data.ico</iconset>
            </property>
            <property name="checkable">
             <bool>true</bool>

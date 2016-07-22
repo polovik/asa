@@ -8,5 +8,7 @@
         <file>icons/oscillator_triangle.png</file>
         <file>icons/front_slope.ico</file>
         <file>icons/back_slope.ico</file>
+        <file>icons/capture_data.ico</file>
+        <file>icons/play_tone.ico</file>
     </qresource>
 </RCC>
