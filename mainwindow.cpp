@@ -39,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_triangle.png"), "Triangle", QVariant(WAVE_TRIANGLE));
 
     // Audio capture
+    m_dataForSingleCaptureAcquredLeft = true;
+    m_dataForSingleCaptureAcquredRight = true;
     m_samplingRate = -1;
     m_frameLength = -1;
     m_capture = new AudioInputThread;
@@ -136,8 +138,17 @@ void MainWindow::captureDeviceInitiated (int samplingRate)
     double bound = 1000. * (m_frameLength / 2.) / m_samplingRate;
     ui->oscilloscope->setXaxisRange(-bound, bound);
     qDebug() << "Capture device is ready with sampling rate =" << samplingRate << "Frame len =" << m_frameLength;
-//    m_capture->changeFrameSize (AudioInputThread::OSCILLOSCOPE, m_frameLength / 2);
-    changeCapturedChannels();
+
+    if (m_triggerMode == TRIG_SINGLE) {
+        m_dataForSingleCaptureAcquredLeft = false;
+        m_dataForSingleCaptureAcquredRight = false;
+    } else {
+        m_dataForSingleCaptureAcquredLeft = true;
+        m_dataForSingleCaptureAcquredRight = true;
+    }
+    m_samplesInputBufferLeft.clear();
+    m_samplesInputBufferRight.clear();
+    changeCapturedChannels(); // Start receive data from input device
 }
 
 void MainWindow::draw(OscCapturedChannels channel, const QVector<double> &values)
@@ -163,10 +174,13 @@ void MainWindow::processOscilloscopeData(OscCapturedChannels channel, SamplesLis
 {
 //    qDebug() << "Got" << samples.length() << "samples";
     SamplesList *buffer = NULL;
+    bool *dataForSingleCaptureAcqured = NULL;
     if (channel == CHANNEL_LEFT) {
         buffer = &m_samplesInputBufferLeft;
+        dataForSingleCaptureAcqured = &m_dataForSingleCaptureAcquredLeft;
     } else if (channel == CHANNEL_RIGHT) {
         buffer = &m_samplesInputBufferRight;
+        dataForSingleCaptureAcqured = &m_dataForSingleCaptureAcquredRight;
     } else {
         qWarning() << "Got" << samples.length() << "samples from incorrect channel" << channel;
         Q_ASSERT(false);
@@ -183,7 +197,10 @@ void MainWindow::processOscilloscopeData(OscCapturedChannels channel, SamplesLis
         *buffer = buffer->mid(m_frameLength);
         return;
     }
-    if (m_triggerMode == TRIG_NORMAL) {
+    if ((m_triggerMode == TRIG_SINGLE) && *dataForSingleCaptureAcqured) {
+        return;
+    }
+    if ((m_triggerMode == TRIG_NORMAL) or (m_triggerMode == TRIG_SINGLE)) {
         buffer->append(samples);
         if (buffer->size() < m_frameLength * 2) {
             return;
@@ -216,6 +233,7 @@ void MainWindow::processOscilloscopeData(OscCapturedChannels channel, SamplesLis
                     values = values.fromList(buffer->mid(offset - m_frameLength / 2, m_frameLength));
                     draw(channel, values);
                     *buffer = buffer->mid(m_frameLength / 2);
+                    *dataForSingleCaptureAcqured = true;
                     return;
                 }
             }
@@ -226,6 +244,7 @@ void MainWindow::processOscilloscopeData(OscCapturedChannels channel, SamplesLis
                 values = values.fromList(buffer->mid(offset - m_frameLength / 2, m_frameLength));
                 draw(channel, values);
                 *buffer = buffer->mid(m_frameLength / 2);
+                *dataForSingleCaptureAcqured = true;
                 return;
             }
         }
@@ -238,10 +257,6 @@ void MainWindow::processOscilloscopeData(OscCapturedChannels channel, SamplesLis
 
 void MainWindow::startAudioCapture(bool start)
 {
-    if (start) {
-        m_samplesInputBufferLeft.clear();
-        m_samplesInputBufferRight.clear();
-    }
     m_capture->startCapturing(start);
 }
 
@@ -295,10 +310,17 @@ void MainWindow::changeTriggerSettings()
         ui->oscilloscope->showTriggerLine(true);
     }
     if (mode != m_triggerMode) {
-        m_samplesInputBufferLeft.clear();
-        m_samplesInputBufferRight.clear();
         qDebug() << "Oscilloscope trigger mode has been changed from" << m_triggerMode << "to" << mode;
         m_triggerMode = mode;
+        m_samplesInputBufferLeft.clear();
+        m_samplesInputBufferRight.clear();
+        if (m_triggerMode == TRIG_SINGLE) {
+            m_dataForSingleCaptureAcquredLeft = false;
+            m_dataForSingleCaptureAcquredRight = false;
+        } else {
+            m_dataForSingleCaptureAcquredLeft = true;
+            m_dataForSingleCaptureAcquredRight = true;
+        }
     }
 
     OscTriggerSlope slope = m_triggerSlope;

@@ -43,6 +43,8 @@ private:
     int m_samplingRate;
     int m_frameLength;
     bool audioCaptureReady;
+    bool m_dataForSingleCaptureAcquredLeft;
+    bool m_dataForSingleCaptureAcquredRight;
     static const int OSCILLOSCOPE_PLOT_FREQUENCY_HZ = 5;
     OscTriggerMode m_triggerMode;
     OscTriggerSlope m_triggerSlope;
