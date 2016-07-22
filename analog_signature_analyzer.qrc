@@ -2,5 +2,9 @@
     <qresource prefix="/">
         <file>icons/blue_line.ico</file>
         <file>icons/green_line.ico</file>
+        <file>icons/oscillator_sine.png</file>
+        <file>icons/oscillator_saw.png</file>
+        <file>icons/oscillator_square.png</file>
+        <file>icons/oscillator_triangle.png</file>
     </qresource>
 </RCC>

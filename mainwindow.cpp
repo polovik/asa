@@ -29,6 +29,10 @@ MainWindow::MainWindow(QWidget *parent) :
         index++;
     }
     m_gen->start();
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_sine.png"), "Sine", QVariant(WAVE_SINE));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_square.png"), "Square", QVariant(WAVE_SQUARE));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_saw.png"), "Sawtooth", QVariant(WAVE_SAWTOOTH));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_triangle.png"), "Triangle", QVariant(WAVE_TRIANGLE));
 
     // Audio capture
     m_samplingRate = -1;
@@ -95,9 +99,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->oscilloscope, SIGNAL(triggerLevelChanged(double)), this, SLOT(updateTriggerLevel(double)));
 
     connect(ui->buttonGenerate, SIGNAL(toggled(bool)), this, SLOT(startToneGenerator(bool)));
-    connect(ui->boxFrequency, SIGNAL(valueChanged(int)), m_gen, SLOT(changeFrequency(int)));
+    connect(ui->boxFrequency, SIGNAL(valueChanged(int)), this, SLOT(switchOutputFrequency()));
     connect(ui->buttonGenerate, SIGNAL(toggled(bool)), ui->boxAudioOutputDevice, SLOT(setDisabled(bool)));
     connect(ui->boxAudioOutputDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputAudioDevice(int)));
+    connect(ui->boxWaveForm, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputWaveForm()));
 
     connect(ui->buttonCupture, SIGNAL(toggled(bool)), this, SLOT(startAudioCapture(bool)));
     connect(ui->buttonCupture, SIGNAL(toggled(bool)), ui->boxAudioInputDevice, SLOT(setDisabled(bool)));
@@ -113,6 +118,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::startToneGenerator(bool start)
 {
+    if (!audioCaptureReady) {
+        switchOutputFrequency();
+        switchOutputWaveForm();
+    }
     m_gen->runGenerator(start);
 }
 
@@ -241,6 +250,20 @@ void MainWindow::switchOutputAudioDevice(int index)
     QVariant cleanName = ui->boxAudioOutputDevice->itemData(index);
     QString name = cleanName.toString();
     m_gen->switchOutputDevice(name);
+}
+
+void MainWindow::switchOutputWaveForm()
+{
+    int index = ui->boxWaveForm->currentIndex();
+    QVariant data = ui->boxWaveForm->itemData(index);
+    ToneWaveForm form = (ToneWaveForm)data.toInt();
+    m_gen->switchWaveForm(form);
+}
+
+void MainWindow::switchOutputFrequency()
+{
+    int freq = ui->boxFrequency->value();
+    m_gen->changeFrequency(freq);
 }
 
 void MainWindow::switchInputAudioDevice(int index)

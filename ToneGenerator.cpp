@@ -18,15 +18,22 @@ AudioOutputDevice::~AudioOutputDevice()
 
 }
 
-void AudioOutputDevice::configure(const QAudioFormat &format, qint32 frequency)
+void AudioOutputDevice::configure(const QAudioFormat &format, qint32 frequency, ToneWaveForm form)
 {
+    QMutexLocker lockerSettings(&m_settingsMutex);
     m_audioFormat = format;
     m_frequency = frequency;
+    m_waveForm = form;
     m_sampleIndex = 0;
+    qDebug() << "Configure tone generator: frequency" << frequency
+             << "waveform" << form << m_audioFormat.sampleRate() << m_audioFormat.byteOrder()
+             << " " << m_audioFormat.channelCount() << " " << m_audioFormat.codec()
+             << " " << m_audioFormat.sampleSize() << " " << m_audioFormat.sampleType();
 }
 
 qint64 AudioOutputDevice::readData(char *data, qint64 maxSize)
 {
+    QMutexLocker lockerSettings(&m_settingsMutex);
 //    qDebug() << "AudioOutputDevice::readData" << maxSize << m_sampleIndex;
 
     qint64 amplitude = (qint32)qPow(2, m_audioFormat.sampleSize()) / 2 - 1;
@@ -38,8 +45,28 @@ qint64 AudioOutputDevice::readData(char *data, qint64 maxSize)
     maxSize = samplesCount * m_audioFormat.bytesPerFrame();
     for (qint64 i = 0; i < samplesCount; ++i) {
         qint64 pos = i * m_audioFormat.bytesPerFrame();
-        double angle = 360. * m_sampleIndex / periodLength;
-        double v = qSin(qDegreesToRadians(angle));
+        double v;
+        if (m_waveForm == WAVE_SINE) {
+            double angle = 360. * m_sampleIndex / periodLength;
+            v = qSin(qDegreesToRadians(angle));
+        } else if (m_waveForm == WAVE_SQUARE) {
+            int relativePos = m_sampleIndex % int(periodLength);
+            if (relativePos < periodLength / 2)
+                v = 1.0;
+            else
+                v = -1.0;
+        } else if (m_waveForm == WAVE_SAWTOOTH) {
+            int relativePos = m_sampleIndex % int(periodLength);
+            v = -1. + 2.0 * relativePos / periodLength;
+        } else if (m_waveForm == WAVE_TRIANGLE) {
+            int relativePos = m_sampleIndex % int(periodLength);
+            if (relativePos < periodLength / 2)
+                v = -1. + 2.0 * (relativePos * 2) / periodLength;
+            else
+                v =  3. - 2.0 * (relativePos * 2) / periodLength;
+        } else {
+            v = 1.0 * qrand() / RAND_MAX;
+        }
         qint64 val = v * amplitude;
         if (m_audioFormat.byteOrder() == QAudioFormat::LittleEndian) {
 //            data[pos + 0] = data[pos + 2] = (val & 0x00FF);
@@ -79,19 +106,19 @@ ToneGenerator::ToneGenerator(QObject *parent) : QThread(parent)
 {
     m_generationEnabled = false;
     m_audioOutput = NULL;
+    m_waveForm = WAVE_UNKNOWN;
 
     // Set up the format, eg.
-    m_sampleRate = 44100;
-    m_toneFrequency = 440;
-    m_audioFormat.setSampleRate(m_sampleRate);
+    m_toneFrequency = 100;
+    m_audioFormat.setSampleRate(44100);
     m_audioFormat.setChannelCount(2);
     m_audioFormat.setSampleSize(16);
     m_audioFormat.setCodec("audio/pcm");
     m_audioFormat.setByteOrder(QAudioFormat::LittleEndian);
     m_audioFormat.setSampleType(QAudioFormat::SignedInt);
-    qDebug() << "ToneGenerator::ToneGenerator " << m_audioFormat.byteOrder() << m_audioFormat.channelCount()
-            << m_audioFormat.codec() << m_audioFormat.sampleRate() << m_audioFormat.sampleSize()
-            << m_audioFormat.sampleType();
+    qDebug() << "ToneGenerator::ToneGenerator " << m_audioFormat.sampleRate() << m_audioFormat.byteOrder()
+             << " " << m_audioFormat.channelCount() << " " << m_audioFormat.codec()
+             << " " << m_audioFormat.sampleSize() << " " << m_audioFormat.sampleType();
 }
 
 ToneGenerator::~ToneGenerator()
@@ -157,7 +184,7 @@ void ToneGenerator::runGenerator(bool start)
 void ToneGenerator::changeFrequency(int freq)
 {
     m_toneFrequency = freq;
-    m_outputBuffer->configure(m_audioFormat, m_toneFrequency);
+    m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm);
 }
 
 void ToneGenerator::switchOutputDevice(QString name)
@@ -173,6 +200,12 @@ void ToneGenerator::switchOutputDevice(QString name)
             break;
         }
     }
+}
+
+void ToneGenerator::switchWaveForm(ToneWaveForm form)
+{
+    m_waveForm = form;
+    m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm);
 }
 
 void ToneGenerator::run()
@@ -200,7 +233,7 @@ void ToneGenerator::run()
             qDebug() << "Start tone generation";
             m_audioOutput = new QAudioOutput(m_curAudioDeviceInfo, m_audioFormat);
             connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), SLOT(stateChanged(QAudio::State)));
-            m_outputBuffer->configure(m_audioFormat, m_toneFrequency);
+            m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm);
             m_audioOutput->start(m_outputBuffer);
             generationStarted = true;
         }

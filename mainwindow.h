@@ -25,6 +25,8 @@ private slots:
     void processOscilloscopeData (OscCapturedChannels channel, SamplesList samples);
     void startAudioCapture(bool start);
     void switchOutputAudioDevice(int index);
+    void switchOutputWaveForm();
+    void switchOutputFrequency();
     void switchInputAudioDevice(int index);
     void updateTriggerLevel(double voltage);
     void changeTriggerSettings();
