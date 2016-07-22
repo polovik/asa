@@ -6,5 +6,7 @@
         <file>icons/oscillator_saw.png</file>
         <file>icons/oscillator_square.png</file>
         <file>icons/oscillator_triangle.png</file>
+        <file>icons/front_slope.ico</file>
+        <file>icons/back_slope.ico</file>
     </qresource>
 </RCC>

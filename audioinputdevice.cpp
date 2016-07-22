@@ -108,12 +108,13 @@ void AudioInputThread::run ()
                 m_audioInput->deleteLater();
                 m_audioInput = NULL;
                 captureStarted = false;
-                m_capturedChannels = CHANNEL_NONE;
+                setCapturedChannels(CHANNEL_NONE);
             }
             continue;
         }
         if (captureStarted == false) {
             qDebug() << "Start audio capture";
+            setCapturedChannels(CHANNEL_NONE);
             m_audioInput = new QAudioInput (m_curAudioDeviceInfo, m_audioFormat);
             connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), SLOT(stateChanged(QAudio::State)));
             m_audioInput->start(m_inputBuffer);

@@ -4,6 +4,8 @@
 #include "ToneGenerator.h"
 #include "audioinputdevice.h"
 
+extern bool g_verboseOutput;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -28,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent) :
         }
         index++;
     }
+    connect(m_gen, SIGNAL(deviceReady(bool)), this, SLOT(switchOutputFrequency()));
+    connect(m_gen, SIGNAL(deviceReady(bool)), this, SLOT(switchOutputWaveForm()));
     m_gen->start();
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_sine.png"), "Sine", QVariant(WAVE_SINE));
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_square.png"), "Square", QVariant(WAVE_SQUARE));
@@ -118,10 +122,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::startToneGenerator(bool start)
 {
-    if (!audioCaptureReady) {
-        switchOutputFrequency();
-        switchOutputWaveForm();
-    }
     m_gen->runGenerator(start);
 }
 
@@ -275,27 +275,43 @@ void MainWindow::switchInputAudioDevice(int index)
 
 void MainWindow::updateTriggerLevel(double voltage)
 {
-    qDebug() << "Trigger level is changed to" << voltage << "V";
+    if (g_verboseOutput) {
+        qDebug() << "Trigger level is changed to" << voltage << "V";
+    }
     m_triggerLevel = voltage;
 }
 
 void MainWindow::changeTriggerSettings()
 {
+    OscTriggerMode mode = m_triggerMode;
     if (ui->boxTriggerAuto->isChecked()) {
-        m_triggerMode = TRIG_AUTO;
+        mode = TRIG_AUTO;
         ui->oscilloscope->showTriggerLine(false);
     } else if (ui->boxTriggerNormal->isChecked()) {
-        m_triggerMode = TRIG_NORMAL;
+        mode = TRIG_NORMAL;
         ui->oscilloscope->showTriggerLine(true);
     } else {
-        m_triggerMode = TRIG_SINGLE;
+        mode = TRIG_SINGLE;
         ui->oscilloscope->showTriggerLine(true);
     }
+    if (mode != m_triggerMode) {
+        m_samplesInputBufferLeft.clear();
+        m_samplesInputBufferRight.clear();
+        qDebug() << "Oscilloscope trigger mode has been changed from" << m_triggerMode << "to" << mode;
+        m_triggerMode = mode;
+    }
 
+    OscTriggerSlope slope = m_triggerSlope;
     if (ui->boxSlopeRising->isChecked())
-        m_triggerSlope = TRIG_RISING;
+        slope = TRIG_RISING;
     else
-        m_triggerSlope = TRIG_FALLING;
+        slope = TRIG_FALLING;
+    if (slope != m_triggerSlope) {
+        m_samplesInputBufferLeft.clear();
+        m_samplesInputBufferRight.clear();
+        qDebug() << "Oscilloscope trigger slope has been changed from" << m_triggerSlope << "to" << slope;
+        m_triggerSlope = slope;
+    }
 }
 
 void MainWindow::changeCapturedChannels()

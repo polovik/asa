@@ -123,6 +123,10 @@
                 <property name="text">
                  <string>Rising</string>
                 </property>
+                <property name="icon">
+                 <iconset resource="analog_signature_analyzer.qrc">
+                  <normaloff>:/icons/front_slope.ico</normaloff>:/icons/front_slope.ico</iconset>
+                </property>
                 <property name="checked">
                  <bool>true</bool>
                 </property>
@@ -132,6 +136,10 @@
                <widget class="QRadioButton" name="boxSlopeFalling">
                 <property name="text">
                  <string>Falling</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="analog_signature_analyzer.qrc">
+                  <normaloff>:/icons/back_slope.ico</normaloff>:/icons/back_slope.ico</iconset>
                 </property>
                </widget>
               </item>

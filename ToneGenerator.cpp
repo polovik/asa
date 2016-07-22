@@ -212,6 +212,7 @@ void ToneGenerator::run()
 {
     m_outputBuffer = new AudioOutputDevice();
     m_outputBuffer->open(QIODevice::ReadOnly);
+    emit deviceReady(true);
 
     bool generationStarted = false;
     QEventLoop loop;
