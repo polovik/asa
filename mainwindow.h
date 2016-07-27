@@ -22,7 +22,7 @@ private slots:
     void startToneGenerator(bool start);
     void captureDeviceInitiated (int samplingRate);
     void draw(OscCapturedChannels channel, const QVector<double> &values);
-    void processOscilloscopeData (OscCapturedChannels channel, SamplesList samples);
+    void processOscilloscopeData (SamplesList leftChannelData, SamplesList rightChannelData);
     void startAudioCapture(bool start);
     void switchOutputAudioDevice(int index);
     void switchOutputWaveForm();
@@ -33,6 +33,8 @@ private slots:
     void changeCapturedChannels();
 
 private:
+    void displayOscilloscopeChannelData(int dislayFrom, int displayedLength, int removeFrom);
+
     Ui::MainWindow *ui;
     ToneGenerator *m_gen;
     AudioInputThread *m_capture;
@@ -43,14 +45,14 @@ private:
     int m_samplingRate;
     int m_frameLength;
     bool audioCaptureReady;
-    bool m_dataForSingleCaptureAcquredLeft;
-    bool m_dataForSingleCaptureAcquredRight;
+    bool m_dataForSingleCaptureAcqured;
     static const int OSCILLOSCOPE_PLOT_FREQUENCY_HZ = 5;
     OscTriggerMode m_triggerMode;
     OscTriggerSlope m_triggerSlope;
     SamplesList m_samplesInputBufferLeft;
     SamplesList m_samplesInputBufferRight;
     OscCapturedChannels m_capturedChannels;
+    OscCapturedChannels m_triggerChannel;
 };
 
 #endif // MAINWINDOW_H

@@ -62,8 +62,10 @@ qint64 AudioInputDevice::writeData (const char* data, qint64 maxSize)
             samplesRight.append (charToReal(&data[i + 2], true));
     }
 //    qDebug() << samplesLeft.size() << samplesRight.size();
-    emit samplesReceived (CHANNEL_LEFT, samplesLeft); // emit this signal always before readyRead
-    emit samplesReceived (CHANNEL_RIGHT, samplesRight); // emit this signal always before readyRead
+    // TODO attach timestamp
+//    emit samplesReceived (CHANNEL_LEFT, samplesLeft); // emit this signal always before readyRead
+//    emit samplesReceived (CHANNEL_RIGHT, samplesRight); // emit this signal always before readyRead
+    emit samplesReceived(samplesLeft, samplesRight);
     emit readyRead(); // if after emit this signal device can write more data, stop processing more and this function called again
     return maxSize;
 }
@@ -93,7 +95,8 @@ void AudioInputThread::run ()
     m_inputBuffer = new AudioInputDevice();
     m_inputBuffer->open(QIODevice::ReadWrite | QIODevice::Truncate);
 //    connect(m_inputBuffer, SIGNAL(samplesReceived(OscCapturedChannels,SamplesList)), SLOT (updateBuffers(OscCapturedChannels,SamplesList)), Qt::QueuedConnection);
-    connect(m_inputBuffer, SIGNAL(samplesReceived(OscCapturedChannels,SamplesList)), SIGNAL(dataForOscilloscope(OscCapturedChannels,SamplesList)), Qt::QueuedConnection);
+//    connect(m_inputBuffer, SIGNAL(samplesReceived(OscCapturedChannels,SamplesList)), SIGNAL(dataForOscilloscope(OscCapturedChannels,SamplesList)), Qt::QueuedConnection);
+    connect(m_inputBuffer, SIGNAL(samplesReceived(SamplesList,SamplesList)), SIGNAL(dataForOscilloscope(SamplesList,SamplesList)), Qt::QueuedConnection);
 
     bool captureStarted = false;
     QEventLoop loop;

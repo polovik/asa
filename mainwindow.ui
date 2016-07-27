@@ -111,7 +111,26 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QComboBox" name="boxTriggerChannel"/>
+               <widget class="QComboBox" name="boxTriggerChannel">
+                <item>
+                 <property name="text">
+                  <string>track left channel</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="analog_signature_analyzer.qrc">
+                   <normaloff>:/icons/blue_line.ico</normaloff>:/icons/blue_line.ico</iconset>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>track right channel</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="analog_signature_analyzer.qrc">
+                   <normaloff>:/icons/green_line.ico</normaloff>:/icons/green_line.ico</iconset>
+                 </property>
+                </item>
+               </widget>
               </item>
              </layout>
             </widget>

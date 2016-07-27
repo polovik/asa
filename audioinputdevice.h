@@ -36,6 +36,7 @@ private:
 
 signals:
     void samplesReceived(OscCapturedChannels channel, SamplesList data);
+    void samplesReceived(SamplesList leftChannelData, SamplesList rightChannelData);
 
 private slots:
 };
@@ -81,6 +82,7 @@ signals:
     void dataForVolumeIndicator (SamplesList);
     void dataForTuner (SamplesList);
     void dataForOscilloscope(OscCapturedChannels channel, SamplesList data);
+    void dataForOscilloscope(SamplesList leftChannelData, SamplesList rightChannelData);
 
 private slots:
     void stateChanged(QAudio::State newState);
