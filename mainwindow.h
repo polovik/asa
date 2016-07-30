@@ -2,13 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "audioinputdevice.h"
+#include <formcalibration.h>
+#include <formraw.h>
 
 namespace Ui {
 class MainWindow;
 }
-
-class ToneGenerator;
 
 class MainWindow : public QMainWindow
 {
@@ -19,40 +18,14 @@ public:
     ~MainWindow();
 
 private slots:
-    void startToneGenerator(bool start);
-    void captureDeviceInitiated (int samplingRate);
-    void draw(OscCapturedChannels channel, const QVector<double> &values);
-    void processOscilloscopeData (SamplesList leftChannelData, SamplesList rightChannelData);
-    void startAudioCapture(bool start);
-    void switchOutputAudioDevice(int index);
-    void switchOutputWaveForm();
-    void switchOutputFrequency();
-    void switchInputAudioDevice(int index);
-    void updateTriggerLevel(double voltage);
-    void changeTriggerSettings();
-    void changeCapturedChannels();
+    void showForm();
 
 private:
-    void displayOscilloscopeChannelData(int dislayFrom, int displayedLength, int removeFrom);
-
     Ui::MainWindow *ui;
-    ToneGenerator *m_gen;
-    AudioInputThread *m_capture;
+    FormCalibration *m_formCalibration;
+    FormRaw *m_formRaw;
 
-    QVector<double> m_dataX;
-    QVector<double> m_dataY;
-    double m_triggerLevel;
-    int m_samplingRate;
-    int m_frameLength;
-    bool audioCaptureReady;
-    bool m_dataForSingleCaptureAcqured;
-    static const int OSCILLOSCOPE_PLOT_FREQUENCY_HZ = 5;
-    OscTriggerMode m_triggerMode;
-    OscTriggerSlope m_triggerSlope;
-    SamplesList m_samplesInputBufferLeft;
-    SamplesList m_samplesInputBufferRight;
-    OscCapturedChannels m_capturedChannels;
-    OscCapturedChannels m_triggerChannel;
+    QWidget *m_currentForm;
 };
 
 #endif // MAINWINDOW_H

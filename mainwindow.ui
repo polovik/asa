@@ -14,255 +14,145 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,2">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_6">
-      <item>
-       <widget class="QGroupBox" name="groupBox">
-        <property name="title">
-         <string>Tone Generator</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <item>
-          <widget class="QComboBox" name="boxAudioOutputDevice"/>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QSpinBox" name="boxFrequency">
-             <property name="specialValueText">
-              <string/>
-             </property>
-             <property name="suffix">
-              <string>Hz</string>
-             </property>
-             <property name="minimum">
-              <number>50</number>
-             </property>
-             <property name="maximum">
-              <number>20000</number>
-             </property>
-             <property name="value">
-              <number>440</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="boxWaveForm"/>
-           </item>
-           <item>
-            <widget class="QPushButton" name="buttonGenerate">
-             <property name="text">
-              <string>Generate</string>
-             </property>
-             <property name="icon">
-              <iconset resource="analog_signature_analyzer.qrc">
-               <normaloff>:/icons/play_tone.ico</normaloff>:/icons/play_tone.ico</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="groupBox_2">
-        <property name="title">
-         <string>Capture</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <item>
-          <widget class="QComboBox" name="boxAudioInputDevice"/>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
-            <widget class="QGroupBox" name="groupTriggerMode">
-             <property name="title">
-              <string>Trigger Mode</string>
-             </property>
-             <layout class="QFormLayout" name="formLayout">
-              <item row="0" column="0">
-               <widget class="QRadioButton" name="boxTriggerAuto">
-                <property name="text">
-                 <string>Auto</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QRadioButton" name="boxTriggerNormal">
-                <property name="text">
-                 <string>Normal</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QRadioButton" name="boxTriggerSingle">
-                <property name="text">
-                 <string>Single</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QComboBox" name="boxTriggerChannel">
-                <item>
-                 <property name="text">
-                  <string>track left channel</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="analog_signature_analyzer.qrc">
-                   <normaloff>:/icons/blue_line.ico</normaloff>:/icons/blue_line.ico</iconset>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>track right channel</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="analog_signature_analyzer.qrc">
-                   <normaloff>:/icons/green_line.ico</normaloff>:/icons/green_line.ico</iconset>
-                 </property>
-                </item>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="groupTriggerSlope">
-             <property name="title">
-              <string>Trigger Slope</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_2">
-              <item>
-               <widget class="QRadioButton" name="boxSlopeRising">
-                <property name="text">
-                 <string>Rising</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="analog_signature_analyzer.qrc">
-                  <normaloff>:/icons/front_slope.ico</normaloff>:/icons/front_slope.ico</iconset>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="boxSlopeFalling">
-                <property name="text">
-                 <string>Falling</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="analog_signature_analyzer.qrc">
-                  <normaloff>:/icons/back_slope.ico</normaloff>:/icons/back_slope.ico</iconset>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="groupChannels">
-             <property name="title">
-              <string>Channels</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_7">
-              <item>
-               <widget class="QCheckBox" name="boxChannelLeft">
-                <property name="text">
-                 <string>Left</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="analog_signature_analyzer.qrc">
-                  <normaloff>:/icons/blue_line.ico</normaloff>:/icons/blue_line.ico</iconset>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="boxChannelRight">
-                <property name="text">
-                 <string>Right</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="analog_signature_analyzer.qrc">
-                  <normaloff>:/icons/green_line.ico</normaloff>:/icons/green_line.ico</iconset>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QPushButton" name="buttonCupture">
-           <property name="text">
-            <string>Capture</string>
-           </property>
-           <property name="icon">
-            <iconset resource="analog_signature_analyzer.qrc">
-             <normaloff>:/icons/capture_data.ico</normaloff>:/icons/capture_data.ico</iconset>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QFrame" name="leftPanel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>75</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>75</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="buttonCalibration">
+         <property name="minimumSize">
+          <size>
+           <width>73</width>
+           <height>73</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Calibration</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonRaw">
+         <property name="minimumSize">
+          <size>
+           <width>73</width>
+           <height>73</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Raw</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonAnalyze">
+         <property name="minimumSize">
+          <size>
+           <width>73</width>
+           <height>73</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Analyze</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonDiagnose">
+         <property name="minimumSize">
+          <size>
+           <width>73</width>
+           <height>73</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Diagnose</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonOptions">
+         <property name="minimumSize">
+          <size>
+           <width>73</width>
+           <height>73</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Options</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
     <item>
-     <widget class="OscilloscopeView" name="oscilloscope" native="true"/>
+     <widget class="QStackedWidget" name="mainArea">
+      <widget class="QWidget" name="mainAreaPage1" native="true"/>
+     </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>807</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>OscilloscopeView</class>
-   <extends>QWidget</extends>
-   <header location="global">OscilloscopeView.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
- <resources>
-  <include location="analog_signature_analyzer.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

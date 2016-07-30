@@ -11,15 +11,21 @@ SOURCES += main.cpp\
     ToneGenerator.cpp \
     qcustomplot/qcustomplot.cpp \
     OscilloscopeView.cpp \
-    audioinputdevice.cpp
+    audioinputdevice.cpp \
+    formcalibration.cpp \
+    formraw.cpp
 
 HEADERS  += mainwindow.h \
     ToneGenerator.h \
     qcustomplot/qcustomplot.h \
     OscilloscopeView.h \
-    audioinputdevice.h
+    audioinputdevice.h \
+    formcalibration.h \
+    formraw.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    formcalibration.ui \
+    formraw.ui
 
 # DEPLOY
 #translationsSource = $$PWD/languages/lang_ru_RU.qm
