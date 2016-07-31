@@ -10,5 +10,6 @@
         <file>icons/back_slope.ico</file>
         <file>icons/capture_data.ico</file>
         <file>icons/play_tone.ico</file>
+        <file>icons/photo.ico</file>
     </qresource>
 </RCC>

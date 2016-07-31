@@ -35,18 +35,12 @@
    <property name="text">
     <string>Grab picture from camera</string>
    </property>
-  </widget>
-  <widget class="QWidget" name="widget" native="true">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>80</y>
-     <width>121</width>
-     <height>141</height>
-    </rect>
+   <property name="icon">
+    <iconset resource="analog_signature_analyzer.qrc">
+     <normaloff>:/icons/photo.ico</normaloff>:/icons/photo.ico</iconset>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="buttonOpenBoard">
    <property name="geometry">
     <rect>
      <x>320</x>
@@ -59,10 +53,10 @@
     <string>Select picture from file</string>
    </property>
   </widget>
-  <widget class="QGraphicsView" name="graphicsView">
+  <widget class="QGraphicsView" name="boardView">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>140</x>
      <y>80</y>
      <width>231</width>
      <height>151</height>
@@ -93,6 +87,8 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="analog_signature_analyzer.qrc"/>
+ </resources>
  <connections/>
 </ui>

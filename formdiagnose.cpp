@@ -12,26 +12,43 @@
 #include <QCameraImageCapture>
 #include <QImageEncoderSettings>
 #include <QFileDialog>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 
 FormDiagnose::FormDiagnose(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FormDiagnose)
 {
     ui->setupUi(this);
-    m_camera = NULL;
     m_dialogCamera = NULL;
 
-    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
-    foreach (const QCameraInfo &cameraInfo, cameras) {
+    m_camerasList = QCameraInfo::availableCameras();
+    foreach (const QCameraInfo &cameraInfo, m_camerasList) {
         qDebug() << "Found camera:" << cameraInfo.deviceName() << cameraInfo.description()
                  << cameraInfo.orientation() << cameraInfo.position();
-        ui->boxCameras->addItem(cameraInfo.description());
-//        if (cameraInfo.deviceName() == "mycamera")
-//            camera = new QCamera(cameraInfo);
+        ui->boxCameras->addItem(cameraInfo.description(), QVariant(cameraInfo.deviceName()));
     }
-
+    if (m_camerasList.count() > 0) {
+        switchCamera(0);
+        ui->buttonCamera->setEnabled(true);
+    } else {
+        ui->buttonCamera->setEnabled(false);
+    }
+    connect(ui->boxCameras, SIGNAL(currentIndexChanged(int)), this, SLOT(switchCamera(int)));
     connect(ui->buttonCamera, SIGNAL(pressed()), this, SLOT(showCamera()));
+    connect(ui->buttonOpenBoard, SIGNAL(pressed()), this, SLOT(selectBoard()));
 
+    m_scene = new QGraphicsScene;
+    m_scene->setSceneRect(-200, -200, 5000, 5000);
+
+    ui->boardView->setAlignment(Qt::AlignCenter);
+    ui->boardView->setScene(m_scene);
+    ui->boardView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->boardView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->boardView->setFrameShape(QFrame::NoFrame);
+    ui->boardView->setLineWidth(0);
+    ui->boardView->setMidLineWidth(0);
+    ui->boardView->setBackgroundBrush(QBrush(Qt::black));
 }
 
 FormDiagnose::~FormDiagnose()
@@ -39,10 +56,22 @@ FormDiagnose::~FormDiagnose()
     delete ui;
 }
 
+void FormDiagnose::switchCamera(int index)
+{
+    QVariant deviceName = ui->boxCameras->itemData(index);
+    QString cameraName = deviceName.toString();
+    qDebug() << "Select camera:" << cameraName;
+}
+
 void FormDiagnose::showCamera()
 {
     if (m_dialogCamera != NULL) {
         qCritical() << "Trying to open dialog camera twice";
+        Q_ASSERT(false);
+        return;
+    }
+    if ((m_camerasList.count() < 0) || (ui->boxCameras->currentIndex() >= m_camerasList.count())) {
+        qWarning() << "Invalid camera is selected:" << m_camerasList.count() << ui->boxCameras->currentIndex();
         Q_ASSERT(false);
         return;
     }
@@ -56,27 +85,30 @@ void FormDiagnose::showCamera()
     QPushButton *buttonTakePhoto = new QPushButton("Take a photo");
     QSpacerItem *spacer = new QSpacerItem(40, 20);
     QPushButton *buttonCancel = new QPushButton("Cancel");
-    connect(buttonCancel, SIGNAL(pressed()), this, SLOT(closeCamera()));
+    connect(buttonCancel, SIGNAL(pressed()), m_dialogCamera, SLOT(reject()));
     hboxLayout->addWidget(buttonTakePhoto);
     hboxLayout->addSpacerItem(spacer);
     hboxLayout->addWidget(buttonCancel);
     vboxLayout->addLayout(hboxLayout, 0);
-    m_dialogCamera->show();
     qDebug() << "Dialog for grab a photo is opened";
 
-    m_camera = new QCamera(m_dialogCamera);
-    m_camera->setViewfinder(cameraVideo);
+    QCameraInfo info = m_camerasList.at(ui->boxCameras->currentIndex());
+    QCamera *camera = new QCamera(info, m_dialogCamera);
+    camera->setViewfinder(cameraVideo);
 
-    QCameraImageCapture *imageCapture = new QCameraImageCapture(m_camera);
+    QCameraImageCapture *imageCapture = new QCameraImageCapture(camera);
     imageCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
     QImageEncoderSettings imageSettings;
     imageSettings.setCodec("image/jpeg");
     imageCapture->setEncodingSettings(imageSettings);
     connect(buttonTakePhoto, SIGNAL(pressed()), imageCapture, SLOT(capture()));
+    connect(m_dialogCamera, SIGNAL(rejected()), this, SLOT(closeCamera()));
     connect(imageCapture, SIGNAL(imageCaptured(int,QImage)), this, SLOT(savePhoto(int,QImage)));
 
-    m_camera->setCaptureMode(QCamera::CaptureStillImage);
-    m_camera->start();
+    camera->setCaptureMode(QCamera::CaptureStillImage);
+    camera->start();
+
+    m_dialogCamera->showMaximized();
 }
 
 void FormDiagnose::closeCamera()
@@ -86,6 +118,7 @@ void FormDiagnose::closeCamera()
         Q_ASSERT(false);
         return;
     }
+    qDebug() << "Camera dialog is closing";
     m_dialogCamera->close();
     m_dialogCamera->deleteLater();
     m_dialogCamera = NULL;
@@ -116,7 +149,36 @@ void FormDiagnose::savePhoto(int id, const QImage &preview)
     bool saved = preview.save(fileName, "JPG");
     if (saved) {
         qDebug() << "Photo" << preview.size() << "is stored to" << fileName;
+        loadBoardData(fileName);
     } else {
         qWarning() << "Photo" << preview.size() << "can't be stored to" << fileName;
     }
+}
+
+void FormDiagnose::selectBoard()
+{
+    QFileDialog dialog(this);
+    dialog.setWindowTitle(tr("Open board by photo"));
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter(tr("Images (*.jpg)"));
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+    QStringList files = dialog.selectedFiles();
+    if (files.count() != 1) {
+        qWarning() << "Incorrect selected board file:" << files;
+        Q_ASSERT(false);
+        return;
+    }
+    QString fileName = files.first();
+    loadBoardData(fileName);
+}
+
+void FormDiagnose::loadBoardData(QString boardPhotoPath)
+{
+    qDebug() << "Load board data by photo:" << boardPhotoPath;
+    m_boardPhotoPath = boardPhotoPath;
+    QPixmap pix(m_boardPhotoPath);
+    QGraphicsPixmapItem *photo = m_scene->addPixmap(pix);
+    ui->boardView->centerOn((QGraphicsItem *)photo);
 }
