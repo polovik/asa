@@ -1,4 +1,4 @@
-QT       += core gui multimedia printsupport
+QT       += core gui multimedia printsupport multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,7 +13,8 @@ SOURCES += main.cpp\
     OscilloscopeView.cpp \
     audioinputdevice.cpp \
     formcalibration.cpp \
-    formraw.cpp
+    formraw.cpp \
+    formdiagnose.cpp
 
 HEADERS  += mainwindow.h \
     ToneGenerator.h \
@@ -21,11 +22,13 @@ HEADERS  += mainwindow.h \
     OscilloscopeView.h \
     audioinputdevice.h \
     formcalibration.h \
-    formraw.h
+    formraw.h \
+    formdiagnose.h
 
 FORMS    += mainwindow.ui \
     formcalibration.ui \
-    formraw.ui
+    formraw.ui \
+    formdiagnose.ui
 
 # DEPLOY
 #translationsSource = $$PWD/languages/lang_ru_RU.qm

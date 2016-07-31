@@ -9,12 +9,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->buttonCalibration, SIGNAL(pressed()), this, SLOT(showForm()));
     connect(ui->buttonRaw, SIGNAL(pressed()), this, SLOT(showForm()));
-//    connect(ui->buttonOptions, SIGNAL(pressed()), this, SLOT(showForm()));
+    connect(ui->buttonDiagnose, SIGNAL(pressed()), this, SLOT(showForm()));
 
     m_formCalibration = new FormCalibration();
     m_formRaw = new FormRaw();
+    m_formDiagnose = new FormDiagnose();
     ui->mainArea->addWidget(m_formCalibration);
     ui->mainArea->addWidget(m_formRaw);
+    ui->mainArea->addWidget(m_formDiagnose);
 
     m_currentForm = m_formCalibration;
     ui->mainArea->setCurrentWidget(m_currentForm);
@@ -35,6 +37,9 @@ void MainWindow::showForm()
     } else if (button == ui->buttonRaw) {
         qDebug() << "Open form \"Raw\"";
         newForm = m_formRaw;
+    } else if (button == ui->buttonDiagnose) {
+        qDebug() << "Open form \"Diagnose\"";
+        newForm = m_formDiagnose;
     } else {
         qWarning() << "Unknown Form:" << button;
         Q_ASSERT(false);
