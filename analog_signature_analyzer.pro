@@ -14,7 +14,8 @@ SOURCES += main.cpp\
     audioinputdevice.cpp \
     formcalibration.cpp \
     formraw.cpp \
-    formdiagnose.cpp
+    formdiagnose.cpp \
+    boardview.cpp
 
 HEADERS  += mainwindow.h \
     ToneGenerator.h \
@@ -23,7 +24,8 @@ HEADERS  += mainwindow.h \
     audioinputdevice.h \
     formcalibration.h \
     formraw.h \
-    formdiagnose.h
+    formdiagnose.h \
+    boardview.h
 
 FORMS    += mainwindow.ui \
     formcalibration.ui \
