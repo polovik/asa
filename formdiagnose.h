@@ -8,8 +8,6 @@ namespace Ui {
 class FormDiagnose;
 }
 
-class QGraphicsScene;
-
 class FormDiagnose : public QWidget
 {
     Q_OBJECT
@@ -31,7 +29,6 @@ private:
     QList<QCameraInfo> m_camerasList;
     QDialog *m_dialogCamera;
     QString m_boardPhotoPath;
-    QGraphicsScene *m_scene;
 };
 
 #endif // FORMDIAGNOSE_H

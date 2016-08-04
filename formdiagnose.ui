@@ -93,10 +93,8 @@
    </property>
    <property name="plainText">
     <string>Features:
-0. photo fit to view on start
-1. photo zooming (View):
+1. zooming (View):
 - redraw testpoints
-2. photo dragging (View)
 3. testpoint selecting/moving
 4. context menu:
 - add testpoint

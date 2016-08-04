@@ -12,9 +12,6 @@
 #include <QCameraImageCapture>
 #include <QImageEncoderSettings>
 #include <QFileDialog>
-#include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QGraphicsPixmapItem>
 
 FormDiagnose::FormDiagnose(QWidget *parent) :
     QWidget(parent),
@@ -39,12 +36,8 @@ FormDiagnose::FormDiagnose(QWidget *parent) :
     connect(ui->buttonCamera, SIGNAL(pressed()), this, SLOT(showCamera()));
     connect(ui->buttonOpenBoard, SIGNAL(pressed()), this, SLOT(selectBoard()));
 
-    m_scene = new QGraphicsScene;
-    m_scene->setSceneRect(-200, -200, 5000, 5000);
-
     ui->boardView->setAlignment(Qt::AlignCenter);
 //    ui->boardView->setDragMode(QGraphicsView::ScrollHandDrag);
-    ui->boardView->setScene(m_scene);
     ui->boardView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->boardView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->boardView->setFrameShape(QFrame::NoFrame);
@@ -179,13 +172,7 @@ void FormDiagnose::selectBoard()
 void FormDiagnose::loadBoardData(QString boardPhotoPath)
 {
     qDebug() << "Load board data by photo:" << boardPhotoPath;
-    m_scene->clear();
     m_boardPhotoPath = boardPhotoPath;
     QPixmap pix(m_boardPhotoPath);
-    QGraphicsPixmapItem *photo = m_scene->addPixmap(pix);
-    photo->setData(33, QVariant("BOARD_PHOTO"));
-    ui->boardView->fitInView((QGraphicsItem *)photo, Qt::KeepAspectRatio);
-    ui->boardView->ensureVisible((QGraphicsItem *)photo, 0, 0);
-//    m_scene->setFocus();
-//    ui->boardView->setFocus();
+    ui->boardView->showBoard(pix);
 }
