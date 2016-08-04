@@ -93,14 +93,7 @@
    </property>
    <property name="plainText">
     <string>Features:
-1. zooming (View):
-- redraw testpoints
-3. testpoint selecting/moving
-4. context menu:
-- add testpoint
-- remove testpoint
-- view entire photo
-</string>
+3. testpoint selecting/moving</string>
    </property>
   </widget>
  </widget>

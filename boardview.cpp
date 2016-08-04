@@ -11,8 +11,12 @@
 BoardView::BoardView(QWidget* parent = 0) :
     QGraphicsView(parent)
 {
+    m_entireViewIsDragging = false;
+    m_testpointDragging = false;
     m_lastMousePos = QPoint (0, 0);
     m_boardPhoto = NULL;
+    m_currentTestpoint = NULL;
+
     setTransformationAnchor(QGraphicsView::NoAnchor);
     setResizeAnchor(QGraphicsView::NoAnchor);
     setInteractive (false);	//disable propagation events to scene and items
@@ -42,21 +46,42 @@ void BoardView::showBoard(QPixmap pixmap)
 void BoardView::mousePressEvent(QMouseEvent* event)
 {
     qDebug() << "press" << event->button() << "at" << event->pos();
-    if(event->button() == Qt::LeftButton) {
+    if (event->button() == Qt::LeftButton) {
         m_lastMousePos = event->pos();
         QList<QGraphicsItem *> listItems = items(event->pos());
         bool dragEntireView = true;
+        QGraphicsEllipseItem *testpoint = NULL;
+        if (listItems.isEmpty()) {
+            dragEntireView = false;
+        }
         foreach (QGraphicsItem *item, listItems) {
-            if (!item->data(33).toString().isEmpty()) {
+            if (item != m_boardPhoto) {
+                dragEntireView = false;
+            } else {
                 qDebug() << "There is the board photo:" << item->data(33).toString();
+            }
+            QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
+            if (pin != NULL) {
+                testpoint = pin;
                 continue;
             }
         }
         if (dragEntireView) {
             qDebug() << "Start view dragging";
             m_entireViewIsDragging = true;
-        } else {
-            qDebug() << "Clicked at items";
+        }
+        if (testpoint != NULL) {
+            bool ok = false;
+            int id = testpoint->data(DATA_TESTPOINT_ID).toInt(&ok);
+            qDebug() << "Testpoint is" << id << "selected";
+            if (ok) {
+                m_currentTestpoint = testpoint;
+                m_testpointDragging = true;
+                emit testpointSelected(id);
+            } else {
+                qCritical() << "Testpoint have invalid ID:" << testpoint->data(DATA_TESTPOINT_ID);
+                Q_ASSERT(false);
+            }
         }
     }
     else
@@ -68,23 +93,21 @@ void BoardView::mouseMoveEvent(QMouseEvent* event)
 {
     QPoint curPos = event->pos();
     qDebug() << "move" << event->buttons() << "at" << m_lastMousePos;
-//    if (mMovePan)
-//    {
-//        if(event->buttons() & Qt::LeftButton)
-//        {
-//            centerOn (mapToScene (curPos));
-//            viewport()->setCursor(Qt::ClosedHandCursor);
-//        }
-//    }
-    if (m_entireViewIsDragging)
-    {
-        if(event->buttons() & Qt::LeftButton)
-        {
+    if (m_entireViewIsDragging) {
+        if(event->buttons() & Qt::LeftButton) {
             viewport()->setCursor(Qt::ClosedHandCursor);
-            qDebug() << "move from" << m_lastMousePos << "to" << curPos;
+            qDebug() << "move board photo from" << m_lastMousePos << "to" << curPos;
             QPointF oldScenePos = mapToScene(m_lastMousePos);
             QPointF newScenePos = mapToScene(curPos);
             translate(newScenePos.x() - oldScenePos.x(), newScenePos.y() - oldScenePos.y());
+        }
+    }
+    if (m_testpointDragging) {
+        if (event->buttons() & Qt::LeftButton) {
+            viewport()->setCursor(Qt::ClosedHandCursor);
+            qDebug() << "move testpoint from" << m_lastMousePos << "to" << curPos;
+            QPointF newScenePos = mapToScene(curPos);
+            m_currentTestpoint->setPos(newScenePos);
         }
     }
     m_lastMousePos = curPos;
@@ -95,6 +118,7 @@ void BoardView::mouseReleaseEvent(QMouseEvent* event)
 {
 //    qDebug() << "release" << "at" << event->pos();
     m_entireViewIsDragging = false;
+    m_testpointDragging = false;
     viewport()->setCursor(Qt::ArrowCursor);
 //	QGraphicsView::mouseReleaseEvent(event);
     event->accept();
@@ -184,14 +208,54 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
             updateTestpointView(pin);
         }
     } else if (action == &actionAddTestpoint) {
-        qDebug() << "add testpoint at" << event->pos();
+        QList<int> ids;
+        ids.append(-1);
+        foreach (QGraphicsItem *item, scene()->items()) {
+            QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
+            if (pin == NULL) {
+                continue;
+            }
+            bool ok = false;
+            int id = pin->data(DATA_TESTPOINT_ID).toInt(&ok);
+            if (!ok) {
+                qCritical() << "Testpoint have invalid ID:" << pin->data(DATA_TESTPOINT_ID);
+                Q_ASSERT(false);
+            }
+            ids.append(id);
+        }
+        qSort(ids);
+        int testpointId = 0;
+        for (int i = 0; i < ids.size(); i++) {
+            if (i == ids.size() - 1) {
+                testpointId = ids[i] + 1;
+                break;
+            }
+            if ((ids[i + 1] - ids[i]) > 1) {
+                testpointId = ids[i] + 1;
+                break;
+            }
+        }
+        qDebug() << "add testpoint" << testpointId << "at" << event->pos();
         QGraphicsEllipseItem *item = new QGraphicsEllipseItem();
+        item->setData(DATA_TESTPOINT_ID, QVariant(testpointId));
         updateTestpointView(item);
         scene()->addItem(item);
         item->setPos(mapToScene(event->pos()));
+        emit testpointAdded(testpointId);
     } else if (action == &actionRemoveTestpoint) {
-        qDebug() << "remove testpoint at" << event->pos();
         scene()->removeItem(testpoint);
+        bool ok = false;
+        int id = testpoint->data(DATA_TESTPOINT_ID).toInt(&ok);
+        qDebug() << "remove testpoint" << id << "at" << event->pos();
+        if (ok) {
+            if (m_currentTestpoint == testpoint) {
+                m_currentTestpoint = NULL;
+            }
+            emit testpointRemoved(id);
+        } else {
+            qCritical() << "Testpoint have invalid ID:" << testpoint->data(DATA_TESTPOINT_ID);
+            Q_ASSERT(false);
+        }
     }
     event->accept();
 }
