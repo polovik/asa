@@ -92,8 +92,7 @@
     </rect>
    </property>
    <property name="plainText">
-    <string>Features:
-3. testpoint selecting/moving</string>
+    <string/>
    </property>
   </widget>
  </widget>

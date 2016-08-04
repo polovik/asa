@@ -6,6 +6,8 @@
 #include <QAction>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
+#include <QTimer>
+#include <QFontMetrics>
 #include "boardview.h"
 
 BoardView::BoardView(QWidget* parent = 0) :
@@ -24,6 +26,11 @@ BoardView::BoardView(QWidget* parent = 0) :
     QGraphicsScene *scene = new QGraphicsScene;
     scene->setSceneRect(-200, -200, 5000, 5000);
     setScene(scene);
+
+    m_animationTimer = new QTimer(this);
+    m_animationTimer->setInterval(500);
+    m_animationTimer->setTimerType(Qt::CoarseTimer);
+    connect(m_animationTimer, SIGNAL(timeout()), this, SLOT(timeslotAnimate()));
 }
 
 BoardView::~BoardView()
@@ -45,7 +52,7 @@ void BoardView::showBoard(QPixmap pixmap)
 
 void BoardView::mousePressEvent(QMouseEvent* event)
 {
-    qDebug() << "press" << event->button() << "at" << event->pos();
+//    qDebug() << "press" << event->button() << "at" << event->pos();
     if (event->button() == Qt::LeftButton) {
         m_lastMousePos = event->pos();
         QList<QGraphicsItem *> listItems = items(event->pos());
@@ -58,7 +65,7 @@ void BoardView::mousePressEvent(QMouseEvent* event)
             if (item != m_boardPhoto) {
                 dragEntireView = false;
             } else {
-                qDebug() << "There is the board photo:" << item->data(33).toString();
+//                qDebug() << "There is the board photo:" << item->data(33).toString();
             }
             QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
             if (pin != NULL) {
@@ -67,7 +74,7 @@ void BoardView::mousePressEvent(QMouseEvent* event)
             }
         }
         if (dragEntireView) {
-            qDebug() << "Start view dragging";
+//            qDebug() << "Start view dragging";
             m_entireViewIsDragging = true;
         }
         if (testpoint != NULL) {
@@ -75,8 +82,10 @@ void BoardView::mousePressEvent(QMouseEvent* event)
             int id = testpoint->data(DATA_TESTPOINT_ID).toInt(&ok);
             qDebug() << "Testpoint is" << id << "selected";
             if (ok) {
+                stopAnimation();
                 m_currentTestpoint = testpoint;
                 m_testpointDragging = true;
+                startAnimation();
                 emit testpointSelected(id);
             } else {
                 qCritical() << "Testpoint have invalid ID:" << testpoint->data(DATA_TESTPOINT_ID);
@@ -92,11 +101,11 @@ void BoardView::mousePressEvent(QMouseEvent* event)
 void BoardView::mouseMoveEvent(QMouseEvent* event)
 {
     QPoint curPos = event->pos();
-    qDebug() << "move" << event->buttons() << "at" << m_lastMousePos;
+//    qDebug() << "move" << event->buttons() << "at" << m_lastMousePos;
     if (m_entireViewIsDragging) {
         if(event->buttons() & Qt::LeftButton) {
             viewport()->setCursor(Qt::ClosedHandCursor);
-            qDebug() << "move board photo from" << m_lastMousePos << "to" << curPos;
+//            qDebug() << "move board photo from" << m_lastMousePos << "to" << curPos;
             QPointF oldScenePos = mapToScene(m_lastMousePos);
             QPointF newScenePos = mapToScene(curPos);
             translate(newScenePos.x() - oldScenePos.x(), newScenePos.y() - oldScenePos.y());
@@ -105,7 +114,7 @@ void BoardView::mouseMoveEvent(QMouseEvent* event)
     if (m_testpointDragging) {
         if (event->buttons() & Qt::LeftButton) {
             viewport()->setCursor(Qt::ClosedHandCursor);
-            qDebug() << "move testpoint from" << m_lastMousePos << "to" << curPos;
+//            qDebug() << "move testpoint from" << m_lastMousePos << "to" << curPos;
             QPointF newScenePos = mapToScene(curPos);
             m_currentTestpoint->setPos(newScenePos);
         }
@@ -158,7 +167,7 @@ void BoardView::wheelEvent(QWheelEvent* event)
 
 void BoardView::contextMenuEvent(QContextMenuEvent *event)
 {
-    qDebug() << "show context menu";
+//    qDebug() << "show context menu";
     QMenu menu(this);
     QAction actionAddTestpoint(tr("Add testpoint"), &menu);
     QAction actionRemoveTestpoint(tr("Remove testpoint"), &menu);
@@ -197,7 +206,7 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
     }
     QAction *action = menu.exec(mapToGlobal(event->pos()));
     if (action == &actionFitBoardToView) {
-        qDebug() << "fit to view";
+//        qDebug() << "fit to view";
         fitInView((QGraphicsItem *)m_boardPhoto, Qt::KeepAspectRatio);
         ensureVisible((QGraphicsItem *)m_boardPhoto, 0, 0);
         foreach (QGraphicsItem *item, scene()->items()) {
@@ -238,19 +247,25 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
         qDebug() << "add testpoint" << testpointId << "at" << event->pos();
         QGraphicsEllipseItem *item = new QGraphicsEllipseItem();
         item->setData(DATA_TESTPOINT_ID, QVariant(testpointId));
+        QGraphicsTextItem *itemId = new QGraphicsTextItem(item);
+        itemId->setDefaultTextColor(Qt::green);
+        QString label = QString::number(testpointId);
+        itemId->setPlainText(label);
         updateTestpointView(item);
         scene()->addItem(item);
         item->setPos(mapToScene(event->pos()));
         emit testpointAdded(testpointId);
     } else if (action == &actionRemoveTestpoint) {
-        scene()->removeItem(testpoint);
         bool ok = false;
         int id = testpoint->data(DATA_TESTPOINT_ID).toInt(&ok);
         qDebug() << "remove testpoint" << id << "at" << event->pos();
+        if (m_currentTestpoint == testpoint) {
+            stopAnimation();
+            m_currentTestpoint = NULL;
+        }
+        scene()->removeItem(testpoint);
+        delete testpoint;
         if (ok) {
-            if (m_currentTestpoint == testpoint) {
-                m_currentTestpoint = NULL;
-            }
             emit testpointRemoved(id);
         } else {
             qCritical() << "Testpoint have invalid ID:" << testpoint->data(DATA_TESTPOINT_ID);
@@ -260,9 +275,32 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
     event->accept();
 }
 
+int BoardView::fitLabelFontSize(QFont& currentFont, const QRect &rectToBeFit,
+                                const QString& text, int startFromSize)
+{
+    int currentFontHeight = startFromSize == 0 ? currentFont.pointSize() : startFromSize;
+    QRect currentBoundingRect;
+
+    for (; currentFontHeight > 0; ) {
+        currentFont.setPointSize(currentFontHeight);
+        QFontMetrics metrics(currentFont);
+        currentBoundingRect = metrics.boundingRect(rectToBeFit, Qt::TextWordWrap | Qt::AlignVCenter| Qt::AlignHCenter, text);
+        if ((currentBoundingRect.width() <= rectToBeFit.width())
+            && (currentBoundingRect.height() <= rectToBeFit.height())) {
+            break;
+        }
+        if (currentFontHeight == 1) {
+            break;
+        }
+        currentFontHeight--;
+    }
+
+    return currentFontHeight;
+}
+
 void BoardView::updateTestpointView(QGraphicsEllipseItem *pin)
 {
-    int radius = height() * 0.1;
+    int radius = 15;
     QPointF pt1 = mapToScene(0, 0);
     QPointF pt2 = mapToScene(radius, radius);
     int r = pt2.x() - pt1.x();
@@ -270,4 +308,66 @@ void BoardView::updateTestpointView(QGraphicsEllipseItem *pin)
     QPen pen(QBrush(Qt::red), r * 0.3);
     pin->setPen(pen);
     pin->setRect(circleRect);
+
+    QGraphicsTextItem *itemId = NULL;
+    foreach (QGraphicsItem *item, pin->childItems()) {
+        itemId = qgraphicsitem_cast<QGraphicsTextItem *>(item);
+        if (itemId != NULL) {
+            break;
+        }
+    }
+    if (itemId == NULL) {
+        qWarning() << "Testpoint view doesn't contain the ID item";
+        return;
+    }
+    QFont idFont("Arial");
+    int fontSize = fitLabelFontSize(idFont, circleRect.toRect(), itemId->toPlainText(), 200);
+    idFont.setPixelSize(fontSize);
+    itemId->setFont(idFont);
+    QRectF boundRect = itemId->boundingRect();
+    itemId->setPos(-boundRect.width() / 2., -boundRect.height() / 2.);
 }
+
+void BoardView::startAnimation()
+{
+    if (m_currentTestpoint == NULL) {
+        qWarning() << "Try to start animation for missed testpoint";
+        Q_ASSERT(false);
+        return;
+    }
+    QPen pen = m_currentTestpoint->pen();
+    pen.setColor(Qt::darkGray);
+    m_currentTestpoint->setPen(pen);
+    m_animationTimer->start();
+}
+
+void BoardView::stopAnimation()
+{
+    m_animationTimer->stop();
+    if (m_currentTestpoint == NULL) {
+        qWarning() << "Try to stop animation for missed testpoint";
+//        Q_ASSERT(false);
+        return;
+    }
+    QPen pen = m_currentTestpoint->pen();
+    pen.setColor(Qt::red);
+    m_currentTestpoint->setPen(pen);
+}
+
+void BoardView::timeslotAnimate()
+{
+    if (m_currentTestpoint == NULL) {
+        qWarning() << "Current testpoint is missed. Therefore stop animation";
+        stopAnimation();
+        Q_ASSERT(false);
+        return;
+    }
+    QPen pen = m_currentTestpoint->pen();
+    if (pen.color() == Qt::red) {
+        pen.setColor(Qt::darkGray);
+    } else {
+        pen.setColor(Qt::red);
+    }
+    m_currentTestpoint->setPen(pen);
+}
+
