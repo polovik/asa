@@ -32,6 +32,15 @@ FORMS    += mainwindow.ui \
     formraw.ui \
     formdiagnose.ui
 
+RESOURCES += \
+    analog_signature_analyzer.qrc
+
+DISTFILES += \
+    run_debug_version.bat \
+    icons/license.txt
+
+include($$PWD/tiff/libtiff.pri)
+
 # DEPLOY
 #translationsSource = $$PWD/languages/lang_ru_RU.qm
 #database = $$PWD/asa.accdb
@@ -70,10 +79,3 @@ win32 {
     system(xcopy /V /R /Y "%QTDIR%\plugins\imageformats\qico.dll" $$resourcesTarget\imageformats\\)
     system(xcopy /V /R /Y "%QTDIR%\plugins\printsupport\windowsprintersupport.dll" $$resourcesTarget\printsupport\\)
 }
-
-RESOURCES += \
-    analog_signature_analyzer.qrc
-
-DISTFILES += \
-    run_debug_version.bat \
-    icons/license.txt

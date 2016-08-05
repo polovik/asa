@@ -12,6 +12,7 @@
 #include <QCameraImageCapture>
 #include <QImageEncoderSettings>
 #include <QFileDialog>
+#include "tiff/imagetiff.h"
 
 FormDiagnose::FormDiagnose(QWidget *parent) :
     QWidget(parent),
@@ -173,8 +174,11 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
 {
     qDebug() << "Load board data by photo:" << boardPhotoPath;
     m_boardPhotoPath = boardPhotoPath;
-    QPixmap pix(m_boardPhotoPath);
-    TestpointsList testpoints;
+    QImage img(m_boardPhotoPath);
+    ImageTiff tiff;
+    tiff.write(m_boardPhotoPath + ".tiff", img);
+//    QPixmap pix(m_boardPhotoPath);
+//    TestpointsList testpoints;
 //    testpoints[0] = QPoint(100, 100);
-    ui->boardView->showBoard(pix, testpoints);
+//    ui->boardView->showBoard(pix, testpoints);
 }

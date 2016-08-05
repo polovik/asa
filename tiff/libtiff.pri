@@ -33,11 +33,16 @@ SOURCES += \
     $$PWD/libtiff/libtiff/tif_warning.c \
     $$PWD/libtiff/libtiff/tif_write.c \
     $$PWD/libtiff/libtiff/tif_zip.c \
-    $$PWD/libtiff/port/snprintf.c
+    $$PWD/libtiff/port/snprintf.c \
+    $$PWD/imagetiff.cpp
 
 wince*:       SOURCES += $$PWD/libtiff/libtiff/tif_win32.c
 win32:        SOURCES += $$PWD/libtiff/libtiff/tif_win32.c
 else:         SOURCES += $$PWD/libtiff/libtiff/tif_unix.c
 android:      SOURCES += $$PWD/libtiff/port/lfind.c
 
-include($$PWD/zlib_dependency.pri)
+INCLUDEPATH += $$PWD/../zlib
+include($$PWD/../zlib/zlib.pri)
+
+HEADERS += \
+    $$PWD/imagetiff.h
