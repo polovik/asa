@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_currentForm = m_formCalibration;
     ui->mainArea->setCurrentWidget(m_currentForm);
+    ui->buttonCalibration->setChecked(true);
 }
 
 MainWindow::~MainWindow()

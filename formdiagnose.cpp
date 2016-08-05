@@ -174,5 +174,7 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
     qDebug() << "Load board data by photo:" << boardPhotoPath;
     m_boardPhotoPath = boardPhotoPath;
     QPixmap pix(m_boardPhotoPath);
-    ui->boardView->showBoard(pix);
+    TestpointsList testpoints;
+//    testpoints[0] = QPoint(100, 100);
+    ui->boardView->showBoard(pix, testpoints);
 }

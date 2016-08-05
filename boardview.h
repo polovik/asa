@@ -8,17 +8,20 @@ typedef enum {
     DATA_TESTPOINT_ID = 133
 } ItemDataType;
 
+typedef QMap<int, QPoint> TestpointsList;
+
 class BoardView : public QGraphicsView
 {
     Q_OBJECT
 public:
     BoardView(QWidget* parent);
     ~BoardView();
-    void showBoard(QPixmap pixmap);
+    void showBoard(QPixmap pixmap, TestpointsList testpoints);
 
 signals:
     void testpointAdded(int id);
     void testpointSelected(int id);
+    void testpointMoved(int id, QPoint pos);
     void testpointRemoved(int id);
 
 protected:
@@ -27,6 +30,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent* event);
     void wheelEvent (QWheelEvent* event);
     void contextMenuEvent(QContextMenuEvent* event);
+    void insertTestpoint(int id, QPointF posOnScene);
 
 private slots:
     void timeslotAnimate();

@@ -38,9 +38,11 @@ BoardView::~BoardView()
 
 }
 
-void BoardView::showBoard(QPixmap pixmap)
+void BoardView::showBoard(QPixmap pixmap, TestpointsList testpoints)
 {
     m_boardPhoto = NULL;
+    stopAnimation();
+    m_currentTestpoint = NULL;
     scene()->clear();
     m_boardPhoto = scene()->addPixmap(pixmap);
     m_boardPhoto->setData(33, QVariant("BOARD_PHOTO"));
@@ -48,6 +50,10 @@ void BoardView::showBoard(QPixmap pixmap)
     ensureVisible((QGraphicsItem *)m_boardPhoto, 0, 0);
 //    m_scene->setFocus();
 //    ui->boardView->setFocus();
+    foreach (int id, testpoints.keys()) {
+        QPoint pos = testpoints.value(id);
+        insertTestpoint(id, pos);
+    }
 }
 
 void BoardView::mousePressEvent(QMouseEvent* event)
@@ -100,26 +106,23 @@ void BoardView::mousePressEvent(QMouseEvent* event)
 
 void BoardView::mouseMoveEvent(QMouseEvent* event)
 {
-    QPoint curPos = event->pos();
-//    qDebug() << "move" << event->buttons() << "at" << m_lastMousePos;
-    if (m_entireViewIsDragging) {
-        if(event->buttons() & Qt::LeftButton) {
+    if (event->buttons() & Qt::LeftButton) {
+        QPoint curPos = event->pos();
+        QPointF oldScenePos = mapToScene(m_lastMousePos);
+        QPointF newScenePos = mapToScene(curPos);
+        if (m_entireViewIsDragging) {
             viewport()->setCursor(Qt::ClosedHandCursor);
-//            qDebug() << "move board photo from" << m_lastMousePos << "to" << curPos;
-            QPointF oldScenePos = mapToScene(m_lastMousePos);
-            QPointF newScenePos = mapToScene(curPos);
             translate(newScenePos.x() - oldScenePos.x(), newScenePos.y() - oldScenePos.y());
+            m_lastMousePos = curPos;
         }
-    }
-    if (m_testpointDragging) {
-        if (event->buttons() & Qt::LeftButton) {
+        if (m_testpointDragging) {
             viewport()->setCursor(Qt::ClosedHandCursor);
-//            qDebug() << "move testpoint from" << m_lastMousePos << "to" << curPos;
-            QPointF newScenePos = mapToScene(curPos);
-            m_currentTestpoint->setPos(newScenePos);
+            if (m_boardPhoto->contains(newScenePos)) {
+                m_currentTestpoint->setPos(newScenePos);
+                m_lastMousePos = curPos;
+            }
         }
     }
-    m_lastMousePos = curPos;
     event->accept();
 }
 
@@ -127,7 +130,17 @@ void BoardView::mouseReleaseEvent(QMouseEvent* event)
 {
 //    qDebug() << "release" << "at" << event->pos();
     m_entireViewIsDragging = false;
-    m_testpointDragging = false;
+    if (m_testpointDragging) {
+        bool ok = false;
+        int id = m_currentTestpoint->data(DATA_TESTPOINT_ID).toInt(&ok);
+        if (!ok) {
+            qCritical() << "Testpoint have invalid ID:" << m_currentTestpoint->data(DATA_TESTPOINT_ID);
+            Q_ASSERT(false);
+        }
+        QPointF scenePos = mapToScene(m_lastMousePos);
+        emit testpointMoved(id, scenePos.toPoint());
+        m_testpointDragging = false;
+    }
     viewport()->setCursor(Qt::ArrowCursor);
 //	QGraphicsView::mouseReleaseEvent(event);
     event->accept();
@@ -163,6 +176,20 @@ void BoardView::wheelEvent(QWheelEvent* event)
         updateTestpointView(pin);
     }
     event->accept();
+}
+
+void BoardView::insertTestpoint(int id, QPointF posOnScene)
+{
+    qDebug() << "add testpoint" << id << "at" << posOnScene;
+    QGraphicsEllipseItem *item = new QGraphicsEllipseItem();
+    item->setData(DATA_TESTPOINT_ID, QVariant(id));
+    QGraphicsTextItem *itemId = new QGraphicsTextItem(item);
+    itemId->setDefaultTextColor(Qt::green);
+    QString label = QString::number(id);
+    itemId->setPlainText(label);
+    updateTestpointView(item);
+    scene()->addItem(item);
+    item->setPos(posOnScene);
 }
 
 void BoardView::contextMenuEvent(QContextMenuEvent *event)
@@ -244,16 +271,7 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
                 break;
             }
         }
-        qDebug() << "add testpoint" << testpointId << "at" << event->pos();
-        QGraphicsEllipseItem *item = new QGraphicsEllipseItem();
-        item->setData(DATA_TESTPOINT_ID, QVariant(testpointId));
-        QGraphicsTextItem *itemId = new QGraphicsTextItem(item);
-        itemId->setDefaultTextColor(Qt::green);
-        QString label = QString::number(testpointId);
-        itemId->setPlainText(label);
-        updateTestpointView(item);
-        scene()->addItem(item);
-        item->setPos(mapToScene(event->pos()));
+        insertTestpoint(testpointId, mapToScene(event->pos()));
         emit testpointAdded(testpointId);
     } else if (action == &actionRemoveTestpoint) {
         bool ok = false;
