@@ -7,6 +7,59 @@ extern "C" {
 #include "tiffio.h"
 }
 
+#define TIFFTAG_FILEFORMAT        59998
+#define TIFFTAG_TESTPOINTS_COUNT  59999
+#define TIFFTAG_TESTPOINTS        60000
+
+#define MAX_TESTPOINTS  1000
+
+static char DEFAULT_TAG_NAME[] = "custom_tag";
+
+static TIFFExtendProc parent_extender = NULL;  // In case we want a chain of extensions
+
+static void registerCustomTIFFTags(TIFF *tif)
+{
+    /* Install the extended Tag field info */
+    TIFFFieldInfo *tiffFieldInfos = (TIFFFieldInfo *)calloc(2 + MAX_TESTPOINTS, sizeof(TIFFFieldInfo));
+    tiffFieldInfos[0].field_tag = TIFFTAG_FILEFORMAT;
+    tiffFieldInfos[0].field_readcount = TIFF_VARIABLE;
+    tiffFieldInfos[0].field_writecount = TIFF_VARIABLE;
+    tiffFieldInfos[0].field_type = TIFF_ASCII;
+    tiffFieldInfos[0].field_bit = FIELD_CUSTOM;
+    tiffFieldInfos[0].field_oktochange = 1;
+    tiffFieldInfos[0].field_passcount = 0;
+    tiffFieldInfos[0].field_name = DEFAULT_TAG_NAME;
+    tiffFieldInfos[1].field_tag = TIFFTAG_TESTPOINTS_COUNT;
+    tiffFieldInfos[1].field_readcount = 1;
+    tiffFieldInfos[1].field_writecount = 1;
+    tiffFieldInfos[1].field_type = TIFF_SHORT;
+    tiffFieldInfos[1].field_bit = FIELD_CUSTOM;
+    tiffFieldInfos[1].field_oktochange = 1;
+    tiffFieldInfos[1].field_passcount = 0;
+    tiffFieldInfos[1].field_name = DEFAULT_TAG_NAME;
+    for (int i = 0; i < MAX_TESTPOINTS; i++) {
+        tiffFieldInfos[2 + i].field_tag = TIFFTAG_FILEFORMAT + i;
+        tiffFieldInfos[2 + i].field_readcount = TIFF_VARIABLE;
+        tiffFieldInfos[2 + i].field_writecount = TIFF_VARIABLE;
+        tiffFieldInfos[2 + i].field_type = TIFF_ASCII;
+        tiffFieldInfos[2 + i].field_bit = FIELD_CUSTOM;
+        tiffFieldInfos[2 + i].field_oktochange = 1;
+        tiffFieldInfos[2 + i].field_passcount = 0;
+        tiffFieldInfos[2 + i].field_name = DEFAULT_TAG_NAME;
+    }
+    int error = TIFFMergeFieldInfo(tif, tiffFieldInfos, 2 + MAX_TESTPOINTS);
+
+    if (parent_extender)
+        (*parent_extender)(tif);
+}
+
+static void augment_libtiff_with_custom_tags() {
+    static bool first_time = true;
+    if (!first_time) return;
+    first_time = false;
+    parent_extender = TIFFSetTagExtender(registerCustomTIFFTags);
+}
+
 tsize_t qtiffReadProc(thandle_t fd, tdata_t buf, tsize_t size)
 {
     QIODevice *device = static_cast<QIODevice *>(fd);
@@ -110,6 +163,9 @@ bool ImageTiff::write(QString filePath, const QImage &image)
         return false;
     }
 
+    // Create the TIFF directory object:
+    augment_libtiff_with_custom_tags();
+
     TIFF *const tiff = TIFFClientOpen("foo",
                                       "wB",
                                       &file,
@@ -160,6 +216,11 @@ bool ImageTiff::write(QString filePath, const QImage &image)
         TIFFClose(tiff);
         return false;
     }
+
+    // ... and now our own custom ones:
+    TIFFSetField(tiff, TIFFTAG_FILEFORMAT, "V1.0");
+    TIFFSetField(tiff, TIFFTAG_TESTPOINTS_COUNT, 1);
+    TIFFSetField(tiff, TIFFTAG_TESTPOINTS+10, "POINT:10, X:232, Y:6522, SIG:sin, FREQ:1000, VOLT:2.6");
 
     // configure image depth
     const QImage::Format format = image.format();
