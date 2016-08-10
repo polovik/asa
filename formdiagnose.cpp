@@ -36,6 +36,8 @@ FormDiagnose::FormDiagnose(QWidget *parent) :
     connect(ui->boxCameras, SIGNAL(currentIndexChanged(int)), this, SLOT(switchCamera(int)));
     connect(ui->buttonCamera, SIGNAL(pressed()), this, SLOT(showCamera()));
     connect(ui->buttonOpenBoard, SIGNAL(pressed()), this, SLOT(selectBoard()));
+    connect(ui->buttonSave, SIGNAL(pressed()), this, SLOT(saveMeasures()));
+    freezeForm(false);
 
     ui->boardView->setAlignment(Qt::AlignCenter);
 //    ui->boardView->setDragMode(QGraphicsView::ScrollHandDrag);
@@ -126,7 +128,7 @@ void FormDiagnose::savePhoto(int id, const QImage &preview)
     QFileDialog dialog(m_dialogCamera);
     dialog.setWindowTitle(tr("Save Photo"));
     dialog.setFileMode(QFileDialog::AnyFile);
-    dialog.setNameFilter(tr("Images (*.jpg)"));
+    dialog.setNameFilter(tr("Images (*.tif *.tiff)"));
 
     if (dialog.exec() != QDialog::Accepted) {
         qDebug() << "Photo" << preview.size() << "is discarded";
@@ -139,10 +141,11 @@ void FormDiagnose::savePhoto(int id, const QImage &preview)
         return;
     }
     QString fileName = files.first();
-    if (!fileName.endsWith(".jpg", Qt::CaseInsensitive)) {
-        fileName.append(".jpg");
+    if (!fileName.endsWith(".tif", Qt::CaseInsensitive)
+        || !fileName.endsWith(".tiff", Qt::CaseInsensitive)) {
+        fileName.append(".tiff");
     }
-    bool saved = preview.save(fileName, "JPG");
+    bool saved = preview.save(fileName, "TIFF");
     if (saved) {
         qDebug() << "Photo" << preview.size() << "is stored to" << fileName;
         loadBoardData(fileName);
@@ -156,7 +159,7 @@ void FormDiagnose::selectBoard()
     QFileDialog dialog(this);
     dialog.setWindowTitle(tr("Open board by photo"));
     dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setNameFilter(tr("Images (*.jpg)"));
+    dialog.setNameFilter(tr("Images (*.tif *.tiff)"));
     if (dialog.exec() != QDialog::Accepted) {
         return;
     }
@@ -182,8 +185,33 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
     images.append(img);
     images.append(img2);
     tiff.writeImageSeries(m_boardPhotoPath + ".tiff", images);
-//    QPixmap pix(m_boardPhotoPath);
-//    TestpointsList testpoints;
-//    testpoints[0] = QPoint(100, 100);
-//    ui->boardView->showBoard(pix, testpoints);
+
+    QPixmap pix(m_boardPhotoPath);
+    TestpointsList testpoints;
+    testpoints[0] = QPoint(100, 100);
+    ui->boardView->showBoard(pix, testpoints);
+}
+
+void FormDiagnose::saveMeasures()
+{
+    if (!m_needSave) {
+        qDebug() << "There are no changes. Do not store diagnostic data";
+        return;
+    }
+}
+
+void FormDiagnose::freezeForm(bool changesNotStored)
+{
+    if (changesNotStored) {
+        ui->buttonCamera->setEnabled(false);
+        ui->buttonOpenBoard->setEnabled(false);
+        ui->buttonSave->setEnabled(true);
+        ui->buttonDiscard->setEnabled(true);
+    } else {
+        ui->buttonCamera->setEnabled(true);
+        ui->buttonOpenBoard->setEnabled(true);
+        ui->buttonSave->setEnabled(false);
+        ui->buttonDiscard->setEnabled(false);
+    }
+    m_needSave = changesNotStored;
 }

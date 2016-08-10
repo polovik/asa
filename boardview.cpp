@@ -195,6 +195,7 @@ void BoardView::insertTestpoint(int id, QPointF posOnScene)
 void BoardView::contextMenuEvent(QContextMenuEvent *event)
 {
 //    qDebug() << "show context menu";
+    event->accept();
     QMenu menu(this);
     QAction actionAddTestpoint(tr("Add testpoint"), &menu);
     QAction actionRemoveTestpoint(tr("Remove testpoint"), &menu);
@@ -260,17 +261,7 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
             ids.append(id);
         }
         qSort(ids);
-        int testpointId = 0;
-        for (int i = 0; i < ids.size(); i++) {
-            if (i == ids.size() - 1) {
-                testpointId = ids[i] + 1;
-                break;
-            }
-            if ((ids[i + 1] - ids[i]) > 1) {
-                testpointId = ids[i] + 1;
-                break;
-            }
-        }
+        int testpointId = ids.last() + 1;
         insertTestpoint(testpointId, mapToScene(event->pos()));
         emit testpointAdded(testpointId);
     } else if (action == &actionRemoveTestpoint) {
@@ -288,9 +279,47 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
         } else {
             qCritical() << "Testpoint have invalid ID:" << testpoint->data(DATA_TESTPOINT_ID);
             Q_ASSERT(false);
+            return;
+        }
+        // Reenumerate rest of testpoints - they have to had sequential number (for simplify TIFF store procedure)
+        foreach (QGraphicsItem *item, scene()->items()) {
+            QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
+            if (pin == NULL) {
+                continue;
+            }
+            bool ok = false;
+            int curId = pin->data(DATA_TESTPOINT_ID).toInt(&ok);
+            if (!ok) {
+                qCritical() << "Testpoint have invalid ID:" << pin->data(DATA_TESTPOINT_ID);
+                Q_ASSERT(false);
+                return;
+            }
+            if (curId < id) {
+                continue;
+            }
+            if (curId == id) {
+                qCritical() << "Testpoint" << curId << "have the same ID as removed testpoint";
+                Q_ASSERT(false);
+                return;
+            }
+            QGraphicsTextItem *itemId = NULL;
+            foreach (QGraphicsItem *child, item->childItems()) {
+                itemId = qgraphicsitem_cast<QGraphicsTextItem *>(child);
+                if (itemId != NULL) {
+                    break;
+                }
+            }
+            if (itemId == NULL) {
+                qCritical() << "Testpoint" << curId << "doesn't contain the ID item";
+                Q_ASSERT(false);
+                return;
+            }
+            curId = curId - 1;
+            QString label = QString::number(curId);
+            itemId->setPlainText(label);
+            pin->setData(DATA_TESTPOINT_ID, QVariant(curId));
         }
     }
-    event->accept();
 }
 
 int BoardView::fitLabelFontSize(QFont& currentFont, const QRect &rectToBeFit,

@@ -8,6 +8,15 @@ namespace Ui {
 class FormDiagnose;
 }
 
+typedef struct {
+    int id;
+    QPoint pos;
+    int signalType;
+    int signalFrequency;
+    int signalVoltage;
+    QImage signature;
+} Tespoint;
+
 class FormDiagnose : public QWidget
 {
     Q_OBJECT
@@ -15,6 +24,10 @@ class FormDiagnose : public QWidget
 public:
     explicit FormDiagnose(QWidget *parent = 0);
     ~FormDiagnose();
+    void saveMeasures();
+
+signals:
+//    void preventClosing(bool changesNotStored);
 
 private slots:
     void switchCamera(int index);
@@ -25,10 +38,13 @@ private slots:
     void loadBoardData(QString boardPhotoPath);
 
 private:
+    void freezeForm(bool changesNotStored);
+
     Ui::FormDiagnose *ui;
     QList<QCameraInfo> m_camerasList;
     QDialog *m_dialogCamera;
     QString m_boardPhotoPath;
+    bool m_needSave;
 };
 
 #endif // FORMDIAGNOSE_H
