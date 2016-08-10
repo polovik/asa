@@ -15,7 +15,8 @@ typedef struct {
     int signalFrequency;
     int signalVoltage;
     QImage signature;
-} Tespoint;
+    QList<QPointF> data;
+} TestpointMeasure;
 
 class FormDiagnose : public QWidget
 {
@@ -24,6 +25,8 @@ class FormDiagnose : public QWidget
 public:
     explicit FormDiagnose(QWidget *parent = 0);
     ~FormDiagnose();
+
+public slots:
     void saveMeasures();
 
 signals:
@@ -45,6 +48,7 @@ private:
     QDialog *m_dialogCamera;
     QString m_boardPhotoPath;
     bool m_needSave;
+    QList<TestpointMeasure> m_testpoints;
 };
 
 #endif // FORMDIAGNOSE_H

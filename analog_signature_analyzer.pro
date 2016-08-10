@@ -15,7 +15,8 @@ SOURCES += main.cpp\
     formcalibration.cpp \
     formraw.cpp \
     formdiagnose.cpp \
-    boardview.cpp
+    boardview.cpp \
+    signatureview.cpp
 
 HEADERS  += mainwindow.h \
     ToneGenerator.h \
@@ -25,7 +26,8 @@ HEADERS  += mainwindow.h \
     formcalibration.h \
     formraw.h \
     formdiagnose.h \
-    boardview.h
+    boardview.h \
+    signatureview.h
 
 FORMS    += mainwindow.ui \
     formcalibration.ui \

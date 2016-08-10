@@ -37,10 +37,10 @@ FormDiagnose::FormDiagnose(QWidget *parent) :
     connect(ui->buttonCamera, SIGNAL(pressed()), this, SLOT(showCamera()));
     connect(ui->buttonOpenBoard, SIGNAL(pressed()), this, SLOT(selectBoard()));
     connect(ui->buttonSave, SIGNAL(pressed()), this, SLOT(saveMeasures()));
+    connect(ui->buttonLockMeasure, SIGNAL(pressed()), ui->viewSignature, SLOT(saveView()));
     freezeForm(false);
 
     ui->boardView->setAlignment(Qt::AlignCenter);
-//    ui->boardView->setDragMode(QGraphicsView::ScrollHandDrag);
     ui->boardView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->boardView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->boardView->setFrameShape(QFrame::NoFrame);
@@ -177,14 +177,14 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
 {
     qDebug() << "Load board data by photo:" << boardPhotoPath;
     m_boardPhotoPath = boardPhotoPath;
-    QImage img(m_boardPhotoPath);
-    ImageTiff tiff;
+//    QImage img(m_boardPhotoPath);
+//    ImageTiff tiff;
 //    tiff.write(m_boardPhotoPath + ".tiff", img);
-    QImage img2 = img.scaled(500,500);
-    QList<QImage> images;
-    images.append(img);
-    images.append(img2);
-    tiff.writeImageSeries(m_boardPhotoPath + ".tiff", images);
+//    QImage img2 = img.scaled(500,500);
+//    QList<QImage> images;
+//    images.append(img);
+//    images.append(img2);
+//    tiff.writeImageSeries(m_boardPhotoPath + ".tiff", images);
 
     QPixmap pix(m_boardPhotoPath);
     TestpointsList testpoints;
@@ -198,6 +198,17 @@ void FormDiagnose::saveMeasures()
         qDebug() << "There are no changes. Do not store diagnostic data";
         return;
     }
+    // ToDo add save filedialog
+    ImageTiff tiff;
+    QImage boardPhoto;
+    QImage boardPhotoWithMarkers;
+    ui->boardView->getBoardPhoto(boardPhoto, boardPhotoWithMarkers);
+    TestpointMeasure meas;
+    meas.signature = boardPhoto;
+    m_testpoints.append(meas);
+    tiff.writeImageSeries(m_boardPhotoPath + ".tiff", boardPhoto, boardPhotoWithMarkers, m_testpoints);
+
+    freezeForm(false);
 }
 
 void FormDiagnose::freezeForm(bool changesNotStored)

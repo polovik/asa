@@ -7,47 +7,30 @@ extern "C" {
 #include "tiffio.h"
 }
 
-#define TIFFTAG_FILEFORMAT        59998
-#define TIFFTAG_TESTPOINTS_COUNT  59999
-#define TIFFTAG_TESTPOINTS        60000
+#define	TIFFFieldInfo_LEN(a)	(sizeof (a) / sizeof (a[0]))
 
-#define MAX_TESTPOINTS  1000
+#define TIFFTAG_FILEFORMAT              59998
+#define TIFFTAG_TESTPOINT_DESCRIPTION   59999
+#define TIFFTAG_TESTPOINT_DATA_X        60000
+#define TIFFTAG_TESTPOINT_DATA_Y        60001
+//#define TIFFTAG_TESTPOINTS_COUNT  59999
+//#define TIFFTAG_TESTPOINTS        60000
+//#define MAX_TESTPOINTS  1000
 
-static char DEFAULT_TAG_NAME[] = "custom_tag";
+//static char DEFAULT_TAG_NAME[] = "custom_tag";
 
 static TIFFExtendProc parent_extender = NULL;  // In case we want a chain of extensions
+static const TIFFFieldInfo xtiffFieldInfo[] = {
+    { TIFFTAG_FILEFORMAT,           TIFF_VARIABLE, TIFF_VARIABLE, TIFF_ASCII,	FIELD_CUSTOM, 1,	0,	(char *)"FileFormat" },
+    { TIFFTAG_TESTPOINT_DESCRIPTION,TIFF_VARIABLE, TIFF_VARIABLE, TIFF_ASCII,	FIELD_CUSTOM, 1,	0,	(char *)"Description" },
+    { TIFFTAG_TESTPOINT_DATA_X,     TIFF_VARIABLE, TIFF_VARIABLE, TIFF_DOUBLE,	FIELD_CUSTOM, 1,	1,	(char *)"RawDataX" },
+    { TIFFTAG_TESTPOINT_DATA_Y,     TIFF_VARIABLE, TIFF_VARIABLE, TIFF_DOUBLE,	FIELD_CUSTOM, 1,	1,	(char *)"RawDataY" }
+};
 
 static void registerCustomTIFFTags(TIFF *tif)
 {
     /* Install the extended Tag field info */
-    TIFFFieldInfo *tiffFieldInfos = (TIFFFieldInfo *)calloc(2 + MAX_TESTPOINTS, sizeof(TIFFFieldInfo));
-    tiffFieldInfos[0].field_tag = TIFFTAG_FILEFORMAT;
-    tiffFieldInfos[0].field_readcount = TIFF_VARIABLE;
-    tiffFieldInfos[0].field_writecount = TIFF_VARIABLE;
-    tiffFieldInfos[0].field_type = TIFF_ASCII;
-    tiffFieldInfos[0].field_bit = FIELD_CUSTOM;
-    tiffFieldInfos[0].field_oktochange = 1;
-    tiffFieldInfos[0].field_passcount = 0;
-    tiffFieldInfos[0].field_name = DEFAULT_TAG_NAME;
-    tiffFieldInfos[1].field_tag = TIFFTAG_TESTPOINTS_COUNT;
-    tiffFieldInfos[1].field_readcount = 1;
-    tiffFieldInfos[1].field_writecount = 1;
-    tiffFieldInfos[1].field_type = TIFF_SHORT;
-    tiffFieldInfos[1].field_bit = FIELD_CUSTOM;
-    tiffFieldInfos[1].field_oktochange = 1;
-    tiffFieldInfos[1].field_passcount = 0;
-    tiffFieldInfos[1].field_name = DEFAULT_TAG_NAME;
-    for (int i = 0; i < MAX_TESTPOINTS; i++) {
-        tiffFieldInfos[2 + i].field_tag = TIFFTAG_FILEFORMAT + i;
-        tiffFieldInfos[2 + i].field_readcount = TIFF_VARIABLE;
-        tiffFieldInfos[2 + i].field_writecount = TIFF_VARIABLE;
-        tiffFieldInfos[2 + i].field_type = TIFF_ASCII;
-        tiffFieldInfos[2 + i].field_bit = FIELD_CUSTOM;
-        tiffFieldInfos[2 + i].field_oktochange = 1;
-        tiffFieldInfos[2 + i].field_passcount = 0;
-        tiffFieldInfos[2 + i].field_name = DEFAULT_TAG_NAME;
-    }
-    int error = TIFFMergeFieldInfo(tif, tiffFieldInfos, 2 + MAX_TESTPOINTS);
+    int error = TIFFMergeFieldInfo(tif, xtiffFieldInfo, TIFFFieldInfo_LEN(xtiffFieldInfo));
     if (error != 0) {
         qWarning() << "Custom tags couldn't be installed";
         Q_ASSERT(false);
@@ -223,8 +206,7 @@ bool ImageTiff::write(QString filePath, const QImage &image)
 
     // ... and now our own custom ones:
     TIFFSetField(tiff, TIFFTAG_FILEFORMAT, "V1.0");
-    TIFFSetField(tiff, TIFFTAG_TESTPOINTS_COUNT, 1);
-    TIFFSetField(tiff, TIFFTAG_TESTPOINTS+10, "POINT:10, X:232, Y:6522, SIG:sin, FREQ:1000, VOLT:2.6");
+    TIFFSetField(tiff, TIFFTAG_TESTPOINT_DESCRIPTION, "POINT:10, X:232, Y:6522, SIG:sin, FREQ:1000, VOLT:2.6, POINTS:1000");
 
     // configure image depth
     const QImage::Format format = image.format();
@@ -389,7 +371,8 @@ bool ImageTiff::write(QString filePath, const QImage &image)
     return true;
 }
 
-bool ImageTiff::writeImageSeries(QString filePath, QList<QImage> images)
+bool ImageTiff::writeImageSeries(QString filePath, const QImage &boardPhoto,
+                                 const QImage &boardPhotoWithMarkers, const QList<TestpointMeasure> &testpoints)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
@@ -411,10 +394,49 @@ bool ImageTiff::writeImageSeries(QString filePath, QList<QImage> images)
         return false;
     }
 
-    for (int page = 0; page < images.count(); page ++) {
-        const QImage &image = images.at(page);
+    int totalPages = 2 + testpoints.count();
+    int page = 0;
+    TIFFSetField(m_tiff, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE);
+    TIFFSetField(m_tiff, TIFFTAG_PAGENUMBER, page, totalPages);
+    if (!appendImage(boardPhoto)) {
+        qWarning() << "Image" << boardPhoto << "couldn't be written in" << filePath;
+        TIFFClose(m_tiff);
+        Q_ASSERT(false);
+        return false;
+    }
+    TIFFWriteDirectory(m_tiff);
+
+    page = 1;
+    TIFFSetField(m_tiff, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE);
+    TIFFSetField(m_tiff, TIFFTAG_PAGENUMBER, page, totalPages);
+    if (!appendImage(boardPhotoWithMarkers)) {
+        qWarning() << "Image" << boardPhotoWithMarkers << "couldn't be written in" << filePath;
+        TIFFClose(m_tiff);
+        Q_ASSERT(false);
+        return false;
+    }
+    TIFFWriteDirectory(m_tiff);
+
+    for (int i = 0; i < testpoints.count(); i++) {
+        const TestpointMeasure &testpoint = testpoints.at(i);
+        const QImage &image = testpoint.signature;
+
+        page++;
         TIFFSetField(m_tiff, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE);
-        TIFFSetField(m_tiff, TIFFTAG_PAGENUMBER, page, images.count());
+        TIFFSetField(m_tiff, TIFFTAG_PAGENUMBER, page, totalPages);
+
+        TIFFSetField(m_tiff, TIFFTAG_FILEFORMAT, "V1.0");
+        // Example: "POINT:10, X:232, Y:6522, SIG:sin, FREQ:1000, VOLT:2.6, POINTS:1000"
+        QString description = QString("POINT:%1, X:%2, Y:%3, SIG:%4, FREQ:%5, VOLT:%6, POINTS:%7")
+                                     .arg(QString::number(testpoint.id))
+                                     .arg(QString::number(testpoint.pos.x()))
+                                     .arg(QString::number(testpoint.pos.y()))
+                                     .arg(QString::number(testpoint.signalType))
+                                     .arg(QString::number(testpoint.signalFrequency))
+                                     .arg(QString::number(testpoint.signalVoltage, 'f', 1))
+                                     .arg(QString::number(testpoint.data.count()));
+        TIFFSetField(m_tiff, TIFFTAG_TESTPOINT_DESCRIPTION, description.toLatin1().data());
+
         if (!appendImage(image)) {
             qWarning() << "Image" << image << "couldn't be written in" << filePath;
             TIFFClose(m_tiff);
@@ -470,11 +492,6 @@ bool ImageTiff::appendImage(const QImage &image)
         Q_ASSERT(false);
         return false;
     }
-
-    // ... and now our own custom ones:
-    TIFFSetField(m_tiff, TIFFTAG_FILEFORMAT, "V1.0");
-    TIFFSetField(m_tiff, TIFFTAG_TESTPOINTS_COUNT, 1);
-    TIFFSetField(m_tiff, TIFFTAG_TESTPOINTS+10, "POINT:10, X:232, Y:6522, SIG:sin, FREQ:1000, VOLT:2.6");
 
     // configure image depth
     const QImage::Format format = image.format();

@@ -2,6 +2,7 @@
 #define IMAGETIFF_H
 
 #include <QObject>
+#include "../formdiagnose.h"
 
 typedef struct tiff TIFF;
 
@@ -13,7 +14,8 @@ public:
     ~ImageTiff();
 
     bool write(QString filePath, const QImage &image);
-    bool writeImageSeries(QString filePath, QList<QImage> images);
+    bool writeImageSeries(QString filePath, const QImage &boardPhoto,
+                          const QImage &boardPhotoWithMarkers, const QList<TestpointMeasure> &testpoints);
 
     enum Compression {
         NoCompression = 0,

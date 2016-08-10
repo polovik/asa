@@ -56,6 +56,32 @@ void BoardView::showBoard(QPixmap pixmap, TestpointsList testpoints)
     }
 }
 
+void BoardView::getBoardPhoto(QImage &boardPhoto, QImage &boardPhotoWithMarkers)
+{
+    if (m_boardPhoto == NULL) {
+        qCritical() << "There is no board photo for getting";
+        Q_ASSERT(false);
+        return;
+    }
+    QPixmap origPhoto = m_boardPhoto->pixmap();
+    boardPhoto = origPhoto.toImage();
+
+    stopAnimation();
+    fitInView((QGraphicsItem *)m_boardPhoto, Qt::KeepAspectRatio);
+    ensureVisible((QGraphicsItem *)m_boardPhoto, 0, 0);
+    foreach (QGraphicsItem *item, scene()->items()) {
+        QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
+        if (pin == NULL) {
+            continue;
+        }
+        updateTestpointView(pin);
+    }
+    boardPhotoWithMarkers = boardPhoto;
+    boardPhotoWithMarkers.fill(Qt::black);
+    QPainter painter(&boardPhotoWithMarkers);
+    render(&painter);
+}
+
 void BoardView::mousePressEvent(QMouseEvent* event)
 {
 //    qDebug() << "press" << event->button() << "at" << event->pos();
@@ -262,8 +288,9 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
         }
         qSort(ids);
         int testpointId = ids.last() + 1;
-        insertTestpoint(testpointId, mapToScene(event->pos()));
-        emit testpointAdded(testpointId);
+        QPointF scenePos = mapToScene(event->pos());
+        insertTestpoint(testpointId, scenePos);
+        emit testpointAdded(testpointId, scenePos.toPoint());
     } else if (action == &actionRemoveTestpoint) {
         bool ok = false;
         int id = testpoint->data(DATA_TESTPOINT_ID).toInt(&ok);
@@ -318,6 +345,7 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
             QString label = QString::number(curId);
             itemId->setPlainText(label);
             pin->setData(DATA_TESTPOINT_ID, QVariant(curId));
+            emit testpointIdChanged(curId + 1, curId);
         }
     }
 }

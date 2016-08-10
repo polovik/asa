@@ -17,12 +17,14 @@ public:
     BoardView(QWidget* parent);
     ~BoardView();
     void showBoard(QPixmap pixmap, TestpointsList testpoints);
+    void getBoardPhoto(QImage &boardPhoto, QImage &boardPhotoWithMarkers);
 
 signals:
-    void testpointAdded(int id);
+    void testpointAdded(int id, QPoint pos);
     void testpointSelected(int id);
     void testpointMoved(int id, QPoint pos);
     void testpointRemoved(int id);
+    void testpointIdChanged(int oldId, int newId);
 
 protected:
     void mousePressEvent(QMouseEvent* event);
