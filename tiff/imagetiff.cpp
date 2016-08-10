@@ -48,6 +48,10 @@ static void registerCustomTIFFTags(TIFF *tif)
         tiffFieldInfos[2 + i].field_name = DEFAULT_TAG_NAME;
     }
     int error = TIFFMergeFieldInfo(tif, tiffFieldInfos, 2 + MAX_TESTPOINTS);
+    if (error != 0) {
+        qWarning() << "Custom tags couldn't be installed";
+        Q_ASSERT(false);
+    }
 
     if (parent_extender)
         (*parent_extender)(tif);
@@ -382,5 +386,269 @@ bool ImageTiff::write(QString filePath, const QImage &image)
         TIFFClose(tiff);
     }
 
+    return true;
+}
+
+bool ImageTiff::writeImageSeries(QString filePath, QList<QImage> images)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+        qWarning() << "File" << filePath << "couldn't be open for writing";
+        Q_ASSERT(false);
+        return false;
+    }
+
+    // Create the TIFF directory object:
+    augment_libtiff_with_custom_tags();
+
+    m_tiff = TIFFClientOpen("foo", "wB", &file,
+                            qtiffReadProc, qtiffWriteProc, qtiffSeekProc,
+                            qtiffCloseProc, qtiffSizeProc, qtiffMapProc,
+                            qtiffUnmapProc);
+    if (!m_tiff) {
+        qWarning() << "File" << filePath << "couldn't be opened for store TIFF image";
+        Q_ASSERT(false);
+        return false;
+    }
+
+    for (int page = 0; page < images.count(); page ++) {
+        const QImage &image = images.at(page);
+        TIFFSetField(m_tiff, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE);
+        TIFFSetField(m_tiff, TIFFTAG_PAGENUMBER, page, images.count());
+        if (!appendImage(image)) {
+            qWarning() << "Image" << image << "couldn't be written in" << filePath;
+            TIFFClose(m_tiff);
+            Q_ASSERT(false);
+            return false;
+        }
+        TIFFWriteDirectory(m_tiff);
+    }
+    TIFFClose(m_tiff);
+    qDebug() << "Tiff image has been successfully written to" << filePath;
+    return true;
+}
+
+bool ImageTiff::appendImage(const QImage &image)
+{
+    const int width = image.width();
+    const int height = image.height();
+    const int compression = NoCompression;
+    const int exifTagTransormation = 1; // QImageIOHandler::TransformationNone -> 1
+
+    if (!TIFFSetField(m_tiff, TIFFTAG_IMAGEWIDTH, width)
+        || !TIFFSetField(m_tiff, TIFFTAG_IMAGELENGTH, height)
+        || !TIFFSetField(m_tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG)) {
+        qWarning() << "Can't set image's size:" << image;
+        Q_ASSERT(false);
+        return false;
+    }
+
+    // set the resolution
+    bool  resolutionSet = false;
+    const int dotPerMeterX = image.dotsPerMeterX();
+    const int dotPerMeterY = image.dotsPerMeterY();
+    if ((dotPerMeterX % 100) == 0
+        && (dotPerMeterY % 100) == 0) {
+        resolutionSet = TIFFSetField(m_tiff, TIFFTAG_RESOLUTIONUNIT, RESUNIT_CENTIMETER)
+                        && TIFFSetField(m_tiff, TIFFTAG_XRESOLUTION, dotPerMeterX/100.0)
+                        && TIFFSetField(m_tiff, TIFFTAG_YRESOLUTION, dotPerMeterY/100.0);
+    } else {
+        resolutionSet = TIFFSetField(m_tiff, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH)
+                        && TIFFSetField(m_tiff, TIFFTAG_XRESOLUTION, static_cast<float>(image.logicalDpiX()))
+                        && TIFFSetField(m_tiff, TIFFTAG_YRESOLUTION, static_cast<float>(image.logicalDpiY()));
+    }
+    if (!resolutionSet) {
+        qWarning() << "Can't set image's resolution:" << image;
+        Q_ASSERT(false);
+        return false;
+    }
+    // set the orienataion
+    bool orientationSet = false;
+    orientationSet = TIFFSetField(m_tiff, TIFFTAG_ORIENTATION, exifTagTransormation);
+    if (!orientationSet) {
+        qWarning() << "Can't set image's orientation:" << image;
+        Q_ASSERT(false);
+        return false;
+    }
+
+    // ... and now our own custom ones:
+    TIFFSetField(m_tiff, TIFFTAG_FILEFORMAT, "V1.0");
+    TIFFSetField(m_tiff, TIFFTAG_TESTPOINTS_COUNT, 1);
+    TIFFSetField(m_tiff, TIFFTAG_TESTPOINTS+10, "POINT:10, X:232, Y:6522, SIG:sin, FREQ:1000, VOLT:2.6");
+
+    // configure image depth
+    const QImage::Format format = image.format();
+    if (format == QImage::Format_Mono || format == QImage::Format_MonoLSB) {
+        qDebug() << "Image" << image << "have MONO format";
+        uint16 photometric = PHOTOMETRIC_MINISBLACK;
+        if (image.colorTable().at(0) == 0xffffffff)
+            photometric = PHOTOMETRIC_MINISWHITE;
+        if (!TIFFSetField(m_tiff, TIFFTAG_PHOTOMETRIC, photometric)
+            || !TIFFSetField(m_tiff, TIFFTAG_COMPRESSION, compression == NoCompression ? COMPRESSION_NONE : COMPRESSION_CCITTRLE)
+            || !TIFFSetField(m_tiff, TIFFTAG_BITSPERSAMPLE, 1)) {
+            qWarning() << "Can't set image's format:" << image;
+            Q_ASSERT(false);
+            return false;
+        }
+
+        // try to do the conversion in chunks no greater than 16 MB
+        int chunks = (width * height / (1024 * 1024 * 16)) + 1;
+        int chunkHeight = qMax(height / chunks, 1);
+
+        int y = 0;
+        while (y < height) {
+            QImage chunk = image.copy(0, y, width, qMin(chunkHeight, height - y)).convertToFormat(QImage::Format_Mono);
+
+            int chunkStart = y;
+            int chunkEnd = y + chunk.height();
+            while (y < chunkEnd) {
+                if (TIFFWriteScanline(m_tiff, reinterpret_cast<uint32 *>(chunk.scanLine(y - chunkStart)), y) != 1) {
+                    qWarning() << "Can't write data in TIFF from image:" << image;
+                    Q_ASSERT(false);
+                    return false;
+                }
+                ++y;
+            }
+        }
+        return true;
+    }
+    if (format == QImage::Format_Indexed8) {
+//               || format == QImage::Format_Grayscale8
+//               || format == QImage::Format_Alpha8) {
+        qDebug() << "Image" << image << "have 8-bit format";
+        QVector<QRgb> colorTable = effectiveColorTable(image);
+        bool isGrayscale = checkGrayscale(colorTable);
+        if (isGrayscale) {
+            uint16 photometric = PHOTOMETRIC_MINISBLACK;
+            if (colorTable.at(0) == 0xffffffff)
+                photometric = PHOTOMETRIC_MINISWHITE;
+            if (!TIFFSetField(m_tiff, TIFFTAG_PHOTOMETRIC, photometric)
+                    || !TIFFSetField(m_tiff, TIFFTAG_COMPRESSION, compression == NoCompression ? COMPRESSION_NONE : COMPRESSION_PACKBITS)
+                    || !TIFFSetField(m_tiff, TIFFTAG_BITSPERSAMPLE, 8)) {
+                qWarning() << "Can't set image's format:" << image;
+                Q_ASSERT(false);
+                return false;
+            }
+        } else {
+            if (!TIFFSetField(m_tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_PALETTE)
+                    || !TIFFSetField(m_tiff, TIFFTAG_COMPRESSION, compression == NoCompression ? COMPRESSION_NONE : COMPRESSION_PACKBITS)
+                    || !TIFFSetField(m_tiff, TIFFTAG_BITSPERSAMPLE, 8)) {
+                qWarning() << "Can't set image's format:" << image;
+                Q_ASSERT(false);
+                return false;
+            }
+            //// write the color table
+            // allocate the color tables
+            const int tableSize = colorTable.size();
+            Q_ASSERT(tableSize <= 256);
+            QVarLengthArray<uint16> redTable(tableSize);
+            QVarLengthArray<uint16> greenTable(tableSize);
+            QVarLengthArray<uint16> blueTable(tableSize);
+
+            // set the color table
+            for (int i = 0; i<tableSize; ++i) {
+                const QRgb color = colorTable.at(i);
+                redTable[i] = qRed(color) * 257;
+                greenTable[i] = qGreen(color) * 257;
+                blueTable[i] = qBlue(color) * 257;
+            }
+
+            const bool setColorTableSuccess = TIFFSetField(m_tiff, TIFFTAG_COLORMAP, redTable.data(), greenTable.data(), blueTable.data());
+
+            if (!setColorTableSuccess) {
+                qWarning() << "Can't set image's color table:" << image;
+                Q_ASSERT(false);
+                return false;
+            }
+        }
+
+        //// write the data
+        // try to do the conversion in chunks no greater than 16 MB
+        int chunks = (width * height/ (1024 * 1024 * 16)) + 1;
+        int chunkHeight = qMax(height / chunks, 1);
+
+        int y = 0;
+        while (y < height) {
+            QImage chunk = image.copy(0, y, width, qMin(chunkHeight, height - y));
+
+            int chunkStart = y;
+            int chunkEnd = y + chunk.height();
+            while (y < chunkEnd) {
+                if (TIFFWriteScanline(m_tiff, reinterpret_cast<uint32 *>(chunk.scanLine(y - chunkStart)), y) != 1) {
+                    qWarning() << "Can't write data in TIFF from image:" << image;
+                    Q_ASSERT(false);
+                    return false;
+                }
+                ++y;
+            }
+        }
+        return true;
+    }
+    if (!image.hasAlphaChannel()) {
+        qDebug() << "Image" << image << "have 24-bit format (no alpha channel)";
+        if (!TIFFSetField(m_tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB)
+            || !TIFFSetField(m_tiff, TIFFTAG_COMPRESSION, compression == NoCompression ? COMPRESSION_NONE : COMPRESSION_LZW)
+            || !TIFFSetField(m_tiff, TIFFTAG_SAMPLESPERPIXEL, 3)
+            || !TIFFSetField(m_tiff, TIFFTAG_BITSPERSAMPLE, 8)) {
+            qWarning() << "Can't set store image's format:" << image;
+            Q_ASSERT(false);
+            return false;
+        }
+        // try to do the RGB888 conversion in chunks no greater than 16 MB
+        const int chunks = (width * height * 3 / (1024 * 1024 * 16)) + 1;
+        const int chunkHeight = qMax(height / chunks, 1);
+
+        int y = 0;
+        while (y < height) {
+            const QImage chunk = image.copy(0, y, width, qMin(chunkHeight, height - y)).convertToFormat(QImage::Format_RGB888);
+
+            int chunkStart = y;
+            int chunkEnd = y + chunk.height();
+            while (y < chunkEnd) {
+                if (TIFFWriteScanline(m_tiff, (void*)chunk.scanLine(y - chunkStart), y) != 1) {
+                    qWarning() << "Can't write data in TIFF from image:" << image;
+                    Q_ASSERT(false);
+                    return false;
+                }
+                ++y;
+            }
+        }
+        return true;
+    }
+
+    qDebug() << "Image" << image << "have 32-bit format (alpha channel presents)";
+    const bool premultiplied = image.format() != QImage::Format_ARGB32
+                            && image.format() != QImage::Format_RGBA8888;
+    const uint16 extrasamples = premultiplied ? EXTRASAMPLE_ASSOCALPHA : EXTRASAMPLE_UNASSALPHA;
+    if (!TIFFSetField(m_tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB)
+        || !TIFFSetField(m_tiff, TIFFTAG_COMPRESSION, compression == NoCompression ? COMPRESSION_NONE : COMPRESSION_LZW)
+        || !TIFFSetField(m_tiff, TIFFTAG_SAMPLESPERPIXEL, 4)
+        || !TIFFSetField(m_tiff, TIFFTAG_BITSPERSAMPLE, 8)
+        || !TIFFSetField(m_tiff, TIFFTAG_EXTRASAMPLES, 1, &extrasamples)) {
+        qWarning() << "Can't set store image's format:" << image;
+        Q_ASSERT(false);
+        return false;
+    }
+    // try to do the RGBA8888 conversion in chunks no greater than 16 MB
+    const int chunks = (width * height * 4 / (1024 * 1024 * 16)) + 1;
+    const int chunkHeight = qMax(height / chunks, 1);
+
+    const QImage::Format format32 = premultiplied ? QImage::Format_RGBA8888_Premultiplied
+                                                : QImage::Format_RGBA8888;
+    int y = 0;
+    while (y < height) {
+        const QImage chunk = image.copy(0, y, width, qMin(chunkHeight, height - y)).convertToFormat(format32);
+
+        int chunkStart = y;
+        int chunkEnd = y + chunk.height();
+        while (y < chunkEnd) {
+            if (TIFFWriteScanline(m_tiff, (void*)chunk.scanLine(y - chunkStart), y) != 1) {
+                qWarning() << "Can't write data in TIFF from image:" << image;
+                Q_ASSERT(false);
+                return false;
+            }
+            ++y;
+        }
+    }
     return true;
 }

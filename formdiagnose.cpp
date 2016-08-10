@@ -176,7 +176,12 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
     m_boardPhotoPath = boardPhotoPath;
     QImage img(m_boardPhotoPath);
     ImageTiff tiff;
-    tiff.write(m_boardPhotoPath + ".tiff", img);
+//    tiff.write(m_boardPhotoPath + ".tiff", img);
+    QImage img2 = img.scaled(500,500);
+    QList<QImage> images;
+    images.append(img);
+    images.append(img2);
+    tiff.writeImageSeries(m_boardPhotoPath + ".tiff", images);
 //    QPixmap pix(m_boardPhotoPath);
 //    TestpointsList testpoints;
 //    testpoints[0] = QPoint(100, 100);
