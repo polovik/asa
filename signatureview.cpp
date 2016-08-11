@@ -24,7 +24,7 @@ SignatureView::~SignatureView()
 
 }
 
-void SignatureView::loadPreviousSignature(QList<QPointF> &graphData)
+void SignatureView::loadPreviousSignature(const QList<QPointF> &graphData)
 {
     QVector<double> keys;
     QVector<double> values;

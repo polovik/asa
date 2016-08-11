@@ -10,7 +10,7 @@ class SignatureView : public QCustomPlot
 public:
     SignatureView(QWidget *parent = 0);
     ~SignatureView();
-    void loadPreviousSignature(QList<QPointF> &graphData);
+    void loadPreviousSignature(const QList<QPointF> &graphData);
     void draw(const QVector<double> &keys, const QVector<double> &values);
     void getView(QImage &renderedView, QList<QPointF> &graphData);
 

@@ -14,6 +14,7 @@ typedef struct {
     int signalType;
     int signalFrequency;
     int signalVoltage;
+    bool isCurrent;
     QImage signature;
     QList<QPointF> data;
 } TestpointMeasure;
@@ -39,6 +40,13 @@ private slots:
     void savePhoto(int id, const QImage &preview);
     void selectBoard();
     void loadBoardData(QString boardPhotoPath);
+    void captureSignature();
+
+    void testpointAdd(int id, QPoint pos);
+    void testpointSelect(int id);
+    void testpointMove(int id, QPoint pos);
+    void testpointRemove(int id);
+    void testpointChangeId(int oldId, int newId);
 
 private:
     void freezeForm(bool changesNotStored);

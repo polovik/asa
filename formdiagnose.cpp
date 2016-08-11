@@ -37,8 +37,9 @@ FormDiagnose::FormDiagnose(QWidget *parent) :
     connect(ui->buttonCamera, SIGNAL(pressed()), this, SLOT(showCamera()));
     connect(ui->buttonOpenBoard, SIGNAL(pressed()), this, SLOT(selectBoard()));
     connect(ui->buttonSave, SIGNAL(pressed()), this, SLOT(saveMeasures()));
-    connect(ui->buttonLockMeasure, SIGNAL(pressed()), ui->viewSignature, SLOT(saveView()));
+    connect(ui->buttonLockMeasure, SIGNAL(pressed()), this, SLOT(captureSignature()));
     freezeForm(false);
+    ui->buttonLockMeasure->setEnabled(false);
 
     ui->boardView->setAlignment(Qt::AlignCenter);
     ui->boardView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -47,6 +48,12 @@ FormDiagnose::FormDiagnose(QWidget *parent) :
     ui->boardView->setLineWidth(0);
     ui->boardView->setMidLineWidth(0);
     ui->boardView->setBackgroundBrush(QBrush(Qt::black));
+
+    connect(ui->boardView, SIGNAL(testpointAdded(int,QPoint)),  this, SLOT(testpointAdd(int,QPoint)));
+    connect(ui->boardView, SIGNAL(testpointSelected(int)),      this, SLOT(testpointSelect(int)));
+    connect(ui->boardView, SIGNAL(testpointMoved(int,QPoint)),  this, SLOT(testpointMove(int,QPoint)));
+    connect(ui->boardView, SIGNAL(testpointRemoved(int)),       this, SLOT(testpointRemove(int)));
+    connect(ui->boardView, SIGNAL(testpointIdChanged(int,int)), this, SLOT(testpointChangeId(int,int)));
 }
 
 FormDiagnose::~FormDiagnose()
@@ -177,6 +184,9 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
 {
     qDebug() << "Load board data by photo:" << boardPhotoPath;
     m_boardPhotoPath = boardPhotoPath;
+    m_testpoints.clear();
+    QVector<double> keys, values;
+    ui->viewSignature->draw(keys, values);
 //    QImage img(m_boardPhotoPath);
 //    ImageTiff tiff;
 //    tiff.write(m_boardPhotoPath + ".tiff", img);
@@ -186,10 +196,136 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
 //    images.append(img2);
 //    tiff.writeImageSeries(m_boardPhotoPath + ".tiff", images);
 
+    // TODO extract from TIFF
     QPixmap pix(m_boardPhotoPath);
     TestpointsList testpoints;
-    testpoints[0] = QPoint(100, 100);
+    testpointSelect(-1);
+
     ui->boardView->showBoard(pix, testpoints);
+}
+
+void FormDiagnose::captureSignature()
+{
+    bool found = false;
+    for (int i = 0; i < m_testpoints.count(); i++) {
+        TestpointMeasure &pt = m_testpoints[i];
+        if (pt.isCurrent) {
+            ui->viewSignature->getView(pt.signature, pt.data);
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        qWarning() << "There is no selected testpoint";
+        Q_ASSERT(false);
+    }
+}
+
+void FormDiagnose::testpointAdd(int id, QPoint pos)
+{
+    TestpointMeasure point;
+    point.id = id;
+    point.pos = pos;
+    point.signalType = 0;
+    point.signalFrequency = 0;
+    point.signalVoltage = 0;
+    point.isCurrent = false;
+    point.data.clear();
+    foreach (const TestpointMeasure &pt, m_testpoints) {
+        if (pt.id == id) {
+            qWarning() << "Testpoint" << id << "is already presented in array";
+            Q_ASSERT(false);
+            return;
+        }
+    }
+    m_testpoints.append(point);
+    freezeForm(true);
+}
+
+void FormDiagnose::testpointSelect(int id)
+{
+    for (int i = 0; i < m_testpoints.count(); i++) {
+        TestpointMeasure &pt = m_testpoints[i];
+        pt.isCurrent = false;
+    }
+    if (id == -1) {
+        QList<QPointF> graphData;
+        ui->viewSignature->loadPreviousSignature(graphData);
+        ui->buttonLockMeasure->setEnabled(false);
+        return;
+    }
+    ui->buttonLockMeasure->setEnabled(true);
+    bool found = false;
+    for (int i = 0; i < m_testpoints.count(); i++) {
+        TestpointMeasure &pt = m_testpoints[i];
+        if (pt.id == id) {
+            pt.isCurrent = true;
+            ui->viewSignature->loadPreviousSignature(pt.data);
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        qWarning() << "Testpoint" << id << "is missed in array";
+        Q_ASSERT(false);
+    }
+}
+
+void FormDiagnose::testpointMove(int id, QPoint pos)
+{
+    bool found = false;
+    for (int i = 0; i < m_testpoints.count(); i++) {
+        TestpointMeasure &pt = m_testpoints[i];
+        if (pt.id == id) {
+            pt.pos = pos;
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        qWarning() << "Testpoint" << id << "is missed in array";
+        Q_ASSERT(false);
+        return;
+    }
+    freezeForm(true);
+}
+
+void FormDiagnose::testpointRemove(int id)
+{
+    bool found = false;
+    for (int i = 0; i < m_testpoints.count(); i++) {
+        TestpointMeasure pt = m_testpoints.at(i);
+        if (pt.id == id) {
+            m_testpoints.removeAt(i);
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        qWarning() << "Testpoint" << id << "is missed in array";
+        Q_ASSERT(false);
+        return;
+    }
+    freezeForm(true);
+}
+
+void FormDiagnose::testpointChangeId(int oldId, int newId)
+{
+    bool found = false;
+    for (int i = 0; i < m_testpoints.count(); i++) {
+        TestpointMeasure &pt = m_testpoints[i];
+        if (pt.id == oldId) {
+            pt.id = newId;
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        qWarning() << "Testpoint" << oldId << "is missed in array";
+        Q_ASSERT(false);
+        return;
+    }
+    freezeForm(true);
 }
 
 void FormDiagnose::saveMeasures()
@@ -203,9 +339,6 @@ void FormDiagnose::saveMeasures()
     QImage boardPhoto;
     QImage boardPhotoWithMarkers;
     ui->boardView->getBoardPhoto(boardPhoto, boardPhotoWithMarkers);
-    TestpointMeasure meas;
-    meas.signature = boardPhoto;
-    m_testpoints.append(meas);
     tiff.writeImageSeries(m_boardPhotoPath + ".tiff", boardPhoto, boardPhotoWithMarkers, m_testpoints);
 
     freezeForm(false);

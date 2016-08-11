@@ -271,6 +271,7 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
             updateTestpointView(pin);
         }
     } else if (action == &actionAddTestpoint) {
+        // TODO move logic about ID manipulation to the FormDiagnose
         QList<int> ids;
         ids.append(-1);
         foreach (QGraphicsItem *item, scene()->items()) {
