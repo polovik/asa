@@ -187,20 +187,17 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
     m_testpoints.clear();
     QVector<double> keys, values;
     ui->viewSignature->draw(keys, values);
-//    QImage img(m_boardPhotoPath);
-//    ImageTiff tiff;
-//    tiff.write(m_boardPhotoPath + ".tiff", img);
-//    QImage img2 = img.scaled(500,500);
-//    QList<QImage> images;
-//    images.append(img);
-//    images.append(img2);
-//    tiff.writeImageSeries(m_boardPhotoPath + ".tiff", images);
 
-    // TODO extract from TIFF
-    QPixmap pix(m_boardPhotoPath);
+    ImageTiff tiff;
+    QImage boardPhoto;
+    tiff.readImageSeries(m_boardPhotoPath, boardPhoto, m_testpoints);
+    QPixmap pix = QPixmap::fromImage(boardPhoto);
+
     TestpointsList testpoints;
+    foreach (const TestpointMeasure &meas, m_testpoints) {
+        testpoints.insert(meas.id, meas.pos);
+    }
     testpointSelect(-1);
-
     ui->boardView->showBoard(pix, testpoints);
 }
 
@@ -226,7 +223,7 @@ void FormDiagnose::testpointAdd(int id, QPoint pos)
     TestpointMeasure point;
     point.id = id;
     point.pos = pos;
-    point.signalType = 0;
+    point.signalType = WAVE_SINE;
     point.signalFrequency = 0;
     point.signalVoltage = 0;
     point.isCurrent = false;

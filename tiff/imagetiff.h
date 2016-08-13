@@ -2,7 +2,7 @@
 #define IMAGETIFF_H
 
 #include <QObject>
-#include "../formdiagnose.h"
+#include "../common_types.h"
 
 typedef struct tiff TIFF;
 

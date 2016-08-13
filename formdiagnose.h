@@ -3,21 +3,11 @@
 
 #include <QWidget>
 #include <QCameraInfo>
+#include "common_types.h"
 
 namespace Ui {
 class FormDiagnose;
 }
-
-typedef struct {
-    int id;
-    QPoint pos;
-    int signalType;
-    int signalFrequency;
-    int signalVoltage;
-    bool isCurrent;
-    QImage signature;
-    QList<QPointF> data;
-} TestpointMeasure;
 
 class FormDiagnose : public QWidget
 {

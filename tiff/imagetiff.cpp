@@ -120,7 +120,7 @@ void ImageTiff::convert32BitOrder(void *buffer, int width)
 
 bool ImageTiff::readPage(QImage &image)
 {
-    int compression;
+//    int compression;
     QImage::Format format;
     QSize size;
     uint16 photometric;
@@ -291,6 +291,9 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         return false;
     }
 
+    // Register custom tags
+    augment_libtiff_with_custom_tags();
+
     // current implementation uses TIFFClientOpen which needs to be
     // able to seek, so sequential devices are not supported
     QByteArray header = file.peek(4);
@@ -313,9 +316,6 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         return false;
     }
 
-    // Register custom tags
-    augment_libtiff_with_custom_tags();
-
     unsigned int totalPages = 0;
     unsigned int page = 0;
     int fileType = -1;
@@ -332,7 +332,132 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         goto error;
     }
     qDebug() << "File" << filePath << "have" << totalPages << "pages";
+    if (totalPages == 0) {
+        qWarning() << "File doesn't have any page:" << filePath;
+        goto error;
+    }
+    if (!readPage(boardPhoto)) {
+        qWarning() << "Can't read board phoro from file:" << filePath;
+        goto error;
+    }
 
+    for (page = 2; page < totalPages; page++) {
+        if (!TIFFSetDirectory(m_tiff, page)) {
+            qWarning() << "Couldn't select page" << page << "for file" << filePath;
+            goto error;
+        }
+        // TODO does it need to free char* rawFileformat?
+        char *rawFileformat;// = (char *)calloc(100, sizeof(char));
+        if (!TIFFGetField(m_tiff, TIFFTAG_FILEFORMAT, &rawFileformat)) {
+            qWarning() << "Couldn't obtain testpoint's format at" << page << "from file" << filePath;
+            goto error;
+        }
+        QString fileformat = QString::fromLatin1(rawFileformat);
+        qDebug() << "Testpoint at" << page << "have format:" << fileformat;
+
+        // TODO does it need to free char* rawDescription?
+        char *rawDescription;// = (char *)calloc(1000, sizeof(char));
+        if (!TIFFGetField(m_tiff, TIFFTAG_TESTPOINT_DESCRIPTION, &rawDescription)) {
+            qWarning() << "Couldn't obtain testpoint's descrtiption at" << page << "from file" << filePath;
+            goto error;
+        }
+        // Example: "POINT:10, X:232, Y:6522, SIG:sine, FREQ:1000, VOLT:2.6, SAMPLES:1000"
+        QString description = QString::fromLatin1(rawDescription);
+        qDebug() << "Testpoint at" << page << "have description:" << description;
+        QStringList args = description.split(", ");
+        int id = -1;
+        int x = -1;
+        int y = -1;
+        ToneWaveForm type = WAVE_UNKNOWN;
+        int freq = -1;
+        qreal volt = -1.;
+        int samplesCount = -1;
+        bool ok = false;
+        foreach (QString arg, args) {
+            QString key = arg.section(":", 0, 0);
+            QString value = arg.section(":", 1, 1);
+            if (key == "POINT") {
+                id = value.toInt(&ok);
+                if (!ok) {
+                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
+                    goto error;
+                }
+                continue;
+            }
+            if (key == "X") {
+                x = value.toInt(&ok);
+                if (!ok) {
+                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
+                    goto error;
+                }
+                continue;
+            }
+            if (key == "Y") {
+                y = value.toInt(&ok);
+                if (!ok) {
+                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
+                    goto error;
+                }
+                continue;
+            }
+            if (key == "SIG") {
+                if (value == "sine") {
+                    type = WAVE_SINE;
+                } else if (value == "square") {
+                    type = WAVE_SQUARE;
+                } else if (value == "sawtooth") {
+                    type = WAVE_SAWTOOTH;
+                } else if (value == "triangle") {
+                    type = WAVE_TRIANGLE;
+                } else {
+                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
+                    goto error;
+                }
+                continue;
+            }
+            if (key == "FREQ") {
+                freq = value.toInt(&ok);
+                if (!ok) {
+                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
+                    goto error;
+                }
+                continue;
+            }
+            if (key == "VOLT") {
+                volt = value.toDouble(&ok);
+                if (!ok) {
+                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
+                    goto error;
+                }
+                continue;
+            }
+            if (key == "SAMPLES") {
+                samplesCount = value.toInt(&ok);
+                if (!ok) {
+                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
+                    goto error;
+                }
+                continue;
+            }
+        }
+        if ((id < 0) || (x < 0) || (y < 0) || (type == WAVE_UNKNOWN) || (freq < 0) || (volt < 0.) || (samplesCount < 0)) {
+            qWarning() << "Some fields is missed in testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
+            goto error;
+        }
+        qDebug() << id << x << y << type << freq << volt << samplesCount;
+
+        TestpointMeasure measure;
+        measure.id = id;
+        measure.pos = QPoint(x, y);
+        measure.signalType = type;
+        measure.signalFrequency = freq;
+        measure.signalVoltage = volt;
+        measure.isCurrent = false;
+//        measure.data
+        testpoints.append(measure);
+    }
+
+    qDebug() << "File" << filePath << "has been successfully read";
     TIFFClose(m_tiff);
     return true;
 
@@ -445,7 +570,7 @@ bool ImageTiff::write(QString filePath, const QImage &image)
 
     // ... and now our own custom ones:
     TIFFSetField(tiff, TIFFTAG_FILEFORMAT, "V1.0");
-    TIFFSetField(tiff, TIFFTAG_TESTPOINT_DESCRIPTION, "POINT:10, X:232, Y:6522, SIG:sin, FREQ:1000, VOLT:2.6, POINTS:1000");
+    TIFFSetField(tiff, TIFFTAG_TESTPOINT_DESCRIPTION, "POINT:10, X:232, Y:6522, SIG:sine, FREQ:1000, VOLT:2.6, SAMPLES:1000");
 
     // configure image depth
     const QImage::Format format = image.format();
@@ -665,12 +790,27 @@ bool ImageTiff::writeImageSeries(QString filePath, const QImage &boardPhoto,
         TIFFSetField(m_tiff, TIFFTAG_PAGENUMBER, page, totalPages);
 
         TIFFSetField(m_tiff, TIFFTAG_FILEFORMAT, "V1.0");
-        // Example: "POINT:10, X:232, Y:6522, SIG:sin, FREQ:1000, VOLT:2.6, POINTS:1000"
-        QString description = QString("POINT:%1, X:%2, Y:%3, SIG:%4, FREQ:%5, VOLT:%6, POINTS:%7")
+        // Example: "POINT:10, X:232, Y:6522, SIG:sine, FREQ:1000, VOLT:2.6, SAMPLES:1000"
+        QString form;
+        if (testpoint.signalType == WAVE_SINE) {
+            form = "sine";
+        } else if (testpoint.signalType == WAVE_SQUARE) {
+            form = "square";
+        } else if (testpoint.signalType == WAVE_SAWTOOTH) {
+            form = "sawtooth";
+        } else if (testpoint.signalType == WAVE_TRIANGLE) {
+            form = "triangle";
+        } else {
+            qWarning() << "Invalid signal type:" << testpoint.signalType << "for image" << filePath;
+            TIFFClose(m_tiff);
+            Q_ASSERT(false);
+            return false;
+        }
+        QString description = QString("POINT:%1, X:%2, Y:%3, SIG:%4, FREQ:%5, VOLT:%6, SAMPLES:%7")
                                      .arg(QString::number(testpoint.id))
                                      .arg(QString::number(testpoint.pos.x()))
                                      .arg(QString::number(testpoint.pos.y()))
-                                     .arg(QString::number(testpoint.signalType))
+                                     .arg(form)
                                      .arg(QString::number(testpoint.signalFrequency))
                                      .arg(QString::number(testpoint.signalVoltage, 'f', 1))
                                      .arg(QString::number(testpoint.data.count()));

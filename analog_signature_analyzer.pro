@@ -27,7 +27,8 @@ HEADERS  += mainwindow.h \
     formraw.h \
     formdiagnose.h \
     boardview.h \
-    signatureview.h
+    signatureview.h \
+    common_types.h
 
 FORMS    += mainwindow.ui \
     formcalibration.ui \
