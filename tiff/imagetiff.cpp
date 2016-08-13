@@ -13,11 +13,6 @@ extern "C" {
 #define TIFFTAG_TESTPOINT_DESCRIPTION   59999
 #define TIFFTAG_TESTPOINT_DATA_X        60000
 #define TIFFTAG_TESTPOINT_DATA_Y        60001
-//#define TIFFTAG_TESTPOINTS_COUNT  59999
-//#define TIFFTAG_TESTPOINTS        60000
-//#define MAX_TESTPOINTS  1000
-
-//static char DEFAULT_TAG_NAME[] = "custom_tag";
 
 static TIFFExtendProc parent_extender = NULL;  // In case we want a chain of extensions
 static const TIFFFieldInfo xtiffFieldInfo[] = {
@@ -446,6 +441,22 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         }
         qDebug() << id << x << y << type << freq << volt << samplesCount;
 
+        QList<QPointF> samples;
+        if (samplesCount > 0) {
+            uint16 count = 0;
+            double *dataX = NULL;
+            double *dataY = NULL;
+            TIFFGetField(m_tiff, TIFFTAG_TESTPOINT_DATA_X, &count, &dataX);
+            TIFFGetField(m_tiff, TIFFTAG_TESTPOINT_DATA_Y, &count, &dataY);
+            for (int t = 0; t < samplesCount; t++) {
+                QPointF point(dataX[t], dataY[t]);
+                samples.append(point);
+            }
+            // TODO does it need to free double *dataX and *dataY?
+//            free(dataX);
+//            free(dataY);
+        }
+
         TestpointMeasure measure;
         measure.id = id;
         measure.pos = QPoint(x, y);
@@ -453,7 +464,7 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         measure.signalFrequency = freq;
         measure.signalVoltage = volt;
         measure.isCurrent = false;
-//        measure.data
+        measure.data = samples;
         testpoints.append(measure);
     }
 
@@ -806,6 +817,7 @@ bool ImageTiff::writeImageSeries(QString filePath, const QImage &boardPhoto,
             Q_ASSERT(false);
             return false;
         }
+        int samplesCount = testpoint.data.count();
         QString description = QString("POINT:%1, X:%2, Y:%3, SIG:%4, FREQ:%5, VOLT:%6, SAMPLES:%7")
                                      .arg(QString::number(testpoint.id))
                                      .arg(QString::number(testpoint.pos.x()))
@@ -813,8 +825,22 @@ bool ImageTiff::writeImageSeries(QString filePath, const QImage &boardPhoto,
                                      .arg(form)
                                      .arg(QString::number(testpoint.signalFrequency))
                                      .arg(QString::number(testpoint.signalVoltage, 'f', 1))
-                                     .arg(QString::number(testpoint.data.count()));
+                                     .arg(QString::number(samplesCount));
         TIFFSetField(m_tiff, TIFFTAG_TESTPOINT_DESCRIPTION, description.toLatin1().data());
+
+        if (samplesCount > 0) {
+            double *dataX = (double *)malloc(samplesCount * sizeof(double));
+            double *dataY = (double *)malloc(samplesCount * sizeof(double));
+            for (int t = 0; t < samplesCount; t++) {
+                QPointF point = testpoint.data.at(t);
+                dataX[t] = point.x();
+                dataY[t] = point.y();
+            }
+            TIFFSetField(m_tiff, TIFFTAG_TESTPOINT_DATA_X, samplesCount, dataX);
+            TIFFSetField(m_tiff, TIFFTAG_TESTPOINT_DATA_Y, samplesCount, dataY);
+            free(dataX);
+            free(dataY);
+        }
 
         if (!appendImage(image)) {
             qWarning() << "Image" << image << "couldn't be written in" << filePath;
