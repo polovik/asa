@@ -13,6 +13,8 @@ public:
     explicit ImageTiff(QObject *parent = 0);
     ~ImageTiff();
 
+    bool readImageSeries(QString filePath, QImage &boardPhoto, QList<TestpointMeasure> &testpoints);
+
     bool write(QString filePath, const QImage &image);
     bool writeImageSeries(QString filePath, const QImage &boardPhoto,
                           const QImage &boardPhotoWithMarkers, const QList<TestpointMeasure> &testpoints);
@@ -27,6 +29,8 @@ public slots:
 signals:
 
 private:
+    void convert32BitOrder(void *buffer, int width);
+    bool readPage(QImage &image);
     bool appendImage(const QImage &image);
 
     TIFF *m_tiff;

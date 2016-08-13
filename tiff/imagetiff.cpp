@@ -105,6 +105,243 @@ ImageTiff::~ImageTiff()
 
 }
 
+void ImageTiff::convert32BitOrder(void *buffer, int width)
+{
+    uint32 *target = reinterpret_cast<uint32 *>(buffer);
+    for (int32 x=0; x<width; ++x) {
+        uint32 p = target[x];
+        // convert between ARGB and ABGR
+        target[x] = (p & 0xff000000)
+                    | ((p & 0x00ff0000) >> 16)
+                    | (p & 0x0000ff00)
+                    | ((p & 0x000000ff) << 16);
+    }
+}
+
+bool ImageTiff::readPage(QImage &image)
+{
+    int compression;
+    QImage::Format format;
+    QSize size;
+    uint16 photometric;
+    bool grayscale;
+
+    // Get Image's header
+    uint32 width;
+    uint32 height;
+    if (!TIFFGetField(m_tiff, TIFFTAG_IMAGEWIDTH, &width)
+        || !TIFFGetField(m_tiff, TIFFTAG_IMAGELENGTH, &height)
+        || !TIFFGetField(m_tiff, TIFFTAG_PHOTOMETRIC, &photometric)) {
+        return false;
+    }
+    size = QSize(width, height);
+
+    uint16 orientationTag;
+    TIFFGetField(m_tiff, TIFFTAG_ORIENTATION, &orientationTag);
+
+    // BitsPerSample defaults to 1 according to the TIFF spec.
+    uint16 bitPerSample;
+    if (!TIFFGetField(m_tiff, TIFFTAG_BITSPERSAMPLE, &bitPerSample))
+        bitPerSample = 1;
+    uint16 samplesPerPixel; // they may be e.g. grayscale with 2 samples per pixel
+    if (!TIFFGetField(m_tiff, TIFFTAG_SAMPLESPERPIXEL, &samplesPerPixel))
+        samplesPerPixel = 1;
+
+    grayscale = photometric == PHOTOMETRIC_MINISBLACK || photometric == PHOTOMETRIC_MINISWHITE;
+
+    if (grayscale && bitPerSample == 1 && samplesPerPixel == 1)
+        format = QImage::Format_Mono;
+//    else if (photometric == PHOTOMETRIC_MINISBLACK && bitPerSample == 8 && samplesPerPixel == 1)
+//        format = QImage::Format_Grayscale8;
+    else if ((grayscale || photometric == PHOTOMETRIC_PALETTE) && bitPerSample == 8 && samplesPerPixel == 1)
+        format = QImage::Format_Indexed8;
+    else if (samplesPerPixel < 4)
+        format = QImage::Format_RGB32;
+    else {
+        uint16 count;
+        uint16 *extrasamples;
+        // If there is any definition of the alpha-channel, libtiff will return premultiplied
+        // data to us. If there is none, libtiff will not touch it and  we assume it to be
+        // non-premultiplied, matching behavior of tested image editors, and how older Qt
+        // versions used to save it.
+        bool gotField = TIFFGetField(m_tiff, TIFFTAG_EXTRASAMPLES, &count, &extrasamples);
+        if (!gotField || !count || extrasamples[0] == EXTRASAMPLE_UNSPECIFIED)
+            format = QImage::Format_ARGB32;
+        else
+            format = QImage::Format_ARGB32_Premultiplied;
+    }
+
+    image = QImage(size, format);
+    if (format == QImage::Format_Mono) {
+        QVector<QRgb> colortable(2);
+        if (photometric == PHOTOMETRIC_MINISBLACK) {
+            colortable[0] = 0xff000000;
+            colortable[1] = 0xffffffff;
+        } else {
+            colortable[0] = 0xffffffff;
+            colortable[1] = 0xff000000;
+        }
+        image.setColorTable(colortable);
+
+        if (!image.isNull()) {
+            for (uint32 y=0; y<height; ++y) {
+                if (TIFFReadScanline(m_tiff, image.scanLine(y), y, 0) < 0) {
+                    return false;
+                }
+            }
+        }
+    } else {
+        if (format == QImage::Format_Indexed8) {
+            if (!image.isNull()) {
+                const uint16 tableSize = 256;
+                QVector<QRgb> qtColorTable(tableSize);
+                if (grayscale) {
+                    for (int i = 0; i<tableSize; ++i) {
+                        const int c = (photometric == PHOTOMETRIC_MINISBLACK) ? i : (255 - i);
+                        qtColorTable[i] = qRgb(c, c, c);
+                    }
+                } else {
+                    // create the color table
+                    uint16 *redTable = 0;
+                    uint16 *greenTable = 0;
+                    uint16 *blueTable = 0;
+                    if (!TIFFGetField(m_tiff, TIFFTAG_COLORMAP, &redTable, &greenTable, &blueTable)) {
+                        return false;
+                    }
+                    if (!redTable || !greenTable || !blueTable) {
+                        return false;
+                    }
+
+                    for (int i = 0; i<tableSize ;++i) {
+                        const int red = redTable[i] / 257;
+                        const int green = greenTable[i] / 257;
+                        const int blue = blueTable[i] / 257;
+                        qtColorTable[i] = qRgb(red, green, blue);
+                    }
+                }
+
+                image.setColorTable(qtColorTable);
+                for (uint32 y=0; y<height; ++y) {
+                    if (TIFFReadScanline(m_tiff, image.scanLine(y), y, 0) < 0) {
+                        return false;
+                    }
+                }
+
+                // free redTable, greenTable and greenTable done by libtiff
+            }
+//        } else if (format == QImage::Format_Grayscale8) {
+//            if (!image.isNull()) {
+//                for (uint32 y = 0; y < height; ++y) {
+//                    if (TIFFReadScanline(m_tiff, image.scanLine(y), y, 0) < 0) {
+//                        return false;
+//                    }
+//                }
+//            }
+        } else {
+            if (!image.isNull()) {
+                const int stopOnError = 1;
+                if (TIFFReadRGBAImageOriented(m_tiff, width, height, reinterpret_cast<uint32 *>(image.bits()), orientationTag, stopOnError)) {
+                    for (uint32 y=0; y<height; ++y)
+                        convert32BitOrder(image.scanLine(y), width);
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+
+    if (image.isNull()) {
+         return false;
+    }
+
+    float resX = 0;
+    float resY = 0;
+    uint16 resUnit;
+    if (!TIFFGetField(m_tiff, TIFFTAG_RESOLUTIONUNIT, &resUnit))
+        resUnit = RESUNIT_INCH;
+
+    if (TIFFGetField(m_tiff, TIFFTAG_XRESOLUTION, &resX)
+        && TIFFGetField(m_tiff, TIFFTAG_YRESOLUTION, &resY)) {
+
+        switch(resUnit) {
+        case RESUNIT_CENTIMETER:
+            image.setDotsPerMeterX(qRound(resX * 100));
+            image.setDotsPerMeterY(qRound(resY * 100));
+            break;
+        case RESUNIT_INCH:
+            image.setDotsPerMeterX(qRound(resX * (100 / 2.54)));
+            image.setDotsPerMeterY(qRound(resY * (100 / 2.54)));
+            break;
+        default:
+            // do nothing as defaults have already
+            // been set within the QImage class
+            break;
+        }
+    }
+
+    return true;
+}
+
+bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<TestpointMeasure> &testpoints)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "File" << filePath << "couldn't be open for reading";
+        Q_ASSERT(false);
+        return false;
+    }
+
+    // current implementation uses TIFFClientOpen which needs to be
+    // able to seek, so sequential devices are not supported
+    QByteArray header = file.peek(4);
+    bool isTiffFile = (header == QByteArray::fromRawData("\x49\x49\x2A\x00", 4))
+                      || (header == QByteArray::fromRawData("\x4D\x4D\x00\x2A", 4));
+    if (!isTiffFile) {
+        qWarning() << "File" << filePath << "is not a Tiff file";
+        Q_ASSERT(false);
+        return false;
+    }
+
+    m_tiff = TIFFClientOpen("foo", "r", &file,
+                              qtiffReadProc, qtiffWriteProc, qtiffSeekProc,
+                              qtiffCloseProc, qtiffSizeProc, qtiffMapProc,
+                              qtiffUnmapProc);
+
+    if (!m_tiff) {
+        qWarning() << "Tiff library couldn't open file" << filePath;
+        Q_ASSERT(false);
+        return false;
+    }
+
+    // Register custom tags
+    augment_libtiff_with_custom_tags();
+
+    unsigned int totalPages = 0;
+    unsigned int page = 0;
+    int fileType = -1;
+    if (!TIFFGetField(m_tiff, TIFFTAG_SUBFILETYPE, &fileType)) {
+        qWarning() << "Couldn't obtain tag" << TIFFTAG_SUBFILETYPE << "from file" << filePath;
+        goto error;
+    }
+    if (fileType != FILETYPE_PAGE) {
+        qWarning() << "Couldn't obtain tag" << TIFFTAG_SUBFILETYPE << "from file" << filePath;
+        goto error;
+    }
+    if (!TIFFGetField(m_tiff, TIFFTAG_PAGENUMBER, &page, &totalPages)) {
+        qWarning() << "Couldn't obtain tag" << TIFFTAG_PAGENUMBER << "from file" << filePath;
+        goto error;
+    }
+    qDebug() << "File" << filePath << "have" << totalPages << "pages";
+
+    TIFFClose(m_tiff);
+    return true;
+
+error:
+    TIFFClose(m_tiff);
+    Q_ASSERT(false);
+    return false;
+}
+
 static bool checkGrayscale(const QVector<QRgb> &colorTable)
 {
     if (colorTable.size() != 256)
@@ -163,8 +400,10 @@ bool ImageTiff::write(QString filePath, const QImage &image)
                                       qtiffSizeProc,
                                       qtiffMapProc,
                                       qtiffUnmapProc);
-    if (!tiff)
+    if (!tiff) {
+        qWarning() << "Tiff library couldn't open file" << filePath;
         return false;
+    }
 
     const int width = image.width();
     const int height = image.height();
