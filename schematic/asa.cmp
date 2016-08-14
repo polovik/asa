@@ -1,157 +1,155 @@
-Cmp-Mod V01 Created by CvPcb (2013-jul-07)-stable date = Sat 06 Aug 2016 10:51:50 PM MSK
+Cmp-Mod V01 Created by PcbNew   date = Sun 14 Aug 2016 02:10:56 PM MSK
 
 BeginCmp
-TimeStamp = /57A63A1F;
+TimeStamp = 57A64893
+Path = /57A63A1F
 Reference = C1;
-ValeurCmp = CP1;
-IdModule  = ;
+ValeurCmp = 1000u;
+IdModule  = Capacitors_ThroughHole:C_Radial_D12.5_L25_P5;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A63A01;
+TimeStamp = 57A64899
+Path = /57A63A01
 Reference = C2;
-ValeurCmp = CP1;
-IdModule  = ;
+ValeurCmp = 1000u;
+IdModule  = Capacitors_ThroughHole:C_Radial_D12.5_L25_P5;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A639F2;
+TimeStamp = 57A6489F
+Path = /57A639F2
 Reference = C3;
-ValeurCmp = CP1;
-IdModule  = ;
+ValeurCmp = 100u;
+IdModule  = Capacitors_ThroughHole:C_Radial_D6.3_L11.2_P2.5;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A63A10;
+TimeStamp = 57A648A5
+Path = /57A63A10
 Reference = C4;
-ValeurCmp = CP1;
-IdModule  = ;
+ValeurCmp = 100u;
+IdModule  = Capacitors_ThroughHole:C_Radial_D6.3_L11.2_P2.5;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A63A2E;
+TimeStamp = 57A648AB
+Path = /57A63A2E
 Reference = C5;
-ValeurCmp = CP1;
-IdModule  = ;
+ValeurCmp = 470u;
+IdModule  = Capacitors_ThroughHole:C_Radial_D13_L21_P5;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A63A3D;
+TimeStamp = 57A648B1
+Path = /57A63A3D
 Reference = C6;
-ValeurCmp = CP1;
-IdModule  = ;
+ValeurCmp = 470u;
+IdModule  = Capacitors_ThroughHole:C_Radial_D13_L21_P5;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A63A6A;
-Reference = D1;
-ValeurCmp = DIODE;
-IdModule  = ;
-EndCmp
-
-BeginCmp
-TimeStamp = /57A63A4C;
-Reference = D2;
-ValeurCmp = DIODE;
-IdModule  = ;
-EndCmp
-
-BeginCmp
-TimeStamp = /57A63A5B;
-Reference = D3;
-ValeurCmp = DIODE;
-IdModule  = ;
-EndCmp
-
-BeginCmp
-TimeStamp = /57A63A79;
-Reference = D4;
-ValeurCmp = DIODE;
-IdModule  = ;
-EndCmp
-
-BeginCmp
-TimeStamp = /57A63AF1;
+TimeStamp = 57A648CF
+Path = /57A63AF1
 Reference = D5;
-ValeurCmp = DIODESCH;
-IdModule  = ;
+ValeurCmp = D814D;
+IdModule  = Diodes_ThroughHole:Diode_P600_Horizontal;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A63B00;
+TimeStamp = 57A648D5
+Path = /57A63B00
 Reference = D6;
-ValeurCmp = DIODESCH;
-IdModule  = ;
+ValeurCmp = D814D;
+IdModule  = Diodes_ThroughHole:Diode_P600_Horizontal;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A63B0F;
+TimeStamp = 57A648DB
+Path = /57A63B0F
 Reference = D7;
-ValeurCmp = LED;
-IdModule  = ;
+ValeurCmp = 2V 0.01A yellow;
+IdModule  = LEDs:LED-3MM;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A63B1E;
+TimeStamp = 57A648E1
+Path = /57A63B1E
 Reference = D8;
-ValeurCmp = LED;
-IdModule  = ;
+ValeurCmp = 2V 0.01A yellow;
+IdModule  = LEDs:LED-3MM;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A6411E;
+TimeStamp = 57A648E8
+Path = /57A6411E
 Reference = K1;
 ValeurCmp = CONN_3;
-IdModule  = ;
+IdModule  = Pin_Headers:Pin_Header_Straight_1x03;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A6410F;
+TimeStamp = 57A648EF
+Path = /57A6410F
 Reference = K2;
 ValeurCmp = CONN_3;
-IdModule  = ;
+IdModule  = Pin_Headers:Pin_Header_Straight_1x03;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A63A88;
-Reference = Q1;
-ValeurCmp = NPN;
-IdModule  = ;
-EndCmp
-
-BeginCmp
-TimeStamp = /57A63A97;
-Reference = Q2;
-ValeurCmp = PNP;
-IdModule  = ;
-EndCmp
-
-BeginCmp
-TimeStamp = /57A63AA6;
+TimeStamp = 57A64903
+Path = /57A63AA6
 Reference = R1;
-ValeurCmp = R;
-IdModule  = ;
+ValeurCmp = 470;
+IdModule  = Resistors_ThroughHole:Resistor_Horizontal_RM20mm;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A63AB5;
+TimeStamp = 57A64909
+Path = /57A63AB5
 Reference = R2;
-ValeurCmp = R;
-IdModule  = ;
+ValeurCmp = 470;
+IdModule  = Resistors_ThroughHole:Resistor_Horizontal_RM20mm;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A63AD3;
+TimeStamp = 57A6490F
+Path = /57A63AD3
 Reference = R3;
-ValeurCmp = R;
-IdModule  = ;
+ValeurCmp = 1200 0.125W;
+IdModule  = Resistors_ThroughHole:Resistor_Horizontal_RM20mm;
 EndCmp
 
 BeginCmp
-TimeStamp = /57A63AC4;
+TimeStamp = 57A64915
+Path = /57A63AC4
 Reference = R4;
-ValeurCmp = R;
-IdModule  = ;
+ValeurCmp = 1200 0.125W;
+IdModule  = Resistors_ThroughHole:Resistor_Horizontal_RM20mm;
+EndCmp
+
+BeginCmp
+TimeStamp = 57A648F6
+Path = /57A63A88
+Reference = Q1;
+ValeurCmp = KT815;
+IdModule  = TO_SOT_Packages_THT:SOT126_SOT32_Housing_Vertical;
+EndCmp
+
+BeginCmp
+TimeStamp = 57A648FD
+Path = /57A63A97
+Reference = Q2;
+ValeurCmp = KT814;
+IdModule  = TO_SOT_Packages_THT:SOT126_SOT32_Housing_Vertical;
+EndCmp
+
+BeginCmp
+TimeStamp = 57B04E98
+Path = /57B04E9D
+Reference = D1;
+ValeurCmp = Diode_Bridge;
+IdModule  = Diodes_ThroughHole:Diode_Bridge_16.7x16.7;
 EndCmp
 
 EndListe
