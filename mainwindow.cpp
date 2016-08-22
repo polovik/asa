@@ -36,16 +36,12 @@ void MainWindow::showForm()
     QPushButton *button = qobject_cast<QPushButton *>(sender());
     QWidget *newForm = NULL;
     if (button == ui->buttonCalibration) {
-        qDebug() << "Open form \"Calibration\"";
         newForm = m_formCalibration;
     } else if (button == ui->buttonRaw) {
-        qDebug() << "Open form \"Raw\"";
         newForm = m_formRaw;
     } else if (button == ui->buttonAnalyze) {
-        qDebug() << "Open form \"Analyze\"";
         newForm = m_formAnalyze;
     } else if (button == ui->buttonDiagnose) {
-        qDebug() << "Open form \"Diagnose\"";
         newForm = m_formDiagnose;
     } else {
         qWarning() << "Unknown Form:" << button;
@@ -55,6 +51,33 @@ void MainWindow::showForm()
     if (newForm == m_currentForm) {
         return;
     }
+    if (m_currentForm == m_formCalibration) {
+        qDebug() << "Close form \"Calibration\"";
+    } else if (m_currentForm == m_formRaw) {
+        qDebug() << "Close form \"Raw\"";
+    } else if (m_currentForm == m_formAnalyze) {
+        qDebug() << "Close form \"Analyze\"";
+        m_formAnalyze->leaveForm();
+    } else if (m_currentForm == m_formDiagnose) {
+        qDebug() << "Close form \"Diagnose\"";
+    } else {
+        qWarning() << "Unknown Form:" << button;
+        Q_ASSERT(false);
+        return;
+    }
     m_currentForm = newForm;
+    if (m_currentForm == m_formCalibration) {
+        qDebug() << "Open form \"Calibration\"";
+    } else if (m_currentForm == m_formRaw) {
+        qDebug() << "Open form \"Raw\"";
+    } else if (m_currentForm == m_formAnalyze) {
+        qDebug() << "Open form \"Analyze\"";
+    } else if (m_currentForm == m_formDiagnose) {
+        qDebug() << "Open form \"Diagnose\"";
+    } else {
+        qWarning() << "Unknown Form:" << button;
+        Q_ASSERT(false);
+        return;
+    }
     ui->mainArea->setCurrentWidget(m_currentForm);
 }

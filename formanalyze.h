@@ -15,6 +15,17 @@ public:
     explicit FormAnalyze(QWidget *parent = 0);
     ~FormAnalyze();
 
+public slots:
+    void leaveForm();
+
+private slots:
+    void setFrequency(int frequency);
+    void setVoltage(double voltage);
+    void setVoltage(int vol10);
+    void switchOutputWaveForm();
+    void runAnalyze(bool start);
+    void saveSignature();
+
 private:
     Ui::FormAnalyze *ui;
 };
