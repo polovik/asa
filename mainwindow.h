@@ -11,6 +11,9 @@ namespace Ui {
 class MainWindow;
 }
 
+class ToneGenerator;
+class AudioInputThread;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -24,6 +27,9 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    ToneGenerator *m_gen;
+    AudioInputThread *m_capture;
+
     FormCalibration *m_formCalibration;
     FormRaw *m_formRaw;
     FormAnalyze *m_formAnalyze;

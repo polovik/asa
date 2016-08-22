@@ -175,6 +175,11 @@ QStringList ToneGenerator::enumerateDevices()
     return devices;
 }
 
+QString ToneGenerator::getDeviceName()
+{
+    return m_curAudioDeviceInfo.deviceName();
+}
+
 void ToneGenerator::runGenerator(bool start)
 {
     qDebug() << "run tone generator:" << start;
@@ -184,6 +189,10 @@ void ToneGenerator::runGenerator(bool start)
 void ToneGenerator::changeFrequency(int freq)
 {
     m_toneFrequency = freq;
+    if (m_outputBuffer == NULL) {
+        qWarning() << "Skip frequency applying for ToneGenerator because it hasn't been started yet";
+        return;
+    }
     m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm);
 }
 
@@ -205,6 +214,10 @@ void ToneGenerator::switchOutputDevice(QString name)
 void ToneGenerator::switchWaveForm(ToneWaveForm form)
 {
     m_waveForm = form;
+    if (m_outputBuffer == NULL) {
+        qWarning() << "Skip waveform applying for ToneGenerator because it hasn't been started yet";
+        return;
+    }
     m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm);
 }
 

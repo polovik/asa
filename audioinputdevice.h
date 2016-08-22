@@ -70,6 +70,7 @@ public:
     void changeFrameSize (ThreadPurpose purpose, int size);
     QStringList enumerateDevices();
     void setCapturedChannels(OscCapturedChannels channels);
+    QString getDeviceName();
 
 public slots:
     void updateBuffers (OscCapturedChannels channel, SamplesList samples);

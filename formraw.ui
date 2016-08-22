@@ -21,7 +21,11 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QComboBox" name="boxAudioOutputDevice"/>
+       <widget class="QLabel" name="labelAudioOutputDevice">
+        <property name="text">
+         <string>output device name</string>
+        </property>
+       </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -73,7 +77,11 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QComboBox" name="boxAudioInputDevice"/>
+       <widget class="QLabel" name="labelAudioInputDevice">
+        <property name="text">
+         <string>input device name</string>
+        </property>
+       </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -206,7 +214,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="buttonCupture">
+       <widget class="QPushButton" name="buttonCapture">
         <property name="text">
          <string>Capture</string>
         </property>

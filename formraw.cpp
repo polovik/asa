@@ -6,33 +6,16 @@
 
 extern bool g_verboseOutput;
 
-FormRaw::FormRaw(QWidget *parent) :
+FormRaw::FormRaw(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FormRaw)
 {
     ui->setupUi(this);
 
     //  Tone generation
-    m_gen = new ToneGenerator;
-    QStringList outputDeviceNames = m_gen->enumerateDevices();
-    QString outputDeviceName;
-    ui->boxAudioOutputDevice->clear();
-    int index = 0;
-    foreach (QString name, outputDeviceNames) {
-        if (name.startsWith("* ")) {
-            outputDeviceName = name;
-            outputDeviceName.remove(0, 2);
-            ui->boxAudioOutputDevice->addItem(name, QVariant(outputDeviceName));
-            ui->boxAudioOutputDevice->setCurrentIndex(index);
-            switchOutputAudioDevice(index);
-        } else {
-            ui->boxAudioOutputDevice->addItem(name, QVariant(name));
-        }
-        index++;
-    }
+    m_gen = gen;
     connect(m_gen, SIGNAL(deviceReady(bool)), this, SLOT(switchOutputFrequency()));
     connect(m_gen, SIGNAL(deviceReady(bool)), this, SLOT(switchOutputWaveForm()));
-    m_gen->start();
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_sine.png"), "Sine", QVariant(WAVE_SINE));
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_square.png"), "Square", QVariant(WAVE_SQUARE));
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_saw.png"), "Sawtooth", QVariant(WAVE_SAWTOOTH));
@@ -43,28 +26,11 @@ FormRaw::FormRaw(QWidget *parent) :
     m_triggerChannel = CHANNEL_NONE;
     m_samplingRate = -1;
     m_frameLength = -1;
-    m_capture = new AudioInputThread;
+    m_capture = capture;
     connect(m_capture, SIGNAL (initiated (int)),
              SLOT (captureDeviceInitiated (int)), Qt::QueuedConnection); // wait while main window initiated
     connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList,SamplesList)),
             this, SLOT(processOscilloscopeData(SamplesList,SamplesList)));
-    QStringList inputDeviceNames = m_capture->enumerateDevices();
-    QString inputDeviceName;
-    ui->boxAudioInputDevice->clear();
-    index = 0;
-    foreach (QString name, inputDeviceNames) {
-        if (name.startsWith("* ")) {
-            inputDeviceName = name;
-            inputDeviceName.remove(0, 2);
-            ui->boxAudioInputDevice->addItem(name, QVariant(inputDeviceName));
-            ui->boxAudioInputDevice->setCurrentIndex(index);
-            switchInputAudioDevice(index);
-        } else {
-            ui->boxAudioInputDevice->addItem(name, QVariant(name));
-        }
-        index++;
-    }
-    m_capture->start ();
 
     changeTriggerSettings();
     connect(ui->boxTriggerAuto, SIGNAL(clicked()), this, SLOT(changeTriggerSettings()));
@@ -107,13 +73,9 @@ FormRaw::FormRaw(QWidget *parent) :
 
     connect(ui->buttonGenerate, SIGNAL(toggled(bool)), this, SLOT(startToneGenerator(bool)));
     connect(ui->boxFrequency, SIGNAL(valueChanged(int)), this, SLOT(switchOutputFrequency()));
-    connect(ui->buttonGenerate, SIGNAL(toggled(bool)), ui->boxAudioOutputDevice, SLOT(setDisabled(bool)));
-    connect(ui->boxAudioOutputDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputAudioDevice(int)));
     connect(ui->boxWaveForm, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputWaveForm()));
 
-    connect(ui->buttonCupture, SIGNAL(toggled(bool)), this, SLOT(startAudioCapture(bool)));
-    connect(ui->buttonCupture, SIGNAL(toggled(bool)), ui->boxAudioInputDevice, SLOT(setDisabled(bool)));
-    connect(ui->boxAudioInputDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(switchInputAudioDevice(int)));
+    connect(ui->buttonCapture, SIGNAL(toggled(bool)), this, SLOT(startAudioCapture(bool)));
     connect(ui->boxChannelLeft, SIGNAL(toggled(bool)), this, SLOT(changeCapturedChannels()));
     connect(ui->boxChannelRight, SIGNAL(toggled(bool)), this, SLOT(changeCapturedChannels()));
 }
@@ -123,13 +85,37 @@ FormRaw::~FormRaw()
     delete ui;
 }
 
+void FormRaw::enterForm()
+{
+    QString inputName = m_capture->getDeviceName();
+    QString outputName = m_gen->getDeviceName();
+    ui->labelAudioInputDevice->setText(inputName);
+    ui->labelAudioOutputDevice->setText(outputName);
+}
+
+void FormRaw::leaveForm()
+{
+    qDebug() << "Leave form \"Raw\"";
+    startToneGenerator(false);
+    startAudioCapture(false);
+    ui->buttonGenerate->setChecked(false);
+    ui->buttonCapture->setChecked(false);
+}
+
 void FormRaw::startToneGenerator(bool start)
 {
+    if (start) {
+        switchOutputWaveForm();
+        switchOutputFrequency();
+    }
     m_gen->runGenerator(start);
 }
 
 void FormRaw::captureDeviceInitiated (int samplingRate)
 {
+    if (!ui->buttonCapture->isChecked()) {
+        return;
+    }
     // Audio device ready to capture - display this
     audioCaptureReady = true;
     m_samplingRate = samplingRate;
@@ -195,6 +181,9 @@ void FormRaw::displayOscilloscopeChannelData(int dislayFrom, int displayedLength
 
 void FormRaw::processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData)
 {
+    if (!ui->buttonCapture->isChecked()) {
+        return;
+    }
 //    qDebug() << "Got" << samples.length() << "samples";
     if (m_capturedChannels == CHANNEL_NONE) {
         return;
@@ -335,32 +324,22 @@ void FormRaw::startAudioCapture(bool start)
     m_capture->startCapturing(start);
 }
 
-void FormRaw::switchOutputAudioDevice(int index)
-{
-    QVariant cleanName = ui->boxAudioOutputDevice->itemData(index);
-    QString name = cleanName.toString();
-    m_gen->switchOutputDevice(name);
-}
-
 void FormRaw::switchOutputWaveForm()
 {
     int index = ui->boxWaveForm->currentIndex();
     QVariant data = ui->boxWaveForm->itemData(index);
     ToneWaveForm form = (ToneWaveForm)data.toInt();
-    m_gen->switchWaveForm(form);
+    if (ui->buttonGenerate->isChecked()) {
+        m_gen->switchWaveForm(form);
+    }
 }
 
 void FormRaw::switchOutputFrequency()
 {
     int freq = ui->boxFrequency->value();
-    m_gen->changeFrequency(freq);
-}
-
-void FormRaw::switchInputAudioDevice(int index)
-{
-    QVariant cleanName = ui->boxAudioInputDevice->itemData(index);
-    QString name = cleanName.toString();
-    m_capture->switchInputDevice(name);
+    if (ui->buttonGenerate->isChecked()) {
+        m_gen->changeFrequency(freq);
+    }
 }
 
 void FormRaw::updateTriggerLevel(double voltage)

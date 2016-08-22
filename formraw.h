@@ -15,8 +15,12 @@ class FormRaw : public QWidget
     Q_OBJECT
 
 public:
-    explicit FormRaw(QWidget *parent = 0);
+    explicit FormRaw(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent = 0);
     ~FormRaw();
+
+public slots:
+    void enterForm();
+    void leaveForm();
 
 private slots:
     void startToneGenerator(bool start);
@@ -24,10 +28,8 @@ private slots:
     void draw(OscCapturedChannels channel, const QVector<double> &values);
     void processOscilloscopeData (SamplesList leftChannelData, SamplesList rightChannelData);
     void startAudioCapture(bool start);
-    void switchOutputAudioDevice(int index);
     void switchOutputWaveForm();
     void switchOutputFrequency();
-    void switchInputAudioDevice(int index);
     void updateTriggerLevel(double voltage);
     void changeTriggerSettings();
     void changeCapturedChannels();

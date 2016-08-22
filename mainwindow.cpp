@@ -1,6 +1,8 @@
 #include <QDebug>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "ToneGenerator.h"
+#include "audioinputdevice.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,9 +14,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->buttonAnalyze, SIGNAL(pressed()), this, SLOT(showForm()));
     connect(ui->buttonDiagnose, SIGNAL(pressed()), this, SLOT(showForm()));
 
-    m_formCalibration = new FormCalibration();
-    m_formRaw = new FormRaw();
-    m_formAnalyze = new FormAnalyze();
+    m_gen = new ToneGenerator;
+    m_capture = new AudioInputThread;
+
+    m_formCalibration = new FormCalibration(m_gen, m_capture);
+    m_formRaw = new FormRaw(m_gen, m_capture);
+    m_formAnalyze = new FormAnalyze(m_gen, m_capture);
     m_formDiagnose = new FormDiagnose();
     ui->mainArea->addWidget(m_formCalibration);
     ui->mainArea->addWidget(m_formRaw);
@@ -24,6 +29,10 @@ MainWindow::MainWindow(QWidget *parent) :
     m_currentForm = m_formCalibration;
     ui->mainArea->setCurrentWidget(m_currentForm);
     ui->buttonCalibration->setChecked(true);
+
+    //  Start audio device only after enumeration completion
+    m_gen->start();
+    m_capture->start();
 }
 
 MainWindow::~MainWindow()
@@ -53,8 +62,10 @@ void MainWindow::showForm()
     }
     if (m_currentForm == m_formCalibration) {
         qDebug() << "Close form \"Calibration\"";
+        m_formCalibration->leaveForm();
     } else if (m_currentForm == m_formRaw) {
         qDebug() << "Close form \"Raw\"";
+        m_formRaw->leaveForm();
     } else if (m_currentForm == m_formAnalyze) {
         qDebug() << "Close form \"Analyze\"";
         m_formAnalyze->leaveForm();
@@ -70,6 +81,7 @@ void MainWindow::showForm()
         qDebug() << "Open form \"Calibration\"";
     } else if (m_currentForm == m_formRaw) {
         qDebug() << "Open form \"Raw\"";
+        m_formRaw->enterForm();
     } else if (m_currentForm == m_formAnalyze) {
         qDebug() << "Open form \"Analyze\"";
     } else if (m_currentForm == m_formDiagnose) {

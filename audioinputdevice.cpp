@@ -239,6 +239,11 @@ void AudioInputThread::setCapturedChannels(OscCapturedChannels channels)
     m_inputBuffer->setChannels(m_capturedChannels);
 }
 
+QString AudioInputThread::getDeviceName()
+{
+    return m_curAudioDeviceInfo.deviceName();
+}
+
 /*
     After appropriated buffer filled then samples emit.
     If certain frame size equal to 0 - do not store samples in this buffer

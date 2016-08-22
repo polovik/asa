@@ -41,6 +41,7 @@ public:
     explicit ToneGenerator(QObject *parent = 0);
     ~ToneGenerator();
     QStringList enumerateDevices();
+    QString getDeviceName();
 
 public slots:
     void runGenerator(bool start);

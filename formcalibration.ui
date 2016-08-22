@@ -16,10 +16,10 @@
   <widget class="QPlainTextEdit" name="plainTextEdit">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>40</y>
-     <width>461</width>
-     <height>281</height>
+     <x>20</x>
+     <y>180</y>
+     <width>641</width>
+     <height>251</height>
     </rect>
    </property>
    <property name="plainText">
@@ -31,12 +31,48 @@ Input device:
 Output device:
 - select device
 - buttons for play signal on each channel separately
-- adjust volume
+- adjust volume - set maximal voltage which corresponds to 65535 value
 The board:
 - ????
 
 Store these settings if even input/output device is missed right now.</string>
    </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>90</y>
+     <width>501</width>
+     <height>65</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Input audio device</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QComboBox" name="boxAudioInputDevice"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>501</width>
+     <height>65</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Output audio device</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QComboBox" name="boxAudioOutputDevice"/>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

@@ -2,17 +2,20 @@
 #define FORMANALYZE_H
 
 #include <QWidget>
+#include "audioinputdevice.h"
 
 namespace Ui {
 class FormAnalyze;
 }
+
+class ToneGenerator;
 
 class FormAnalyze : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit FormAnalyze(QWidget *parent = 0);
+    explicit FormAnalyze(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent = 0);
     ~FormAnalyze();
 
 public slots:
@@ -25,9 +28,13 @@ private slots:
     void switchOutputWaveForm();
     void runAnalyze(bool start);
     void saveSignature();
+    void captureDeviceInitiated (int samplingRate);
+    void processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData);
 
 private:
     Ui::FormAnalyze *ui;
+    ToneGenerator *m_gen;
+    AudioInputThread *m_capture;
 };
 
 #endif // FORMANALYZE_H
