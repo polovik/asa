@@ -16,7 +16,9 @@ SOURCES += main.cpp\
     formraw.cpp \
     formdiagnose.cpp \
     boardview.cpp \
-    signatureview.cpp
+    signatureview.cpp \
+    formanalyze.cpp \
+    squarewidgetholder.cpp
 
 HEADERS  += mainwindow.h \
     ToneGenerator.h \
@@ -28,12 +30,15 @@ HEADERS  += mainwindow.h \
     formdiagnose.h \
     boardview.h \
     signatureview.h \
-    common_types.h
+    common_types.h \
+    formanalyze.h \
+    squarewidgetholder.h
 
 FORMS    += mainwindow.ui \
     formcalibration.ui \
     formraw.ui \
-    formdiagnose.ui
+    formdiagnose.ui \
+    formanalyze.ui
 
 RESOURCES += \
     analog_signature_analyzer.qrc

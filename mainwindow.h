@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <formcalibration.h>
 #include <formraw.h>
+#include <formanalyze.h>
 #include <formdiagnose.h>
 
 namespace Ui {
@@ -25,6 +26,7 @@ private:
     Ui::MainWindow *ui;
     FormCalibration *m_formCalibration;
     FormRaw *m_formRaw;
+    FormAnalyze *m_formAnalyze;
     FormDiagnose *m_formDiagnose;
 
     QWidget *m_currentForm;
