@@ -5,15 +5,9 @@
 #include <QAudioInput>
 #include <QThread>
 #include <QTime>
+#include "common_types.h"
 
 typedef QList<qreal> SamplesList;
-
-typedef enum {
-    CHANNEL_NONE   = 0,
-    CHANNEL_LEFT   = 1,
-    CHANNEL_RIGHT  = 2,
-    CHANNEL_BOTH   = 3
-} OscCapturedChannels;
 
 class AudioInputDevice : public QIODevice
 {
@@ -23,7 +17,7 @@ public:
     ~AudioInputDevice();
 
 public slots:
-    void setChannels(OscCapturedChannels channels);
+    void setChannels(AudioChannels channels);
 
 protected:
     qint64 readData (char * /*data*/, qint64 /*maxSize*/);
@@ -32,10 +26,10 @@ protected:
 private:
     QTime timer;
     qreal samplesReaded;    // use for determinate time of current frame from start
-    OscCapturedChannels m_channels;
+    AudioChannels m_channels;
 
 signals:
-    void samplesReceived(OscCapturedChannels channel, SamplesList data);
+    void samplesReceived(AudioChannels channel, SamplesList data);
     void samplesReceived(SamplesList leftChannelData, SamplesList rightChannelData);
 
 private slots:
@@ -69,11 +63,11 @@ public:
     void startCapturing (bool start);
     void changeFrameSize (ThreadPurpose purpose, int size);
     QStringList enumerateDevices();
-    void setCapturedChannels(OscCapturedChannels channels);
+    void setCapturedChannels(AudioChannels channels);
     QString getDeviceName();
 
 public slots:
-    void updateBuffers (OscCapturedChannels channel, SamplesList samples);
+    void updateBuffers(AudioChannels channel, SamplesList samples);
     void switchInputDevice(QString name);
 
 signals:
@@ -82,7 +76,7 @@ signals:
     void dataForCompressor (SamplesList);
     void dataForVolumeIndicator (SamplesList);
     void dataForTuner (SamplesList);
-    void dataForOscilloscope(OscCapturedChannels channel, SamplesList data);
+    void dataForOscilloscope(AudioChannels channel, SamplesList data);
     void dataForOscilloscope(SamplesList leftChannelData, SamplesList rightChannelData);
 
 private slots:
@@ -106,7 +100,7 @@ private:
     bool m_captureEnabled;
     QAudioDeviceInfo m_curAudioDeviceInfo;
     QList<QAudioDeviceInfo> m_audioDeviceInfos;
-    OscCapturedChannels m_capturedChannels;
+    AudioChannels m_capturedChannels;
 };
 
 #endif // AUDIOINPUTDEVICE_H

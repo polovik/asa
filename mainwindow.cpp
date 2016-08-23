@@ -4,10 +4,14 @@
 #include "ToneGenerator.h"
 #include "audioinputdevice.h"
 
+Q_DECLARE_METATYPE (AudioChannels)
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    qRegisterMetaType <AudioChannels> ();
+
     ui->setupUi(this);
     connect(ui->buttonCalibration, SIGNAL(pressed()), this, SLOT(showForm()));
     connect(ui->buttonRaw, SIGNAL(pressed()), this, SLOT(showForm()));

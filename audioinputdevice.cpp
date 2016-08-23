@@ -5,7 +5,6 @@
 #include "audioinputdevice.h"
 
 Q_DECLARE_METATYPE (SamplesList)
-Q_DECLARE_METATYPE (OscCapturedChannels)
 
 AudioInputDevice::AudioInputDevice(QObject *parent) :
     QIODevice(parent)
@@ -17,7 +16,7 @@ AudioInputDevice::~AudioInputDevice()
 {
 }
 
-void AudioInputDevice::setChannels(OscCapturedChannels channels)
+void AudioInputDevice::setChannels(AudioChannels channels)
 {
     qDebug() << "Select input channels: left -"
              << ((channels & CHANNEL_LEFT) ? "on," : "off,")
@@ -75,7 +74,6 @@ AudioInputThread::AudioInputThread () :
         compressorFrameSize (0), volumeIndicatorFrameSize (0), tunerFrameSize (0), oscilloscopeFrameSize(0)
 {
     qRegisterMetaType <SamplesList> ();
-    qRegisterMetaType <OscCapturedChannels> ();
     m_capturedChannels = CHANNEL_NONE;
     m_captureEnabled = false;
     // set up the format you want, eg.
@@ -94,8 +92,8 @@ void AudioInputThread::run ()
 {
     m_inputBuffer = new AudioInputDevice();
     m_inputBuffer->open(QIODevice::ReadWrite | QIODevice::Truncate);
-//    connect(m_inputBuffer, SIGNAL(samplesReceived(OscCapturedChannels,SamplesList)), SLOT (updateBuffers(OscCapturedChannels,SamplesList)), Qt::QueuedConnection);
-//    connect(m_inputBuffer, SIGNAL(samplesReceived(OscCapturedChannels,SamplesList)), SIGNAL(dataForOscilloscope(OscCapturedChannels,SamplesList)), Qt::QueuedConnection);
+//    connect(m_inputBuffer, SIGNAL(samplesReceived(AudioChannels,SamplesList)), SLOT (updateBuffers(AudioChannels,SamplesList)), Qt::QueuedConnection);
+//    connect(m_inputBuffer, SIGNAL(samplesReceived(AudioChannels,SamplesList)), SIGNAL(dataForOscilloscope(AudioChannels,SamplesList)), Qt::QueuedConnection);
     connect(m_inputBuffer, SIGNAL(samplesReceived(SamplesList,SamplesList)), SIGNAL(dataForOscilloscope(SamplesList,SamplesList)), Qt::QueuedConnection);
 
     bool captureStarted = false;
@@ -233,7 +231,7 @@ QStringList AudioInputThread::enumerateDevices()
     return devices;
 }
 
-void AudioInputThread::setCapturedChannels(OscCapturedChannels channels)
+void AudioInputThread::setCapturedChannels(AudioChannels channels)
 {
     m_capturedChannels = channels;
     m_inputBuffer->setChannels(m_capturedChannels);
@@ -248,7 +246,7 @@ QString AudioInputThread::getDeviceName()
     After appropriated buffer filled then samples emit.
     If certain frame size equal to 0 - do not store samples in this buffer
 */
-void AudioInputThread::updateBuffers (OscCapturedChannels channel, SamplesList samples)
+void AudioInputThread::updateBuffers (AudioChannels channel, SamplesList samples)
 {
     qDebug() << "Got" << samples.length() << "samples";
 //    if (compressorFrameSize > 0)

@@ -17,23 +17,20 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>180</y>
+     <y>240</y>
      <width>641</width>
-     <height>251</height>
+     <height>191</height>
     </rect>
    </property>
    <property name="plainText">
     <string>This form allows to select input and output devices and configure it. Also it provide helps for confirure the board.
 Input device:
-- select device
 - view signal level for each channel
 - adjust amplifing and/or multiply factor (scale volts)
 Output device:
-- select device
-- buttons for play signal on each channel separately
 - adjust volume - set maximal voltage which corresponds to 65535 value
 The board:
-- ????
+- Create a guide - interactive schematic, where highlighted tested points and add some tooltips and/or hints.
 
 Store these settings if even input/output device is missed right now.</string>
    </property>
@@ -43,7 +40,7 @@ Store these settings if even input/output device is missed right now.</string>
     <rect>
      <x>20</x>
      <y>90</y>
-     <width>501</width>
+     <width>381</width>
      <height>65</height>
     </rect>
    </property>
@@ -61,7 +58,7 @@ Store these settings if even input/output device is missed right now.</string>
     <rect>
      <x>20</x>
      <y>10</y>
-     <width>501</width>
+     <width>381</width>
      <height>65</height>
     </rect>
    </property>
@@ -71,6 +68,41 @@ Store these settings if even input/output device is missed right now.</string>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QComboBox" name="boxAudioOutputDevice"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>20</y>
+     <width>190</width>
+     <height>65</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Play tone on specific channel</string>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="buttonLeftOutputChannel">
+      <property name="text">
+       <string>Left</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="buttonRightOutputChannel">
+      <property name="text">
+       <string>Right</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

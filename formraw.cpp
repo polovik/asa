@@ -107,6 +107,7 @@ void FormRaw::startToneGenerator(bool start)
     if (start) {
         switchOutputWaveForm();
         switchOutputFrequency();
+        m_gen->setActiveChannels(CHANNEL_BOTH);
     }
     m_gen->runGenerator(start);
 }
@@ -136,7 +137,7 @@ void FormRaw::captureDeviceInitiated (int samplingRate)
     changeCapturedChannels(); // Start receive data from input device
 }
 
-void FormRaw::draw(OscCapturedChannels channel, const QVector<double> &values)
+void FormRaw::draw(AudioChannels channel, const QVector<double> &values)
 {
     QVector<double> keys;
     keys.resize(values.count());
@@ -387,7 +388,7 @@ void FormRaw::changeTriggerSettings()
         m_triggerSlope = slope;
     }
 
-    OscCapturedChannels channel;
+    AudioChannels channel;
     if (ui->boxTriggerChannel->currentIndex() == 0) {
         channel = CHANNEL_LEFT;
     } else if (ui->boxTriggerChannel->currentIndex() == 1) {
@@ -414,6 +415,6 @@ void FormRaw::changeCapturedChannels()
         channels |= CHANNEL_RIGHT;
     }
     ui->oscilloscope->showGraph(GRAPH_CHANNEL_RIGHT, ui->boxChannelRight->isChecked());
-    m_capturedChannels = (OscCapturedChannels)channels;
+    m_capturedChannels = (AudioChannels)channels;
     m_capture->setCapturedChannels(m_capturedChannels);
 }

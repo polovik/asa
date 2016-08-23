@@ -25,7 +25,7 @@ public slots:
 private slots:
     void startToneGenerator(bool start);
     void captureDeviceInitiated (int samplingRate);
-    void draw(OscCapturedChannels channel, const QVector<double> &values);
+    void draw(AudioChannels channel, const QVector<double> &values);
     void processOscilloscopeData (SamplesList leftChannelData, SamplesList rightChannelData);
     void startAudioCapture(bool start);
     void switchOutputWaveForm();
@@ -53,8 +53,8 @@ private:
     OscTriggerSlope m_triggerSlope;
     SamplesList m_samplesInputBufferLeft;
     SamplesList m_samplesInputBufferRight;
-    OscCapturedChannels m_capturedChannels;
-    OscCapturedChannels m_triggerChannel;
+    AudioChannels m_capturedChannels;
+    AudioChannels m_triggerChannel;
 };
 
 #endif // FORMRAW_H

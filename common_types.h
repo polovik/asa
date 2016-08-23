@@ -12,6 +12,13 @@ typedef enum {
     WAVE_TRIANGLE   = 4
 } ToneWaveForm;
 
+typedef enum {
+    CHANNEL_NONE   = 0,
+    CHANNEL_LEFT   = 1,
+    CHANNEL_RIGHT  = 2,
+    CHANNEL_BOTH   = 3
+} AudioChannels;
+
 typedef struct {
     int id;
     QPoint pos;

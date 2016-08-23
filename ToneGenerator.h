@@ -14,7 +14,8 @@ class AudioOutputDevice : public QIODevice
 public:
     explicit AudioOutputDevice (QObject *parent = 0);
     ~AudioOutputDevice();
-    void configure(const QAudioFormat &format, qint32 frequency, ToneWaveForm form);
+    void configure(const QAudioFormat &format, qint32 frequency,
+                   ToneWaveForm form, AudioChannels activeChannels);
 
 public slots:
 
@@ -29,6 +30,7 @@ private:
     QAudioFormat m_audioFormat;
     qint32 m_frequency;
     ToneWaveForm m_waveForm;
+    AudioChannels m_activeChannels;
     QMutex m_settingsMutex;
 
 signals:
@@ -48,6 +50,7 @@ public slots:
     void changeFrequency(int freq);
     void switchOutputDevice(QString name);
     void switchWaveForm(ToneWaveForm form);
+    void setActiveChannels(AudioChannels channels);
 
 signals:
     void deviceReady(bool ready);
@@ -67,6 +70,7 @@ private:
     bool m_generationEnabled;
     QAudioDeviceInfo m_curAudioDeviceInfo;
     QList<QAudioDeviceInfo> m_audioDeviceInfos;
+    AudioChannels m_activeChannels;
 };
 
 #endif // TONEGENERATOR_H

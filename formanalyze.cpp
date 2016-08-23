@@ -26,6 +26,7 @@ FormAnalyze::FormAnalyze(ToneGenerator *gen, AudioInputThread *capture, QWidget 
     connect(ui->boxWaveForm, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputWaveForm()));
 
     connect(ui->buttonRun, SIGNAL(clicked(bool)), this, SLOT(runAnalyze(bool)));
+    connect(ui->buttonLockSignature, SIGNAL(clicked(bool)), this, SLOT(lockSignature(bool)));
     connect(ui->buttonSave, SIGNAL(clicked()), this, SLOT(saveSignature()));
 
     connect(m_capture, SIGNAL (initiated (int)),
@@ -94,6 +95,7 @@ void FormAnalyze::runAnalyze(bool start)
         switchOutputWaveForm();
         int frequency = ui->boxFrequency->value();
         m_gen->changeFrequency(frequency);
+        m_gen->setActiveChannels(CHANNEL_BOTH);
     }
     m_gen->runGenerator(start);
     m_capture->startCapturing(start);
@@ -125,4 +127,18 @@ void FormAnalyze::processOscilloscopeData(SamplesList leftChannelData, SamplesLi
     QVector<double> current;
     current = QVector<double>::fromList(rightChannelData);
     ui->viewSignature->draw(voltage, current);
+}
+
+void FormAnalyze::lockSignature(bool lock)
+{
+    qDebug() << "Lock signature view:" << lock;
+    if (lock) {
+        QImage image;
+        QList<QPointF> graphData;
+        ui->viewSignature->getView(image, graphData);
+        ui->viewSignature->loadPreviousSignature(graphData);
+    } else {
+        QList<QPointF> graphData;
+        ui->viewSignature->loadPreviousSignature(graphData);
+    }
 }

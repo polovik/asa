@@ -30,6 +30,7 @@ private slots:
     void saveSignature();
     void captureDeviceInitiated (int samplingRate);
     void processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData);
+    void lockSignature(bool lock);
 
 private:
     Ui::FormAnalyze *ui;

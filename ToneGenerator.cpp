@@ -11,6 +11,7 @@ AudioOutputDevice::AudioOutputDevice(QObject *parent) : QIODevice(parent)
 {
     m_frequency = 0;
     m_sampleIndex = 0;
+    m_activeChannels = CHANNEL_NONE;
 }
 
 AudioOutputDevice::~AudioOutputDevice()
@@ -18,15 +19,18 @@ AudioOutputDevice::~AudioOutputDevice()
 
 }
 
-void AudioOutputDevice::configure(const QAudioFormat &format, qint32 frequency, ToneWaveForm form)
+void AudioOutputDevice::configure(const QAudioFormat &format, qint32 frequency,
+                                  ToneWaveForm form, AudioChannels activeChannels)
 {
     QMutexLocker lockerSettings(&m_settingsMutex);
     m_audioFormat = format;
     m_frequency = frequency;
     m_waveForm = form;
+    m_activeChannels = activeChannels;
     m_sampleIndex = 0;
     qDebug() << "Configure tone generator: frequency" << frequency
-             << "waveform" << form << m_audioFormat.sampleRate() << m_audioFormat.byteOrder()
+             << "waveform" << form << "active channels" << m_activeChannels
+             << m_audioFormat.sampleRate() << m_audioFormat.byteOrder()
              << " " << m_audioFormat.channelCount() << " " << m_audioFormat.codec()
              << " " << m_audioFormat.sampleSize() << " " << m_audioFormat.sampleType();
 }
@@ -73,7 +77,13 @@ qint64 AudioOutputDevice::readData(char *data, qint64 maxSize)
 //            data[pos + 1] = data[pos + 3] = (val >> 8) & 0x00FF;
             for (int byte = 0; byte < m_audioFormat.bytesPerFrame(); byte++) {
                 if (byte % sampleLength == 0) {
-                    val = v * amplitude;
+                    val = 0.0;
+                    if ((byte == 0) && (m_activeChannels & CHANNEL_LEFT)) {
+                        val = v * amplitude;
+                    }
+                    if ((byte != 0) && (m_activeChannels & CHANNEL_RIGHT)) {
+                        val = v * amplitude;
+                    }
                 }
                 data[pos + byte] = val & 0xFF;
                 val = val >> 8;
@@ -107,6 +117,7 @@ ToneGenerator::ToneGenerator(QObject *parent) : QThread(parent)
     m_generationEnabled = false;
     m_audioOutput = NULL;
     m_waveForm = WAVE_UNKNOWN;
+    m_activeChannels = CHANNEL_NONE;
 
     // Set up the format, eg.
     m_toneFrequency = 100;
@@ -193,7 +204,7 @@ void ToneGenerator::changeFrequency(int freq)
         qWarning() << "Skip frequency applying for ToneGenerator because it hasn't been started yet";
         return;
     }
-    m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm);
+    m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm, m_activeChannels);
 }
 
 void ToneGenerator::switchOutputDevice(QString name)
@@ -218,7 +229,17 @@ void ToneGenerator::switchWaveForm(ToneWaveForm form)
         qWarning() << "Skip waveform applying for ToneGenerator because it hasn't been started yet";
         return;
     }
-    m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm);
+    m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm, m_activeChannels);
+}
+
+void ToneGenerator::setActiveChannels(AudioChannels channels)
+{
+    m_activeChannels = channels;
+    if (m_outputBuffer == NULL) {
+        qWarning() << "Skip active channels applying for ToneGenerator because it hasn't been started yet";
+        return;
+    }
+    m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm, m_activeChannels);
 }
 
 void ToneGenerator::run()
@@ -247,7 +268,7 @@ void ToneGenerator::run()
             qDebug() << "Start tone generation";
             m_audioOutput = new QAudioOutput(m_curAudioDeviceInfo, m_audioFormat);
             connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), SLOT(stateChanged(QAudio::State)));
-            m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm);
+            m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm, m_activeChannels);
             m_audioOutput->start(m_outputBuffer);
             generationStarted = true;
         }

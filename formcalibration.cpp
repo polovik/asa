@@ -50,6 +50,8 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     }
     connect(ui->boxAudioInputDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(switchInputAudioDevice(int)));
 
+    connect(ui->buttonLeftOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
+    connect(ui->buttonRightOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
 //    connect(ui->buttonGenerate, SIGNAL(toggled(bool)), ui->boxAudioOutputDevice, SLOT(setDisabled(bool)));
 //    connect(ui->buttonCupture, SIGNAL(toggled(bool)), ui->boxAudioInputDevice, SLOT(setDisabled(bool)));
 }
@@ -64,6 +66,8 @@ void FormCalibration::leaveForm()
     qDebug() << "Leave form \"Calibration\"";
     m_gen->runGenerator(false);
     m_capture->startCapturing(false);
+    ui->buttonLeftOutputChannel->setChecked(false);
+    ui->buttonRightOutputChannel->setChecked(false);
 }
 
 void FormCalibration::switchOutputAudioDevice(int index)
@@ -78,4 +82,23 @@ void FormCalibration::switchInputAudioDevice(int index)
     QVariant cleanName = ui->boxAudioInputDevice->itemData(index);
     QString name = cleanName.toString();
     m_capture->switchInputDevice(name);
+}
+
+void FormCalibration::playTestTone()
+{
+    if (!ui->buttonLeftOutputChannel->isChecked() && !ui->buttonRightOutputChannel->isChecked()) {
+        m_gen->runGenerator(false);
+        return;
+    }
+    int channels = CHANNEL_NONE;
+    if (ui->buttonLeftOutputChannel->isChecked()) {
+        channels = CHANNEL_LEFT;
+    }
+    if (ui->buttonRightOutputChannel->isChecked()) {
+        channels |= CHANNEL_RIGHT;
+    }
+    m_gen->changeFrequency(50);
+    m_gen->switchWaveForm(WAVE_SINE);
+    m_gen->setActiveChannels((AudioChannels)channels);
+    m_gen->runGenerator(true);
 }
