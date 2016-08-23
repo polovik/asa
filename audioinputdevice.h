@@ -7,8 +7,6 @@
 #include <QTime>
 #include "common_types.h"
 
-typedef QList<qreal> SamplesList;
-
 class AudioInputDevice : public QIODevice
 {
     Q_OBJECT

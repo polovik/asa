@@ -4,12 +4,14 @@
 #include "ToneGenerator.h"
 #include "audioinputdevice.h"
 
+Q_DECLARE_METATYPE (SamplesList)
 Q_DECLARE_METATYPE (AudioChannels)
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    qRegisterMetaType <SamplesList> ();
     qRegisterMetaType <AudioChannels> ();
 
     ui->setupUi(this);

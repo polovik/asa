@@ -2,6 +2,7 @@
 #define FORMCALIBRATION_H
 
 #include <QWidget>
+#include "common_types.h"
 
 namespace Ui {
 class FormCalibration;
@@ -25,6 +26,9 @@ private slots:
     void switchOutputAudioDevice(int index);
     void switchInputAudioDevice(int index);
     void playTestTone();
+    void captureDeviceInitiated (int samplingRate);
+    void processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData);
+    void checkInputLevel(bool start);
 
 private:
     Ui::FormCalibration *ui;

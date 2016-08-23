@@ -4,6 +4,8 @@
 #include <QPoint>
 #include <QImage>
 
+typedef QList<qreal> SamplesList;
+
 typedef enum {
     WAVE_UNKNOWN    = 0,
     WAVE_SINE       = 1,

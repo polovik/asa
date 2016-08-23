@@ -2,6 +2,7 @@
 #define FORMRAW_H
 
 #include <QWidget>
+#include "common_types.h"
 #include "audioinputdevice.h"
 
 namespace Ui {

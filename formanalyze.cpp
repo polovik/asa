@@ -3,6 +3,7 @@
 #include "ui_formanalyze.h"
 #include "common_types.h"
 #include "ToneGenerator.h"
+#include "audioinputdevice.h"
 
 FormAnalyze::FormAnalyze(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent) :
     QWidget(parent),

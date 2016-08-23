@@ -2,13 +2,14 @@
 #define FORMANALYZE_H
 
 #include <QWidget>
-#include "audioinputdevice.h"
+#include "common_types.h"
 
 namespace Ui {
 class FormAnalyze;
 }
 
 class ToneGenerator;
+class AudioInputThread;
 
 class FormAnalyze : public QWidget
 {

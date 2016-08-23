@@ -4,8 +4,6 @@
 #include <QtCore/qendian.h>
 #include "audioinputdevice.h"
 
-Q_DECLARE_METATYPE (SamplesList)
-
 AudioInputDevice::AudioInputDevice(QObject *parent) :
     QIODevice(parent)
 {
@@ -73,7 +71,6 @@ qint64 AudioInputDevice::writeData (const char* data, qint64 maxSize)
 AudioInputThread::AudioInputThread () :
         compressorFrameSize (0), volumeIndicatorFrameSize (0), tunerFrameSize (0), oscilloscopeFrameSize(0)
 {
-    qRegisterMetaType <SamplesList> ();
     m_capturedChannels = CHANNEL_NONE;
     m_captureEnabled = false;
     // set up the format you want, eg.

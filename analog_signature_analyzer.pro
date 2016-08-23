@@ -18,7 +18,9 @@ SOURCES += main.cpp\
     boardview.cpp \
     signatureview.cpp \
     formanalyze.cpp \
-    squarewidgetholder.cpp
+    squarewidgetholder.cpp \
+    smoothfilter.cpp \
+    volumeindicator.cpp
 
 HEADERS  += mainwindow.h \
     ToneGenerator.h \
@@ -32,7 +34,9 @@ HEADERS  += mainwindow.h \
     signatureview.h \
     common_types.h \
     formanalyze.h \
-    squarewidgetholder.h
+    squarewidgetholder.h \
+    smoothfilter.h \
+    volumeindicator.h
 
 FORMS    += mainwindow.ui \
     formcalibration.ui \

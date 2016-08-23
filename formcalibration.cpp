@@ -52,8 +52,13 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
 
     connect(ui->buttonLeftOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
     connect(ui->buttonRightOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
+    connect(ui->buttonCheckInputLevel, SIGNAL(clicked(bool)), this, SLOT(checkInputLevel(bool)));
 //    connect(ui->buttonGenerate, SIGNAL(toggled(bool)), ui->boxAudioOutputDevice, SLOT(setDisabled(bool)));
 //    connect(ui->buttonCupture, SIGNAL(toggled(bool)), ui->boxAudioInputDevice, SLOT(setDisabled(bool)));
+    connect(m_capture, SIGNAL (initiated (int)),
+             SLOT (captureDeviceInitiated (int)), Qt::QueuedConnection); // wait while main window initiated
+    connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList,SamplesList)),
+            this, SLOT(processOscilloscopeData(SamplesList,SamplesList)));
 }
 
 FormCalibration::~FormCalibration()
@@ -68,6 +73,7 @@ void FormCalibration::leaveForm()
     m_capture->startCapturing(false);
     ui->buttonLeftOutputChannel->setChecked(false);
     ui->buttonRightOutputChannel->setChecked(false);
+    ui->buttonCheckInputLevel->setChecked(false);
 }
 
 void FormCalibration::switchOutputAudioDevice(int index)
@@ -101,4 +107,34 @@ void FormCalibration::playTestTone()
     m_gen->switchWaveForm(WAVE_SINE);
     m_gen->setActiveChannels((AudioChannels)channels);
     m_gen->runGenerator(true);
+}
+
+void FormCalibration::captureDeviceInitiated(int samplingRate)
+{
+    if (!ui->buttonCheckInputLevel->isChecked()) {
+        return;
+    }
+    // Audio device ready to capture - display this
+    ui->viewLeftChannelLevel->setSamplingRate(samplingRate);
+    ui->viewRightChannelLevel->setSamplingRate(samplingRate);
+    Q_ASSERT(m_capture);
+    m_capture->setCapturedChannels(CHANNEL_BOTH);
+}
+
+void FormCalibration::processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData)
+{
+    if (!ui->buttonCheckInputLevel->isChecked()) {
+        return;
+    }
+    ui->viewLeftChannelLevel->processSamples(leftChannelData);
+    ui->viewRightChannelLevel->processSamples(rightChannelData);
+}
+
+void FormCalibration::checkInputLevel(bool start)
+{
+    qDebug() << "Run checking voltage on Audio input:" << start;
+    if (start) {
+
+    }
+    m_capture->startCapturing(start);
 }
