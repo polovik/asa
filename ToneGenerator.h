@@ -15,7 +15,8 @@ public:
     explicit AudioOutputDevice (QObject *parent = 0);
     ~AudioOutputDevice();
     void configure(const QAudioFormat &format, qint32 frequency,
-                   ToneWaveForm form, AudioChannels activeChannels);
+                   ToneWaveForm form, AudioChannels activeChannels,
+                   qreal volume);
 
 public slots:
 
@@ -31,6 +32,7 @@ private:
     qint32 m_frequency;
     ToneWaveForm m_waveForm;
     AudioChannels m_activeChannels;
+    qreal m_volume;
     QMutex m_settingsMutex;
 
 signals:
@@ -44,6 +46,7 @@ public:
     ~ToneGenerator();
     QStringList enumerateDevices();
     QString getDeviceName();
+    qreal getCurVoltageAmplitude();
     qreal getMaxVoltageAmplitude();
 
 public slots:
@@ -52,6 +55,7 @@ public slots:
     void switchOutputDevice(QString name);
     void switchWaveForm(ToneWaveForm form);
     void setActiveChannels(AudioChannels channels);
+    void setCurVoltageAmplitude(qreal voltage);
     void setMaxVoltageAmplitude(qreal voltage);
 
 signals:
@@ -73,6 +77,7 @@ private:
     QAudioDeviceInfo m_curAudioDeviceInfo;
     QList<QAudioDeviceInfo> m_audioDeviceInfos;
     AudioChannels m_activeChannels;
+    qreal m_relativeAmplitude; // 0...1
     qreal m_maxVoltageAmplitude; // just informative member - for display on GUI the maximum possible value
 };
 

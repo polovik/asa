@@ -17,8 +17,6 @@ FormAnalyze::FormAnalyze(ToneGenerator *gen, AudioInputThread *capture, QWidget 
     connect(ui->sliderFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
     connect(ui->boxVoltage, SIGNAL(valueChanged(double)), this, SLOT(setVoltage(double)));
     connect(ui->sliderVoltage, SIGNAL(valueChanged(int)), this, SLOT(setVoltage(int)));
-    setFrequency(440);
-    setVoltage(0.5);
 
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_sine.png"), "Sine", QVariant(WAVE_SINE));
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_square.png"), "Square", QVariant(WAVE_SQUARE));
@@ -48,6 +46,8 @@ void FormAnalyze::enterForm()
     double maxVV = maxV / 10.;
     ui->sliderVoltage->setMaximum(maxV);
     ui->boxVoltage->setMaximum(maxVV);
+    setVoltage(4.4);
+    setFrequency(440);
 }
 
 void FormAnalyze::leaveForm()
@@ -81,6 +81,7 @@ void FormAnalyze::setVoltage(double voltage)
     if (ui->sliderVoltage->value() != v) {
         ui->sliderVoltage->setValue(v);
     }
+    m_gen->setCurVoltageAmplitude(curV);
 }
 
 void FormAnalyze::setVoltage(int vol10)
@@ -106,6 +107,7 @@ void FormAnalyze::runAnalyze(bool start)
         int frequency = ui->boxFrequency->value();
         m_gen->changeFrequency(frequency);
         m_gen->setActiveChannels(CHANNEL_BOTH);
+        m_gen->setCurVoltageAmplitude(ui->boxVoltage->value());
     }
     m_gen->runGenerator(start);
     m_capture->startCapturing(start);

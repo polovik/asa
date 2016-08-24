@@ -27,7 +27,7 @@
 Input device:
 - adjust amplifing and/or multiply factor (scale volts)
 Output device:
-- adjust volume - set maximal voltage which corresponds to 65535 value
+- adjust volume - in percent or abs value of maximal voltage
 The board:
 - Create a guide - interactive schematic, where highlighted tested points and add some tooltips and/or hints.
 Common:
@@ -110,8 +110,8 @@ Store these settings if even input/output device is missed right now.</string>
   <widget class="QGroupBox" name="groupBox_4">
    <property name="geometry">
     <rect>
-     <x>510</x>
-     <y>80</y>
+     <x>330</x>
+     <y>130</y>
      <width>151</width>
      <height>241</height>
     </rect>
@@ -179,8 +179,8 @@ Store these settings if even input/output device is missed right now.</string>
   <widget class="QGroupBox" name="groupBox_5">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>160</y>
+     <x>490</x>
+     <y>90</y>
      <width>171</width>
      <height>151</height>
     </rect>

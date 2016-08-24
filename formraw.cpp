@@ -108,6 +108,7 @@ void FormRaw::startToneGenerator(bool start)
         switchOutputWaveForm();
         switchOutputFrequency();
         m_gen->setActiveChannels(CHANNEL_BOTH);
+        m_gen->setCurVoltageAmplitude(m_gen->getMaxVoltageAmplitude());
     }
     m_gen->runGenerator(start);
 }
