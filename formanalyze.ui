@@ -34,7 +34,7 @@
            <number>1</number>
           </property>
           <property name="maximum">
-           <double>12.000000000000000</double>
+           <double>5.000000000000000</double>
           </property>
           <property name="singleStep">
            <double>0.100000000000000</double>
@@ -63,7 +63,7 @@
         <item row="1" column="1">
          <widget class="QSlider" name="sliderVoltage">
           <property name="maximum">
-           <number>120</number>
+           <number>50</number>
           </property>
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -259,7 +259,7 @@
   <customwidget>
    <class>SquareWidgetHolder</class>
    <extends>QWidget</extends>
-   <header>squarewidgetholder.h</header>
+   <header location="global">squarewidgetholder.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

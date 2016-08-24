@@ -20,6 +20,7 @@ public:
     ~FormAnalyze();
 
 public slots:
+    void enterForm();
     void leaveForm();
 
 private slots:

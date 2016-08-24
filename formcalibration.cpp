@@ -53,12 +53,17 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     connect(ui->buttonLeftOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
     connect(ui->buttonRightOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
     connect(ui->buttonCheckInputLevel, SIGNAL(clicked(bool)), this, SLOT(checkInputLevel(bool)));
+    connect(ui->buttonAdjustGenerator, SIGNAL(clicked(bool)), this, SLOT(adjustGenerator(bool)));
 //    connect(ui->buttonGenerate, SIGNAL(toggled(bool)), ui->boxAudioOutputDevice, SLOT(setDisabled(bool)));
 //    connect(ui->buttonCupture, SIGNAL(toggled(bool)), ui->boxAudioInputDevice, SLOT(setDisabled(bool)));
     connect(m_capture, SIGNAL (initiated (int)),
              SLOT (captureDeviceInitiated (int)), Qt::QueuedConnection); // wait while main window initiated
     connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList,SamplesList)),
             this, SLOT(processOscilloscopeData(SamplesList,SamplesList)));
+
+    setGeneratorMagnitude(11.1); // call before signals connection - avoid recursion trap
+    connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
+    connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
 }
 
 FormCalibration::~FormCalibration()
@@ -74,6 +79,7 @@ void FormCalibration::leaveForm()
     ui->buttonLeftOutputChannel->setChecked(false);
     ui->buttonRightOutputChannel->setChecked(false);
     ui->buttonCheckInputLevel->setChecked(false);
+    ui->buttonAdjustGenerator->setChecked(false);
 }
 
 void FormCalibration::switchOutputAudioDevice(int index)
@@ -96,6 +102,7 @@ void FormCalibration::playTestTone()
         m_gen->runGenerator(false);
         return;
     }
+    ui->buttonAdjustGenerator->setChecked(false);
     int channels = CHANNEL_NONE;
     if (ui->buttonLeftOutputChannel->isChecked()) {
         channels = CHANNEL_LEFT;
@@ -137,4 +144,38 @@ void FormCalibration::checkInputLevel(bool start)
 
     }
     m_capture->startCapturing(start);
+}
+
+void FormCalibration::adjustGenerator(bool start)
+{
+    if (start) {
+        m_gen->changeFrequency(50);
+        m_gen->switchWaveForm(WAVE_SINE);
+        m_gen->setActiveChannels(CHANNEL_BOTH);
+        ui->buttonLeftOutputChannel->setChecked(false);
+        ui->buttonRightOutputChannel->setChecked(false);
+    }
+    m_gen->runGenerator(start);
+}
+
+void FormCalibration::setGeneratorMagnitude(double voltage)
+{
+    double peak = -1.;
+    double rms = -1.;
+    if (sender() == ui->boxGeneratorPeak) {
+        peak = voltage;
+        rms = peak / qSqrt(2);
+        ui->boxGeneratorRMS->setValue(rms);
+    } else if (sender() == ui->boxGeneratorRMS) {
+        rms = voltage;
+        peak = rms * qSqrt(2);
+        ui->boxGeneratorPeak->setValue(peak);
+    } else {
+        peak = voltage;
+        rms = peak / qSqrt(2);
+        ui->boxGeneratorPeak->setValue(peak);
+        ui->boxGeneratorRMS->setValue(rms);
+    }
+    qDebug() << "Set max generator voltage: Vpk" << peak << "Vrms" << rms;
+    m_gen->setMaxVoltageAmplitude(peak);
 }

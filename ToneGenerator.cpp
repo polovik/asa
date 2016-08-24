@@ -118,6 +118,7 @@ ToneGenerator::ToneGenerator(QObject *parent) : QThread(parent)
     m_audioOutput = NULL;
     m_waveForm = WAVE_UNKNOWN;
     m_activeChannels = CHANNEL_NONE;
+    m_maxVoltageAmplitude = -10.;
 
     // Set up the format, eg.
     m_toneFrequency = 100;
@@ -240,6 +241,17 @@ void ToneGenerator::setActiveChannels(AudioChannels channels)
         return;
     }
     m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm, m_activeChannels);
+}
+
+qreal ToneGenerator::getMaxVoltageAmplitude()
+{
+    return m_maxVoltageAmplitude;
+}
+
+void ToneGenerator::setMaxVoltageAmplitude(qreal voltage)
+{
+    qDebug() << "Set max generator voltage amplitude to" << voltage << "Volts";
+    m_maxVoltageAmplitude = voltage;
 }
 
 void ToneGenerator::run()

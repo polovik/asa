@@ -90,6 +90,7 @@ void MainWindow::showForm()
         m_formRaw->enterForm();
     } else if (m_currentForm == m_formAnalyze) {
         qDebug() << "Open form \"Analyze\"";
+        m_formAnalyze->enterForm();
     } else if (m_currentForm == m_formDiagnose) {
         qDebug() << "Open form \"Diagnose\"";
     } else {

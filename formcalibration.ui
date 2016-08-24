@@ -39,8 +39,8 @@ Store these settings if even input/output device is missed right now.</string>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>90</y>
+     <x>10</x>
+     <y>60</y>
      <width>381</width>
      <height>65</height>
     </rect>
@@ -57,8 +57,8 @@ Store these settings if even input/output device is missed right now.</string>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>10</y>
+     <x>10</x>
+     <y>0</y>
      <width>381</width>
      <height>65</height>
     </rect>
@@ -75,8 +75,8 @@ Store these settings if even input/output device is missed right now.</string>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>20</y>
+     <x>470</x>
+     <y>10</y>
      <width>190</width>
      <height>65</height>
     </rect>
@@ -110,8 +110,8 @@ Store these settings if even input/output device is missed right now.</string>
   <widget class="QGroupBox" name="groupBox_4">
    <property name="geometry">
     <rect>
-     <x>420</x>
-     <y>110</y>
+     <x>510</x>
+     <y>80</y>
      <width>151</width>
      <height>241</height>
     </rect>
@@ -156,12 +156,129 @@ Store these settings if even input/output device is missed right now.</string>
     </item>
    </layout>
   </widget>
+  <widget class="SquareWidgetHolder" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>130</y>
+     <width>311</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <widget class="SignatureView" name="graphicsView">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>10</y>
+      <width>256</width>
+      <height>192</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_5">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>160</y>
+     <width>171</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Adjust max generated voltage</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_4">
+    <item>
+     <widget class="QPushButton" name="buttonAdjustGenerator">
+      <property name="text">
+       <string>Adjust generator (R1)</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="0">
+       <widget class="QDoubleSpinBox" name="boxGeneratorPeak">
+        <property name="suffix">
+         <string>V</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>25.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="boxGeneratorRMS">
+        <property name="suffix">
+         <string>V</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>15.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Amplitude
+Vpk</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>RMS</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
    <class>VolumeIndicator</class>
    <extends>QGraphicsView</extends>
    <header location="global">volumeindicator.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SignatureView</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">signatureview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SquareWidgetHolder</class>
+   <extends>QWidget</extends>
+   <header location="global">squarewidgetholder.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

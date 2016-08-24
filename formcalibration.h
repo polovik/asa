@@ -29,6 +29,8 @@ private slots:
     void captureDeviceInitiated (int samplingRate);
     void processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData);
     void checkInputLevel(bool start);
+    void adjustGenerator(bool start);
+    void setGeneratorMagnitude(double voltage);
 
 private:
     Ui::FormCalibration *ui;

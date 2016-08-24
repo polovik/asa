@@ -44,6 +44,7 @@ public:
     ~ToneGenerator();
     QStringList enumerateDevices();
     QString getDeviceName();
+    qreal getMaxVoltageAmplitude();
 
 public slots:
     void runGenerator(bool start);
@@ -51,6 +52,7 @@ public slots:
     void switchOutputDevice(QString name);
     void switchWaveForm(ToneWaveForm form);
     void setActiveChannels(AudioChannels channels);
+    void setMaxVoltageAmplitude(qreal voltage);
 
 signals:
     void deviceReady(bool ready);
@@ -71,6 +73,7 @@ private:
     QAudioDeviceInfo m_curAudioDeviceInfo;
     QList<QAudioDeviceInfo> m_audioDeviceInfos;
     AudioChannels m_activeChannels;
+    qreal m_maxVoltageAmplitude; // just informative member - for display on GUI the maximum possible value
 };
 
 #endif // TONEGENERATOR_H

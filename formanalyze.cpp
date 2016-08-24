@@ -41,6 +41,15 @@ FormAnalyze::~FormAnalyze()
     delete ui;
 }
 
+void FormAnalyze::enterForm()
+{
+    qreal max = m_gen->getMaxVoltageAmplitude();
+    int maxV = qRound(max * 10.);
+    double maxVV = maxV / 10.;
+    ui->sliderVoltage->setMaximum(maxV);
+    ui->boxVoltage->setMaximum(maxVV);
+}
+
 void FormAnalyze::leaveForm()
 {
     qDebug() << "Leave form \"Analyze\"";
