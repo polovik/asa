@@ -2,3 +2,5 @@
 /icons/license.txt~
 /schematic/*.bak
 /schematic/*-bak
+/schematic/main_board/*.bak
+/schematic/main_board/*-bak
