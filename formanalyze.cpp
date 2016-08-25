@@ -27,6 +27,7 @@ FormAnalyze::FormAnalyze(ToneGenerator *gen, AudioInputThread *capture, QWidget 
     connect(ui->boxWaveForm, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputWaveForm()));
 
     connect(ui->buttonRun, SIGNAL(clicked(bool)), this, SLOT(runAnalyze(bool)));
+    connect(ui->buttonOpenSignature, SIGNAL(clicked()), this, SLOT(openSignature()));
     connect(ui->buttonLockSignature, SIGNAL(clicked(bool)), this, SLOT(lockSignature(bool)));
     connect(ui->buttonSave, SIGNAL(clicked()), this, SLOT(saveSignature()));
 
@@ -171,7 +172,7 @@ void FormAnalyze::saveSignature()
     ImageTiff tiff;
     TestpointMeasure point;
     point.id = 0;
-    point.pos = QPoint(-1, -1);
+    point.pos = QPoint(0, 0);
     int index = ui->boxWaveForm->currentIndex();
     QVariant data = ui->boxWaveForm->itemData(index);
     point.signalType.setId((ToneWaveForm::Id)data.toInt());
@@ -211,6 +212,62 @@ void FormAnalyze::processOscilloscopeData(SamplesList leftChannelData, SamplesLi
     QVector<double> current;
     current = QVector<double>::fromList(rightChannelData);
     ui->viewSignature->draw(voltage, current);
+}
+
+void FormAnalyze::openSignature()
+{
+    // Select file
+    QFileDialog dialog(this);
+    dialog.setWindowTitle(tr("Open signature"));
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter(tr("Images (*.tif *.tiff)"));
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+    QStringList files = dialog.selectedFiles();
+    if (files.count() != 1) {
+        qWarning() << "Incorrect selected signature file:" << files;
+        Q_ASSERT(false);
+        return;
+    }
+    QString filePath = files.first();
+
+    // Read signature
+    ImageTiff tiff;
+    QImage boardPhoto;
+    QList<TestpointMeasure> testpoints;
+    tiff.readImageSeries(filePath, boardPhoto, testpoints);
+    if (testpoints.count() != 1) {
+        qWarning() << "File" << filePath << "doesn't contain signature";
+        QMessageBox::warning(this, "Open Signature", "File" + filePath + "doesn't contain signature");
+        return;
+    }
+
+    // Display signature
+    TestpointMeasure measure = testpoints.first();
+    ui->viewSignature->loadPreviousSignature(measure.data);
+    ui->buttonLockSignature->setChecked(true);
+
+    // Restore signature's test environment
+    setFrequency(measure.signalFrequency);
+    if (measure.signalVoltage > ui->boxVoltage->maximum()) {
+        qWarning() << "Voltage is higher than available maximum:"
+                   << measure.signalVoltage, ui->boxVoltage->maximum();
+        measure.signalVoltage = ui->boxVoltage->maximum();
+    }
+    setVoltage(measure.signalVoltage);
+    if (measure.signalType.id() == ToneWaveForm::WAVE_SINE) {
+        ui->boxWaveForm->setCurrentIndex(0);
+    } else if (measure.signalType.id() == ToneWaveForm::WAVE_SQUARE) {
+        ui->boxWaveForm->setCurrentIndex(1);
+    } else if (measure.signalType.id() == ToneWaveForm::WAVE_SAWTOOTH) {
+        ui->boxWaveForm->setCurrentIndex(2);
+    } else if (measure.signalType.id() == ToneWaveForm::WAVE_TRIANGLE) {
+        ui->boxWaveForm->setCurrentIndex(3);
+    } else {
+        qWarning() << "Invalid format of signal form:" << measure.signalType << ". Select \"sine\"";
+        ui->boxWaveForm->setCurrentIndex(0);
+    }
 }
 
 void FormAnalyze::lockSignature(bool lock)

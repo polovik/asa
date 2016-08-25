@@ -32,6 +32,7 @@ private slots:
     void saveSignature();
     void captureDeviceInitiated (int samplingRate);
     void processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData);
+    void openSignature();
     void lockSignature(bool lock);
 
 private:

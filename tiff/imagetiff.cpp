@@ -331,12 +331,8 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         qWarning() << "File doesn't have any page:" << filePath;
         goto error;
     }
-    if (!readPage(boardPhoto)) {
-        qWarning() << "Can't read board phoro from file:" << filePath;
-        goto error;
-    }
 
-    for (page = 2; page < totalPages; page++) {
+    for (page = 0; page < totalPages; page++) {
         if (!TIFFSetDirectory(m_tiff, page)) {
             qWarning() << "Couldn't select page" << page << "for file" << filePath;
             goto error;
@@ -344,8 +340,21 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         // TODO does it need to free char* rawFileformat?
         char *rawFileformat;// = (char *)calloc(100, sizeof(char));
         if (!TIFFGetField(m_tiff, TIFFTAG_FILEFORMAT, &rawFileformat)) {
-            qWarning() << "Couldn't obtain testpoint's format at" << page << "from file" << filePath;
-            goto error;
+            qDebug() << "Page" << page << "doesn't containt testpoint's signature";
+            if (page == 0) {
+                qDebug() << "Read board's photo from page" << page;
+                if (!readPage(boardPhoto)) {
+                    qWarning() << "Can't read board phoro from file:" << filePath;
+                    goto error;
+                }
+                continue;
+            } else if (page == 1) {
+                qDebug() << "Skip board's photo with testpoints location from page" << page;
+                continue;
+            } else {
+                qWarning() << "Couldn't obtain testpoint's format at" << page << "from file" << filePath;
+                goto error;
+            }
         }
         QString fileformat = QString::fromLatin1(rawFileformat);
         qDebug() << "Testpoint at" << page << "have format:" << fileformat;
@@ -353,7 +362,7 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         // TODO does it need to free char* rawDescription?
         char *rawDescription;// = (char *)calloc(1000, sizeof(char));
         if (!TIFFGetField(m_tiff, TIFFTAG_TESTPOINT_DESCRIPTION, &rawDescription)) {
-            qWarning() << "Couldn't obtain testpoint's descrtiption at" << page << "from file" << filePath;
+            qWarning() << "Couldn't obtain testpoint's description at" << page << "from file" << filePath;
             goto error;
         }
         // Example: "POINT:10, X:232, Y:6522, SIG:sine, FREQ:1000, VOLT:2.6, SAMPLES:1000"
