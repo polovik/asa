@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     formanalyze.cpp \
     squarewidgetholder.cpp \
     smoothfilter.cpp \
-    volumeindicator.cpp
+    volumeindicator.cpp \
+    settings.cpp
 
 HEADERS  += mainwindow.h \
     ToneGenerator.h \
@@ -36,7 +37,8 @@ HEADERS  += mainwindow.h \
     formanalyze.h \
     squarewidgetholder.h \
     smoothfilter.h \
-    volumeindicator.h
+    volumeindicator.h \
+    settings.h
 
 FORMS    += mainwindow.ui \
     formcalibration.ui \

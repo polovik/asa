@@ -24,14 +24,14 @@
    </property>
    <property name="plainText">
     <string>This form allows to select input and output devices and configure it. Also it provide helps for confirure the board.
+- QSettings
 Input device:
 - adjust amplifing and/or multiply factor (scale volts)
 Output device:
-- adjust volume - in percent or abs value of maximal voltage
 The board:
 - Create a guide - interactive schematic, where highlighted tested points and add some tooltips and/or hints.
 Common:
-- signature view - adjust resistors and see reaction
+- signature view - adjust resistors and see reaction - or use only &quot;Check Level frame instead&quot;
 
 Store these settings if even input/output device is missed right now.</string>
    </property>
@@ -255,6 +255,9 @@ Vpk</string>
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>RMS</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>

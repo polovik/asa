@@ -6,6 +6,7 @@
 #include <QEventLoop>
 #include <QtMath>
 #include "ToneGenerator.h"
+#include "settings.h"
 
 AudioOutputDevice::AudioOutputDevice(QObject *parent) : QIODevice(parent)
 {
@@ -124,7 +125,7 @@ ToneGenerator::ToneGenerator(QObject *parent) : QThread(parent)
     m_outputBuffer = NULL;
     m_waveForm = WAVE_UNKNOWN;
     m_activeChannels = CHANNEL_NONE;
-    m_relativeAmplitude = 0.1;
+    m_relativeAmplitude = -1;
     m_maxVoltageAmplitude = -10.;
 
     // Set up the format, eg.
@@ -153,8 +154,14 @@ QStringList ToneGenerator::enumerateDevices()
         qWarning() << "Devices can't be enumerated' - some of them is already in use";
         return devices;
     }
-    m_audioDeviceInfos.clear();
+    Settings *settings = Settings::getSettings();
+    QString prevDeviceName = settings->value("Generator/AudioOutputDevice", "").toString();
     QAudioDeviceInfo defaultDevice = QAudioDeviceInfo::defaultOutputDevice();
+    if (prevDeviceName.isEmpty()) {
+        prevDeviceName = defaultDevice.deviceName();
+    }
+    bool highlighted = false;
+    m_audioDeviceInfos.clear();
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
         if (info.isNull()) {
             continue;
@@ -181,13 +188,21 @@ QStringList ToneGenerator::enumerateDevices()
 //        if (sampleRates.empty()) {
 //            continue;
 //        }
-//        if ("default" == deviceInfo.deviceName())
-//            info = deviceInfo;
-        if (name == defaultDevice.deviceName()) {
+        if (name == prevDeviceName) {
+            highlighted = true;
             name.prepend("* ");
         }
         devices.append(name);
         m_audioDeviceInfos.append(info);
+    }
+    if (!highlighted) {
+        qWarning() << "Previous selected output device" << prevDeviceName << "is missed. Select default:" << defaultDevice.deviceName();
+        for (int i = 0; i < devices.count(); i++) {
+            if (devices.at(i) == defaultDevice.deviceName()) {
+                devices[i] = "* " + devices.at(i);
+                break;
+            }
+        }
     }
 
     qDebug() << "Detected audio output devices:" << devices;
@@ -228,6 +243,8 @@ void ToneGenerator::switchOutputDevice(QString name)
             break;
         }
     }
+    Settings *settings = Settings::getSettings();
+    settings->setValue("Generator/AudioOutputDevice", name);
 }
 
 void ToneGenerator::switchWaveForm(ToneWaveForm form)
@@ -268,6 +285,10 @@ void ToneGenerator::setCurVoltageAmplitude(qreal voltage)
 
 qreal ToneGenerator::getMaxVoltageAmplitude()
 {
+    if (m_maxVoltageAmplitude < 0) {
+        Settings *settings = Settings::getSettings();
+        m_maxVoltageAmplitude = settings->value("Generator/MaxVoltageAmplitude", 10.).toDouble();
+    }
     return m_maxVoltageAmplitude;
 }
 
@@ -277,6 +298,8 @@ void ToneGenerator::setMaxVoltageAmplitude(qreal voltage)
     qreal absAmplitude = m_relativeAmplitude * m_maxVoltageAmplitude;
     m_maxVoltageAmplitude = voltage;
     m_relativeAmplitude = absAmplitude / m_maxVoltageAmplitude;
+    Settings *settings = Settings::getSettings();
+    settings->setValue("Generator/MaxVoltageAmplitude", m_maxVoltageAmplitude);
     if (m_outputBuffer == NULL) {
         qWarning() << "Skip cur voltage amplitude updating for ToneGenerator because it hasn't been started yet";
         return;

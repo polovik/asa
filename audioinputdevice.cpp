@@ -3,6 +3,7 @@
 #include <QEventLoop>
 #include <QtCore/qendian.h>
 #include "audioinputdevice.h"
+#include "settings.h"
 
 AudioInputDevice::AudioInputDevice(QObject *parent) :
     QIODevice(parent)
@@ -190,8 +191,14 @@ QStringList AudioInputThread::enumerateDevices()
         qWarning() << "Devices can't be enumerated' - some of them is already in use";
         return devices;
     }
-    m_audioDeviceInfos.clear();
+    Settings *settings = Settings::getSettings();
+    QString prevDeviceName = settings->value("Capture/AudioInputDevice", "").toString();
     QAudioDeviceInfo defaultDevice = QAudioDeviceInfo::defaultInputDevice();
+    if (prevDeviceName.isEmpty()) {
+        prevDeviceName = defaultDevice.deviceName();
+    }
+    bool highlighted = false;
+    m_audioDeviceInfos.clear();
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
         if (info.isNull()) {
             continue;
@@ -214,14 +221,21 @@ QStringList AudioInputThread::enumerateDevices()
             continue;
         }
 #endif
-        if (name == "alsa_input.usb-046d_0825_36D88820-02-U0x46d0x825.analog-mono") {
-//            name.prepend("- ");
-        }
-        if (name == defaultDevice.deviceName()) {
+        if (name == prevDeviceName) {
+            highlighted = true;
             name.prepend("* ");
         }
         devices.append(name);
         m_audioDeviceInfos.append(info);
+    }
+    if (!highlighted) {
+        qWarning() << "Previous selected input device" << prevDeviceName << "is missed. Select default:" << defaultDevice.deviceName();
+        for (int i = 0; i < devices.count(); i++) {
+            if (devices.at(i) == defaultDevice.deviceName()) {
+                devices[i] = "* " + devices.at(i);
+                break;
+            }
+        }
     }
 
     qDebug() << "Detected audio input devices:" << devices;
@@ -301,4 +315,6 @@ void AudioInputThread::switchInputDevice(QString name)
             break;
         }
     }
+    Settings *settings = Settings::getSettings();
+    settings->setValue("Capture/AudioInputDevice", name);
 }

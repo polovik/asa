@@ -61,7 +61,8 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList,SamplesList)),
             this, SLOT(processOscilloscopeData(SamplesList,SamplesList)));
 
-    setGeneratorMagnitude(11.1); // call before signals connection - avoid recursion trap
+    qreal magnitude = m_gen->getMaxVoltageAmplitude();
+    setGeneratorMagnitude(magnitude); // call before signals connection - avoid recursion trap
     connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
     connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
 }
@@ -84,15 +85,31 @@ void FormCalibration::leaveForm()
 
 void FormCalibration::switchOutputAudioDevice(int index)
 {
+    for (int i = 0; i < ui->boxAudioOutputDevice->count(); i++) {
+        QString text = ui->boxAudioOutputDevice->itemText(i);
+        if (text.startsWith("* ")) {
+            text.remove(0, 2);
+            ui->boxAudioOutputDevice->setItemText(i, text);
+        }
+    }
     QVariant cleanName = ui->boxAudioOutputDevice->itemData(index);
     QString name = cleanName.toString();
+    ui->boxAudioOutputDevice->setItemText(index, "* " + name);
     m_gen->switchOutputDevice(name);
 }
 
 void FormCalibration::switchInputAudioDevice(int index)
 {
+    for (int i = 0; i < ui->boxAudioInputDevice->count(); i++) {
+        QString text = ui->boxAudioInputDevice->itemText(i);
+        if (text.startsWith("* ")) {
+            text.remove(0, 2);
+            ui->boxAudioInputDevice->setItemText(i, text);
+        }
+    }
     QVariant cleanName = ui->boxAudioInputDevice->itemData(index);
     QString name = cleanName.toString();
+    ui->boxAudioInputDevice->setItemText(index, "* " + name);
     m_capture->switchInputDevice(name);
 }
 
