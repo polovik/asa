@@ -363,7 +363,7 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         int id = -1;
         int x = -1;
         int y = -1;
-        ToneWaveForm type = WAVE_UNKNOWN;
+        ToneWaveForm type;
         int freq = -1;
         qreal volt = -1.;
         int samplesCount = -1;
@@ -396,15 +396,8 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
                 continue;
             }
             if (key == "SIG") {
-                if (value == "sine") {
-                    type = WAVE_SINE;
-                } else if (value == "square") {
-                    type = WAVE_SQUARE;
-                } else if (value == "sawtooth") {
-                    type = WAVE_SAWTOOTH;
-                } else if (value == "triangle") {
-                    type = WAVE_TRIANGLE;
-                } else {
+                type = ToneWaveForm(value);
+                if (type.id() == ToneWaveForm::WAVE_UNKNOWN) {
                     qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
                     goto error;
                 }
@@ -435,7 +428,7 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
                 continue;
             }
         }
-        if ((id < 0) || (x < 0) || (y < 0) || (type == WAVE_UNKNOWN) || (freq < 0) || (volt < 0.) || (samplesCount < 0)) {
+        if ((id < 0) || (x < 0) || (y < 0) || (type.id() == ToneWaveForm::WAVE_UNKNOWN) || (freq < 0) || (volt < 0.) || (samplesCount < 0)) {
             qWarning() << "Some fields is missed in testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
             goto error;
         }
@@ -802,21 +795,7 @@ bool ImageTiff::writeImageSeries(QString filePath, const QImage &boardPhoto,
 
         TIFFSetField(m_tiff, TIFFTAG_FILEFORMAT, "V1.0");
         // Example: "POINT:10, X:232, Y:6522, SIG:sine, FREQ:1000, VOLT:2.6, SAMPLES:1000"
-        QString form;
-        if (testpoint.signalType == WAVE_SINE) {
-            form = "sine";
-        } else if (testpoint.signalType == WAVE_SQUARE) {
-            form = "square";
-        } else if (testpoint.signalType == WAVE_SAWTOOTH) {
-            form = "sawtooth";
-        } else if (testpoint.signalType == WAVE_TRIANGLE) {
-            form = "triangle";
-        } else {
-            qWarning() << "Invalid signal type:" << testpoint.signalType << "for image" << filePath;
-            TIFFClose(m_tiff);
-            Q_ASSERT(false);
-            return false;
-        }
+        QString form = testpoint.signalType.getName();
         int samplesCount = testpoint.data.count();
         QString description = QString("POINT:%1, X:%2, Y:%3, SIG:%4, FREQ:%5, VOLT:%6, SAMPLES:%7")
                                      .arg(QString::number(testpoint.id))

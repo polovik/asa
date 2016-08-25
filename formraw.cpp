@@ -16,10 +16,10 @@ FormRaw::FormRaw(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent)
     m_gen = gen;
     connect(m_gen, SIGNAL(deviceReady(bool)), this, SLOT(switchOutputFrequency()));
     connect(m_gen, SIGNAL(deviceReady(bool)), this, SLOT(switchOutputWaveForm()));
-    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_sine.png"), "Sine", QVariant(WAVE_SINE));
-    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_square.png"), "Square", QVariant(WAVE_SQUARE));
-    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_saw.png"), "Sawtooth", QVariant(WAVE_SAWTOOTH));
-    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_triangle.png"), "Triangle", QVariant(WAVE_TRIANGLE));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_sine.png"), "Sine", QVariant(ToneWaveForm::WAVE_SINE));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_square.png"), "Square", QVariant(ToneWaveForm::WAVE_SQUARE));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_saw.png"), "Sawtooth", QVariant(ToneWaveForm::WAVE_SAWTOOTH));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_triangle.png"), "Triangle", QVariant(ToneWaveForm::WAVE_TRIANGLE));
 
     // Audio capture
     m_dataForSingleCaptureAcqured = true;
@@ -330,7 +330,7 @@ void FormRaw::switchOutputWaveForm()
 {
     int index = ui->boxWaveForm->currentIndex();
     QVariant data = ui->boxWaveForm->itemData(index);
-    ToneWaveForm form = (ToneWaveForm)data.toInt();
+    ToneWaveForm form((ToneWaveForm::Id)data.toInt());
     if (ui->buttonGenerate->isChecked()) {
         m_gen->switchWaveForm(form);
     }

@@ -4,6 +4,7 @@
 #include "common_types.h"
 #include "ToneGenerator.h"
 #include "audioinputdevice.h"
+#include "settings.h"
 
 FormAnalyze::FormAnalyze(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent) :
     QWidget(parent),
@@ -18,10 +19,10 @@ FormAnalyze::FormAnalyze(ToneGenerator *gen, AudioInputThread *capture, QWidget 
     connect(ui->boxVoltage, SIGNAL(valueChanged(double)), this, SLOT(setVoltage(double)));
     connect(ui->sliderVoltage, SIGNAL(valueChanged(int)), this, SLOT(setVoltage(int)));
 
-    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_sine.png"), "Sine", QVariant(WAVE_SINE));
-    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_square.png"), "Square", QVariant(WAVE_SQUARE));
-    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_saw.png"), "Sawtooth", QVariant(WAVE_SAWTOOTH));
-    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_triangle.png"), "Triangle", QVariant(WAVE_TRIANGLE));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_sine.png"), "Sine", QVariant(ToneWaveForm::WAVE_SINE));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_square.png"), "Square", QVariant(ToneWaveForm::WAVE_SQUARE));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_saw.png"), "Sawtooth", QVariant(ToneWaveForm::WAVE_SAWTOOTH));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_triangle.png"), "Triangle", QVariant(ToneWaveForm::WAVE_TRIANGLE));
     connect(ui->boxWaveForm, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputWaveForm()));
 
     connect(ui->buttonRun, SIGNAL(clicked(bool)), this, SLOT(runAnalyze(bool)));
@@ -46,8 +47,28 @@ void FormAnalyze::enterForm()
     double maxVV = maxV / 10.;
     ui->sliderVoltage->setMaximum(maxV);
     ui->boxVoltage->setMaximum(maxVV);
-    setVoltage(4.4);
-    setFrequency(440);
+    Settings *settings = Settings::getSettings();
+    qreal curV = settings->value("Analyzer/SignalAmplitude", 0.4).toDouble();
+    if (curV > maxVV) {
+        curV = maxVV;
+    }
+    setVoltage(curV);
+    int freq = settings->value("Analyzer/SignalFrequency", 440).toInt();
+    setFrequency(freq);
+    QString waveForm = settings->value("Analyzer/SignalForm",
+                                       ToneWaveForm::getName(ToneWaveForm::WAVE_SINE)).toString();
+    if (waveForm == ToneWaveForm::getName(ToneWaveForm::WAVE_SINE)) {
+        ui->boxWaveForm->setCurrentIndex(0);
+    } else if (waveForm == ToneWaveForm::getName(ToneWaveForm::WAVE_SQUARE)) {
+        ui->boxWaveForm->setCurrentIndex(1);
+    } else if (waveForm == ToneWaveForm::getName(ToneWaveForm::WAVE_SAWTOOTH)) {
+        ui->boxWaveForm->setCurrentIndex(2);
+    } else if (waveForm == ToneWaveForm::getName(ToneWaveForm::WAVE_TRIANGLE)) {
+        ui->boxWaveForm->setCurrentIndex(3);
+    } else {
+        qWarning() << "Invalid format of signal form:" << waveForm << ". Select \"sine\"";
+        ui->boxWaveForm->setCurrentIndex(0);
+    }
 }
 
 void FormAnalyze::leaveForm()
@@ -68,6 +89,8 @@ void FormAnalyze::setFrequency(int frequency)
     if (ui->buttonRun->isChecked()) {
         m_gen->changeFrequency(frequency);
     }
+    Settings *settings = Settings::getSettings();
+    settings->setValue("Analyzer/SignalFrequency", frequency);
 }
 
 void FormAnalyze::setVoltage(double voltage)
@@ -81,6 +104,8 @@ void FormAnalyze::setVoltage(double voltage)
     if (ui->sliderVoltage->value() != v) {
         ui->sliderVoltage->setValue(v);
     }
+    Settings *settings = Settings::getSettings();
+    settings->setValue("Analyzer/SignalAmplitude", curV);
     m_gen->setCurVoltageAmplitude(curV);
 }
 
@@ -93,10 +118,12 @@ void FormAnalyze::switchOutputWaveForm()
 {
     int index = ui->boxWaveForm->currentIndex();
     QVariant data = ui->boxWaveForm->itemData(index);
-    ToneWaveForm form = (ToneWaveForm)data.toInt();
+    ToneWaveForm form((ToneWaveForm::Id)data.toInt());
     if (ui->buttonRun->isChecked()) {
         m_gen->switchWaveForm(form);
     }
+    Settings *settings = Settings::getSettings();
+    settings->setValue("Analyzer/SignalForm", form.getName());
 }
 
 void FormAnalyze::runAnalyze(bool start)

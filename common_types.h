@@ -6,13 +6,33 @@
 
 typedef QList<qreal> SamplesList;
 
-typedef enum {
-    WAVE_UNKNOWN    = 0,
-    WAVE_SINE       = 1,
-    WAVE_SQUARE     = 2,
-    WAVE_SAWTOOTH   = 3,
-    WAVE_TRIANGLE   = 4
-} ToneWaveForm;
+class ToneWaveForm
+{
+public:
+    typedef enum {
+        WAVE_UNKNOWN    = 0,
+        WAVE_SINE       = 1,
+        WAVE_SQUARE     = 2,
+        WAVE_SAWTOOTH   = 3,
+        WAVE_TRIANGLE   = 4,
+        WAVE_LAST       = 5   // mark of enum's end
+    } Id;
+
+    ToneWaveForm();
+    ToneWaveForm(Id id);
+    ToneWaveForm(QString name);
+
+    Id id();
+    void setId(Id id);
+
+    QString getName() const;
+    static QString getName(Id id);
+
+private:
+    Id m_id;
+};
+
+QDebug operator<<(QDebug d, const ToneWaveForm &tone);
 
 typedef enum {
     CHANNEL_NONE   = 0,

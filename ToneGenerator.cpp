@@ -56,19 +56,19 @@ qint64 AudioOutputDevice::readData(char *data, qint64 maxSize)
     for (qint64 i = 0; i < samplesCount; ++i) {
         qint64 pos = i * m_audioFormat.bytesPerFrame();
         double v;
-        if (m_waveForm == WAVE_SINE) {
+        if (m_waveForm.id() == ToneWaveForm::WAVE_SINE) {
             double angle = 360. * m_sampleIndex / periodLength;
             v = qSin(qDegreesToRadians(angle));
-        } else if (m_waveForm == WAVE_SQUARE) {
+        } else if (m_waveForm.id() == ToneWaveForm::WAVE_SQUARE) {
             int relativePos = m_sampleIndex % int(periodLength);
             if (relativePos < periodLength / 2)
                 v = 1.0;
             else
                 v = -1.0;
-        } else if (m_waveForm == WAVE_SAWTOOTH) {
+        } else if (m_waveForm.id() == ToneWaveForm::WAVE_SAWTOOTH) {
             int relativePos = m_sampleIndex % int(periodLength);
             v = -1. + 2.0 * relativePos / periodLength;
-        } else if (m_waveForm == WAVE_TRIANGLE) {
+        } else if (m_waveForm.id() == ToneWaveForm::WAVE_TRIANGLE) {
             int relativePos = m_sampleIndex % int(periodLength);
             if (relativePos < periodLength / 2)
                 v = -1. + 2.0 * (relativePos * 2) / periodLength;
@@ -123,7 +123,6 @@ ToneGenerator::ToneGenerator(QObject *parent) : QThread(parent)
     m_generationEnabled = false;
     m_audioOutput = NULL;
     m_outputBuffer = NULL;
-    m_waveForm = WAVE_UNKNOWN;
     m_activeChannels = CHANNEL_NONE;
     m_relativeAmplitude = -1;
     m_maxVoltageAmplitude = -10.;

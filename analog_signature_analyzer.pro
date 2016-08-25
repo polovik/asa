@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     squarewidgetholder.cpp \
     smoothfilter.cpp \
     volumeindicator.cpp \
-    settings.cpp
+    settings.cpp \
+    common_types.cpp
 
 HEADERS  += mainwindow.h \
     ToneGenerator.h \

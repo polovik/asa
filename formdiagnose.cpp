@@ -223,7 +223,7 @@ void FormDiagnose::testpointAdd(int id, QPoint pos)
     TestpointMeasure point;
     point.id = id;
     point.pos = pos;
-    point.signalType = WAVE_SINE;
+    point.signalType.setId(ToneWaveForm::WAVE_SINE);
     point.signalFrequency = 0;
     point.signalVoltage = 0;
     point.isCurrent = false;

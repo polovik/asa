@@ -128,7 +128,7 @@ void FormCalibration::playTestTone()
         channels |= CHANNEL_RIGHT;
     }
     m_gen->changeFrequency(50);
-    m_gen->switchWaveForm(WAVE_SINE);
+    m_gen->switchWaveForm(ToneWaveForm::WAVE_SINE);
     m_gen->setActiveChannels((AudioChannels)channels);
     m_gen->setCurVoltageAmplitude(m_gen->getMaxVoltageAmplitude());
     m_gen->runGenerator(true);
@@ -168,7 +168,7 @@ void FormCalibration::adjustGenerator(bool start)
 {
     if (start) {
         m_gen->changeFrequency(50);
-        m_gen->switchWaveForm(WAVE_SINE);
+        m_gen->switchWaveForm(ToneWaveForm::WAVE_SINE);
         m_gen->setActiveChannels(CHANNEL_BOTH);
         m_gen->setCurVoltageAmplitude(m_gen->getMaxVoltageAmplitude());
         ui->buttonLeftOutputChannel->setChecked(false);
