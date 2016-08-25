@@ -147,17 +147,20 @@ void FormDiagnose::savePhoto(int id, const QImage &preview)
         Q_ASSERT(false);
         return;
     }
-    QString fileName = files.first();
-    if (!fileName.endsWith(".tif", Qt::CaseInsensitive)
-        || !fileName.endsWith(".tiff", Qt::CaseInsensitive)) {
-        fileName.append(".tiff");
+    QString filePath = files.first();
+    if (!filePath.endsWith(".tif", Qt::CaseInsensitive)
+        && !filePath.endsWith(".tiff", Qt::CaseInsensitive)) {
+        filePath.append(".tiff");
     }
-    bool saved = preview.save(fileName, "TIFF");
-    if (saved) {
-        qDebug() << "Photo" << preview.size() << "is stored to" << fileName;
-        loadBoardData(fileName);
+
+    ImageTiff tiff;
+    QList<TestpointMeasure> testpoints;
+    if (tiff.writeImageSeries(filePath, preview, QImage(), testpoints)) {
+        qDebug() << "photo" << preview.size() << "is stored to" << filePath;
+        loadBoardData(filePath);
     } else {
-        qWarning() << "Photo" << preview.size() << "can't be stored to" << fileName;
+        qWarning() << "photo" << preview.size() << "couldn't be stored to" << filePath;
+        QMessageBox::critical(this, "Save Signature", "Signature couldn't be stored to " + filePath);
     }
 }
 

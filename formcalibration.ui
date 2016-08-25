@@ -31,9 +31,7 @@ Output device:
 The board:
 - Create a guide - interactive schematic, where highlighted tested points and add some tooltips and/or hints.
 Common:
-- signature view - adjust resistors and see reaction - or use only &quot;Check Level frame instead&quot;
-
-Store these settings if even input/output device is missed right now.</string>
+- signature view - adjust resistors and see reaction - or use only &quot;Check Level frame instead&quot;</string>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">

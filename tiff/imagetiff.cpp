@@ -762,34 +762,45 @@ bool ImageTiff::writeImageSeries(QString filePath, const QImage &boardPhoto,
         return false;
     }
 
-    int totalPages = 2 + testpoints.count();
-    int page = 0;
-    TIFFSetField(m_tiff, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE);
-    TIFFSetField(m_tiff, TIFFTAG_PAGENUMBER, page, totalPages);
-    if (!appendImage(boardPhoto)) {
-        qWarning() << "Image" << boardPhoto << "couldn't be written in" << filePath;
-        TIFFClose(m_tiff);
-        Q_ASSERT(false);
-        return false;
+    int totalPages = testpoints.count();
+    if (!boardPhoto.isNull()) {
+        totalPages++;
     }
-    TIFFWriteDirectory(m_tiff);
+    if (!boardPhotoWithMarkers.isNull()) {
+        totalPages++;
+    }
 
-    page = 1;
-    TIFFSetField(m_tiff, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE);
-    TIFFSetField(m_tiff, TIFFTAG_PAGENUMBER, page, totalPages);
-    if (!appendImage(boardPhotoWithMarkers)) {
-        qWarning() << "Image" << boardPhotoWithMarkers << "couldn't be written in" << filePath;
-        TIFFClose(m_tiff);
-        Q_ASSERT(false);
-        return false;
+    int page = 0;
+    if (!boardPhoto.isNull()) {
+        TIFFSetField(m_tiff, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE);
+        TIFFSetField(m_tiff, TIFFTAG_PAGENUMBER, page, totalPages);
+        if (!appendImage(boardPhoto)) {
+            qWarning() << "Image" << boardPhoto << "couldn't be written in" << filePath;
+            TIFFClose(m_tiff);
+            Q_ASSERT(false);
+            return false;
+        }
+        TIFFWriteDirectory(m_tiff);
+        page++;
     }
-    TIFFWriteDirectory(m_tiff);
+
+    if (!boardPhotoWithMarkers.isNull()) {
+        TIFFSetField(m_tiff, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE);
+        TIFFSetField(m_tiff, TIFFTAG_PAGENUMBER, page, totalPages);
+        if (!appendImage(boardPhotoWithMarkers)) {
+            qWarning() << "Image" << boardPhotoWithMarkers << "couldn't be written in" << filePath;
+            TIFFClose(m_tiff);
+            Q_ASSERT(false);
+            return false;
+        }
+        TIFFWriteDirectory(m_tiff);
+        page++;
+    }
 
     for (int i = 0; i < testpoints.count(); i++) {
         const TestpointMeasure &testpoint = testpoints.at(i);
         const QImage &image = testpoint.signature;
 
-        page++;
         TIFFSetField(m_tiff, TIFFTAG_SUBFILETYPE, FILETYPE_PAGE);
         TIFFSetField(m_tiff, TIFFTAG_PAGENUMBER, page, totalPages);
 
@@ -828,6 +839,7 @@ bool ImageTiff::writeImageSeries(QString filePath, const QImage &boardPhoto,
             return false;
         }
         TIFFWriteDirectory(m_tiff);
+        page++;
     }
     TIFFClose(m_tiff);
     qDebug() << "Tiff image has been successfully written to" << filePath;

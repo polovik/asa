@@ -5,6 +5,7 @@
 #include "ToneGenerator.h"
 #include "audioinputdevice.h"
 #include "settings.h"
+#include "tiff/imagetiff.h"
 
 FormAnalyze::FormAnalyze(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent) :
     QWidget(parent),
@@ -142,7 +143,51 @@ void FormAnalyze::runAnalyze(bool start)
 
 void FormAnalyze::saveSignature()
 {
-    ui->viewSignature->saveView();
+    QImage image;
+    QList<QPointF> graphData;
+    ui->viewSignature->getView(image, graphData);
+
+    QFileDialog dialog(this);
+    dialog.setWindowTitle(tr("Save Signature"));
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilter(tr("Images (*.tif *.tiff)"));
+
+    if (dialog.exec() != QDialog::Accepted) {
+        qDebug() << "Signature saving is discarded";
+        return;
+    }
+    QStringList files = dialog.selectedFiles();
+    if (files.count() != 1) {
+        qWarning() << "Incorrect selected dir for store signature:" << files;
+        Q_ASSERT(false);
+        return;
+    }
+    QString filePath = files.first();
+    if (!filePath.endsWith(".tif", Qt::CaseInsensitive)
+        && !filePath.endsWith(".tiff", Qt::CaseInsensitive)) {
+        filePath.append(".tiff");
+    }
+
+    ImageTiff tiff;
+    TestpointMeasure point;
+    point.id = 0;
+    point.pos = QPoint(-1, -1);
+    int index = ui->boxWaveForm->currentIndex();
+    QVariant data = ui->boxWaveForm->itemData(index);
+    point.signalType.setId((ToneWaveForm::Id)data.toInt());
+    point.signalFrequency = ui->boxFrequency->value();
+    point.signalVoltage = ui->boxVoltage->value();
+    point.isCurrent = false;
+    point.signature = image;
+    point.data = graphData;
+    QList<TestpointMeasure> testpoints;
+    testpoints.append(point);
+    if (tiff.writeImageSeries(filePath, QImage(), QImage(), testpoints)) {
+        qDebug() << "signature is stored to" << filePath;
+    } else {
+        qWarning() << "signature couldn't be stored to" << filePath;
+        QMessageBox::critical(this, "Save Signature", "Signature couldn't be stored to " + filePath);
+    }
 }
 
 void FormAnalyze::captureDeviceInitiated(int samplingRate)
