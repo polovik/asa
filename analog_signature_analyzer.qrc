@@ -11,5 +11,7 @@
         <file>icons/capture_data.ico</file>
         <file>icons/play_tone.ico</file>
         <file>icons/photo.ico</file>
+        <file>icons/microphone.ico</file>
+        <file>icons/speaker.ico</file>
     </qresource>
 </RCC>

@@ -7,3 +7,10 @@ Thanks to deviantdark
 File "photo.ico" was obtained from http://findicons.com/icon/16619/photo
 Thanks to judge
 
+
+File "microphone.ico" was obtained from http://findicons.com/icon/177247/microphone_red
+Thanks to Jack Cai
+
+File "speaker.ico" was obtained from http://findicons.com/icon/236923/audio_volume_low
+Thanks to Mandarancio
+

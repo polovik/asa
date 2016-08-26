@@ -31,6 +31,7 @@ private slots:
     void checkInputLevel(bool start);
     void adjustGenerator(bool start);
     void setGeneratorMagnitude(double voltage);
+    void showHint();
 
 private:
     Ui::FormCalibration *ui;

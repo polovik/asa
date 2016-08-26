@@ -65,6 +65,10 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     setGeneratorMagnitude(magnitude); // call before signals connection - avoid recursion trap
     connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
     connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
+
+    connect(ui->buttonHintAdjustGenerator, SIGNAL(clicked()), this, SLOT(showHint()));
+    connect(ui->buttonHintCheckInputLevel, SIGNAL(clicked()), this, SLOT(showHint()));
+    connect(ui->buttonHintPlayTone, SIGNAL(clicked()), this, SLOT(showHint()));
 }
 
 FormCalibration::~FormCalibration()
@@ -153,6 +157,11 @@ void FormCalibration::processOscilloscopeData(SamplesList leftChannelData, Sampl
     }
     ui->viewLeftChannelLevel->processSamples(leftChannelData);
     ui->viewRightChannelLevel->processSamples(rightChannelData);
+    QVector<double> voltage;
+    voltage = QVector<double>::fromList(leftChannelData);
+    QVector<double> current;
+    current = QVector<double>::fromList(rightChannelData);
+    ui->viewSignature->draw(voltage, current);
 }
 
 void FormCalibration::checkInputLevel(bool start)
@@ -197,4 +206,32 @@ void FormCalibration::setGeneratorMagnitude(double voltage)
     }
     qDebug() << "Set max generator voltage: Vpk" << peak << "Vrms" << rms;
     m_gen->setMaxVoltageAmplitude(peak);
+}
+
+void FormCalibration::showHint()
+{
+    QString title;
+    QString text;
+    if (sender() == ui->buttonHintAdjustGenerator) {
+        title = "Adjust max generated voltage";
+        text = "This button helps to adjust tone generator's amplitude.\n"
+               "Button pressing leads to play tone on left and right channel simultaneously.\n"
+               "Tone is Sine 50Hz with maximal amplitude.\n"
+               "Measured voltage should be written in corresponding field:\n"
+               "- Amplitude (Vpk) - when real oscilloscope is used\n"
+               "- RMS - when ordinary voltmeter for ~U is used";
+    } else if (sender() == ui->buttonHintCheckInputLevel) {
+        title = "Check input channel";
+        text = "This area helps to adjust maximal voltage on audio input pins.\n"
+               "Button pressing leads to play tone on left and right channel simultaneously.\n"
+               "Tone is Sine 50Hz with maximal amplitude.\n"
+               "Potentiometers on the board have to be adjusted for making the same voltage "
+               "on both audio input pins.";
+    } else if (sender() == ui->buttonHintPlayTone) {
+        title = "Play tone";
+        text = "This buttons help to distinguish audio output pins.\n"
+               "Button pressing leads to play tone on specific channel.\n"
+               "Tone is Sine 50Hz with maximal amplitude.";
+    }
+    QMessageBox::information(this, title, text);
 }
