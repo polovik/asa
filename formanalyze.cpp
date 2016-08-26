@@ -14,27 +14,27 @@ FormAnalyze::FormAnalyze(ToneGenerator *gen, AudioInputThread *capture, QWidget 
     ui->setupUi(this);
     m_gen = gen;
     m_capture = capture;
-
+    
     connect(ui->boxFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
     connect(ui->sliderFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
     connect(ui->boxVoltage, SIGNAL(valueChanged(double)), this, SLOT(setVoltage(double)));
     connect(ui->sliderVoltage, SIGNAL(valueChanged(int)), this, SLOT(setVoltage(int)));
-
+    
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_sine.png"), "Sine", QVariant(ToneWaveForm::WAVE_SINE));
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_square.png"), "Square", QVariant(ToneWaveForm::WAVE_SQUARE));
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_saw.png"), "Sawtooth", QVariant(ToneWaveForm::WAVE_SAWTOOTH));
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_triangle.png"), "Triangle", QVariant(ToneWaveForm::WAVE_TRIANGLE));
     connect(ui->boxWaveForm, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputWaveForm()));
-
+    
     connect(ui->buttonRun, SIGNAL(clicked(bool)), this, SLOT(runAnalyze(bool)));
     connect(ui->buttonOpenSignature, SIGNAL(clicked()), this, SLOT(openSignature()));
     connect(ui->buttonLockSignature, SIGNAL(clicked(bool)), this, SLOT(lockSignature(bool)));
     connect(ui->buttonSave, SIGNAL(clicked()), this, SLOT(saveSignature()));
-
-    connect(m_capture, SIGNAL (initiated (int)),
-             SLOT (captureDeviceInitiated (int)), Qt::QueuedConnection); // wait while main window initiated
-    connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList,SamplesList)),
-            this, SLOT(processOscilloscopeData(SamplesList,SamplesList)));
+    
+    connect(m_capture, SIGNAL(initiated(int)),
+            SLOT(captureDeviceInitiated(int)), Qt::QueuedConnection);   // wait while main window initiated
+    connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList, SamplesList)),
+            this, SLOT(processOscilloscopeData(SamplesList, SamplesList)));
 }
 
 FormAnalyze::~FormAnalyze()
@@ -147,12 +147,12 @@ void FormAnalyze::saveSignature()
     QImage image;
     QList<QPointF> graphData;
     ui->viewSignature->getView(image, graphData);
-
+    
     QFileDialog dialog(this);
     dialog.setWindowTitle(tr("Save Signature"));
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setNameFilter(tr("Images (*.tif *.tiff)"));
-
+    
     if (dialog.exec() != QDialog::Accepted) {
         qDebug() << "Signature saving is discarded";
         return;
@@ -168,7 +168,7 @@ void FormAnalyze::saveSignature()
         && !filePath.endsWith(".tiff", Qt::CaseInsensitive)) {
         filePath.append(".tiff");
     }
-
+    
     ImageTiff tiff;
     TestpointMeasure point;
     point.id = 0;
@@ -231,7 +231,7 @@ void FormAnalyze::openSignature()
         return;
     }
     QString filePath = files.first();
-
+    
     // Read signature
     ImageTiff tiff;
     QImage boardPhoto;
@@ -242,12 +242,12 @@ void FormAnalyze::openSignature()
         QMessageBox::warning(this, "Open Signature", "File" + filePath + "doesn't contain signature");
         return;
     }
-
+    
     // Display signature
     TestpointMeasure measure = testpoints.first();
     ui->viewSignature->loadPreviousSignature(measure.data);
     ui->buttonLockSignature->setChecked(true);
-
+    
     // Restore signature's test environment
     setFrequency(measure.signalFrequency);
     if (measure.signalVoltage > ui->boxVoltage->maximum()) {

@@ -4,7 +4,7 @@
 OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
 {
     m_movedStraightLine = NULL;
-
+    
     m_graphChannelLeft = addGraph();
     m_graphChannelRight = addGraph();
     m_graphChannelLeft->setPen(QColor("darkBlue"));
@@ -19,7 +19,7 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     zeroLinePen.setWidth(2);
     xAxis->grid()->setZeroLinePen(zeroLinePen);
     yAxis->grid()->setZeroLinePen(zeroLinePen);
-
+    
     setInteraction(QCP::iRangeZoom, true);
     setInteraction(QCP::iRangeDrag, true);
     setInteraction(QCP::iSelectItems, true);
@@ -37,11 +37,11 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_pointUnderMouse->setBrush(Qt::red);
     m_pointUnderMouse->setSize(7);
     m_pointUnderMouse->setSelectable(false);
-
+    
     m_pointUnderMouseText = new QCPItemText(this);
     addItem(m_pointUnderMouseText);
     m_pointUnderMouseText->position->setType(QCPItemPosition::ptPlotCoords);
-    m_pointUnderMouseText->setPositionAlignment(Qt::AlignLeft|Qt::AlignTop);
+    m_pointUnderMouseText->setPositionAlignment(Qt::AlignLeft | Qt::AlignTop);
     m_pointUnderMouseText->setTextAlignment(Qt::AlignLeft);
     m_pointUnderMouseText->setFont(QFont(font().family(), 9));
     m_pointUnderMouseText->setPadding(QMargins(8, 0, 0, 0));
@@ -50,7 +50,7 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_pointUnderMouseText->setText(tr("%1ms, %2V").arg(data.key, 0, 'f', 2).arg(data.value, 0, 'f', 1));
 //    m_pointUnderMouseText->setBrush(Qt::white);
     m_pointUnderMouseText->setSelectable(false);
-
+    
     //  Measure time between two points
     QPen measurementPen;
     measurementPen.setColor("brown");
@@ -60,13 +60,13 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_timeMeasurementLine1->setPen(measurementPen);
     m_timeMeasurementLine1->point1->setCoords(1.0, 0.0);
     m_timeMeasurementLine1->point2->setCoords(1.0, 1.0);
-
+    
     m_timeMeasurementLine2 = new QCPItemStraightLine(this);
     addItem(m_timeMeasurementLine2);
     m_timeMeasurementLine2->setPen(measurementPen);
     m_timeMeasurementLine2->point1->setCoords(10.0, 0.0);
     m_timeMeasurementLine2->point2->setCoords(10.0, 1.0);
-
+    
     // add the bracket at the top:
     m_timeMeasurementBracket = new QCPItemBracket(this);
     addItem(m_timeMeasurementBracket);
@@ -76,12 +76,12 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_timeMeasurementBracket->setLength(10);
     m_timeMeasurementBracket->setStyle(QCPItemBracket::bsSquare);
     m_timeMeasurementBracket->setSelectable(false);
-
+    
     m_timeMeasurementText = new QCPItemText(this);
     addItem(m_timeMeasurementText);
     m_timeMeasurementText->position->setParentAnchor(m_timeMeasurementBracket->center);
     m_timeMeasurementText->position->setCoords(0, 0);
-    m_timeMeasurementText->setPositionAlignment(Qt::AlignTop|Qt::AlignHCenter);
+    m_timeMeasurementText->setPositionAlignment(Qt::AlignTop | Qt::AlignHCenter);
     double mes1 = m_timeMeasurementLine1->point1->key();
     double mes2 = m_timeMeasurementLine2->point2->key();
     QString measuredTime = QString::number(qAbs(mes1 - mes2), 'f', 2) + tr(" ms");
@@ -89,7 +89,7 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_timeMeasurementText->setFont(QFont(font().family(), 10));
     m_timeMeasurementText->setBrush(Qt::white);
     m_timeMeasurementText->setSelectable(false);
-
+    
     QPen triggerPen;
     triggerPen.setWidth(2);
     triggerPen.setColor("green");
@@ -99,10 +99,10 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_triggerLevelLine->setPen(triggerPen);
     m_triggerLevelLine->point1->setCoords(-100.0, 1.0);
     m_triggerLevelLine->point2->setCoords(100.0, 1.0);
-
+    
     m_triggerLevelText = new QCPItemText(this);
     addItem(m_triggerLevelText);
-    m_triggerLevelText->setPositionAlignment(Qt::AlignRight|Qt::AlignVCenter);
+    m_triggerLevelText->setPositionAlignment(Qt::AlignRight | Qt::AlignVCenter);
     m_triggerLevelText->position->setParentAnchor(m_triggerLevelLine->anchor("point2"));
     m_triggerLevelText->position->setCoords(0, 0);
     double triggerVoltage = m_triggerLevelLine->point1->value();
@@ -131,27 +131,27 @@ void OscilloscopeView::showPointToolTip(QMouseEvent *event)
 {
     double plotX = xAxis->pixelToCoord(event->pos().x());
     double plotY = yAxis->pixelToCoord(event->pos().y());
-
+    
     QCPData data = graph(0)->data()->lowerBound(plotX).value();
-
+    
     double time = data.key;
     double voltage = data.value;
-
+    
     double closeness = qAbs(voltage - plotY);
     double percent = closeness / yAxis->range().size();
-
+    
 //    qDebug() << "Current point is: Time:" << plotX << time << "Voltage:" << plotY << voltage << closeness << percent;
 
     if (graph(0)->data()->contains(time) == false)
         return;
-
+        
     if (percent > 0.1)
         return;
-
+        
     m_pointUnderMouse->setGraphKey(time);
-
+    
     replot();
-
+    
     m_pointUnderMouseText->position->setCoords(time, voltage);
     m_pointUnderMouseText->setText(tr("%1ms, %2V").arg(time, 0, 'f', 2).arg(voltage, 0, 'f', 1));
 }
@@ -159,7 +159,7 @@ void OscilloscopeView::showPointToolTip(QMouseEvent *event)
 void OscilloscopeView::saveView()
 {
     QPixmap view = toPixmap();
-
+    
     QDir currentDir = QDir::current();
     if (!currentDir.exists("oscilloscope")) {
         if (!currentDir.mkdir("oscilloscope")) {
@@ -171,16 +171,16 @@ void OscilloscopeView::saveView()
         qWarning() << "Can't enter in folder \"oscilloscope\" from" << currentDir.absolutePath();
         return;
     }
-
+    
     QDateTime currentDate = QDateTime::currentDateTime();
     QString dateTime = currentDate.toString("hh_mm_ss dd_MM_yyyy");
     QString fileName = currentDir.absolutePath() + QDir::separator() + dateTime + ".png";
-
+    
     if (!view.save(fileName)) {
         qWarning() << "Can't save Oscilloscope view to" << fileName;
         return;
     }
-
+    
     qDebug() << "oscilloscope's view has been saved to" << fileName;
 }
 
@@ -190,10 +190,10 @@ void OscilloscopeView::setXaxisRange(double minValue, double maxValue)
     m_axisXmaxValue = maxValue;
     xAxis->setRange(m_axisXminValue, m_axisXmaxValue);
     yAxis->setRange(m_axisYminValue, m_axisYmaxValue);
-
+    
     m_triggerLevelLine->point1->setCoords(-100., m_triggerLevelLine->point1->value());
     m_triggerLevelLine->point2->setCoords(m_axisXmaxValue, m_triggerLevelLine->point2->value());
-
+    
     replot();
 }
 
@@ -203,7 +203,7 @@ void OscilloscopeView::setYaxisRange(double minValue, double maxValue)
     m_axisYmaxValue = maxValue;
     yAxis->setRange(m_axisYminValue, m_axisYmaxValue);
     xAxis->setRange(m_axisXminValue, m_axisXmaxValue);
-
+    
     if (m_triggerLevelLine->point1->value() < m_axisYminValue) {
         setTriggerLevel(m_axisYminValue);
         QString triggerVoltage = QString::number(m_axisYminValue, 'f', 3) + tr(" V");
@@ -214,10 +214,10 @@ void OscilloscopeView::setYaxisRange(double minValue, double maxValue)
         QString triggerVoltage = QString::number(m_axisYmaxValue, 'f', 3) + tr(" V");
         m_triggerLevelText->setText(triggerVoltage);
     }
-
+    
     m_timeMeasurementBracket->left->setCoords(m_timeMeasurementBracket->left->key(), m_axisYmaxValue - 1.0);
     m_timeMeasurementBracket->right->setCoords(m_timeMeasurementBracket->right->key(), m_axisYmaxValue - 1.0);
-
+    
     replot();
 }
 
@@ -245,9 +245,9 @@ void OscilloscopeView::showGraph(DisplayedGraphId id, bool visible)
 void OscilloscopeView::mousePressEvent(QMouseEvent *event)
 {
     QCPAbstractItem *selectedItem = itemAt(event->localPos(), true);
-
+    
     qDebug() << "Selected item:" << selectedItem;
-
+    
     if (selectedItem == NULL) {
         QCustomPlot::mousePressEvent(event);
         return;
@@ -257,22 +257,22 @@ void OscilloscopeView::mousePressEvent(QMouseEvent *event)
         QCustomPlot::mousePressEvent(event);
         return;
     }
-
+    
     if (!selectedItems().empty()) {
-        foreach (QCPAbstractItem *item, selectedItems()) {
+        foreach(QCPAbstractItem *item, selectedItems()) {
             item->setSelected(false);
         }
     }
-
+    
     m_movedStraightLine = straightLine;
     m_movedStraightLine->setSelected(true);
-
+    
     double plotX = xAxis->pixelToCoord(event->pos().x());
     double plotY = yAxis->pixelToCoord(event->pos().y());
     QCPData data = graph(0)->data()->lowerBound(plotX).value();
     double time = data.key;
     double voltage = data.value;
-
+    
     if (m_movedStraightLine == m_triggerLevelLine) {
         QString triggerVoltage = QString::number(plotY, 'f', 3) + tr(" V");
         m_triggerLevelText->setText(triggerVoltage);
@@ -282,7 +282,7 @@ void OscilloscopeView::mousePressEvent(QMouseEvent *event)
         m_pointUnderMouseText->position->setCoords(time, voltage);
         m_pointUnderMouseText->setText(tr("%1ms, %2V").arg(time, 0, 'f', 2).arg(voltage, 0, 'f', 1));
     }
-
+    
     QWidget::mousePressEvent(event);
     replot();
 }
@@ -294,13 +294,13 @@ void OscilloscopeView::mouseMoveEvent(QMouseEvent *event)
         showPointToolTip(event);
         return;
     }
-
+    
     double plotX = xAxis->pixelToCoord(event->pos().x());
     double plotY = yAxis->pixelToCoord(event->pos().y());
     QCPData data = graph(0)->data()->lowerBound(plotX).value();
     double time = data.key;
     double voltage = data.value;
-
+    
 //    qDebug() << "move: time -" << plotX << time << "voltage -" << plotY << voltage;
 
     if (m_movedStraightLine == m_triggerLevelLine) {
@@ -317,14 +317,14 @@ void OscilloscopeView::mouseMoveEvent(QMouseEvent *event)
             QWidget::mouseMoveEvent(event);
             return;
         }
-
+        
         m_movedStraightLine->point1->setCoords(time, 0.0);
         m_movedStraightLine->point2->setCoords(time, 1.0);
-
+        
         m_pointUnderMouse->setGraphKey(time);
         m_pointUnderMouseText->position->setCoords(time, voltage);
         m_pointUnderMouseText->setText(tr("%1ms, %2V").arg(time, 0, 'f', 2).arg(voltage, 0, 'f', 1));
-
+        
         double mes1 = m_timeMeasurementLine1->point1->key();
         double mes2 = m_timeMeasurementLine2->point2->key();
         m_timeMeasurementBracket->left->setCoords(qMin(mes1, mes2), m_timeMeasurementBracket->left->value());
@@ -332,7 +332,7 @@ void OscilloscopeView::mouseMoveEvent(QMouseEvent *event)
         QString measuredTime = QString::number(qAbs(mes1 - mes2), 'f', 2) + tr(" ms");
         m_timeMeasurementText->setText(measuredTime);
     }
-
+    
     QWidget::mouseMoveEvent(event);
     replot();
 }
@@ -340,12 +340,12 @@ void OscilloscopeView::mouseMoveEvent(QMouseEvent *event)
 void OscilloscopeView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (!selectedItems().empty()) {
-        foreach (QCPAbstractItem *item, selectedItems()) {
+        foreach(QCPAbstractItem *item, selectedItems()) {
             item->setSelected(false);
         }
     }
     m_movedStraightLine = NULL;
-
+    
     QCustomPlot::mouseReleaseEvent(event);
     replot();
 }

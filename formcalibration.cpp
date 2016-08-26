@@ -11,13 +11,13 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     ui->setupUi(this);
     m_gen = gen;
     m_capture = capture;
-
+    
     //  Tone generation
     QStringList outputDeviceNames = m_gen->enumerateDevices();
     QString outputDeviceName;
     ui->boxAudioOutputDevice->clear();
     int index = 0;
-    foreach (QString name, outputDeviceNames) {
+    foreach(QString name, outputDeviceNames) {
         if (name.startsWith("* ")) {
             outputDeviceName = name;
             outputDeviceName.remove(0, 2);
@@ -30,13 +30,13 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
         index++;
     }
     connect(ui->boxAudioOutputDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputAudioDevice(int)));
-
+    
     // Audio capture
     QStringList inputDeviceNames = m_capture->enumerateDevices();
     QString inputDeviceName;
     ui->boxAudioInputDevice->clear();
     index = 0;
-    foreach (QString name, inputDeviceNames) {
+    foreach(QString name, inputDeviceNames) {
         if (name.startsWith("* ")) {
             inputDeviceName = name;
             inputDeviceName.remove(0, 2);
@@ -49,23 +49,23 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
         index++;
     }
     connect(ui->boxAudioInputDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(switchInputAudioDevice(int)));
-
+    
     connect(ui->buttonLeftOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
     connect(ui->buttonRightOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
     connect(ui->buttonCheckInputLevel, SIGNAL(clicked(bool)), this, SLOT(checkInputLevel(bool)));
     connect(ui->buttonAdjustGenerator, SIGNAL(clicked(bool)), this, SLOT(adjustGenerator(bool)));
 //    connect(ui->buttonGenerate, SIGNAL(toggled(bool)), ui->boxAudioOutputDevice, SLOT(setDisabled(bool)));
 //    connect(ui->buttonCupture, SIGNAL(toggled(bool)), ui->boxAudioInputDevice, SLOT(setDisabled(bool)));
-    connect(m_capture, SIGNAL (initiated (int)),
-             SLOT (captureDeviceInitiated (int)), Qt::QueuedConnection); // wait while main window initiated
-    connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList,SamplesList)),
-            this, SLOT(processOscilloscopeData(SamplesList,SamplesList)));
-
+    connect(m_capture, SIGNAL(initiated(int)),
+            SLOT(captureDeviceInitiated(int)), Qt::QueuedConnection);   // wait while main window initiated
+    connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList, SamplesList)),
+            this, SLOT(processOscilloscopeData(SamplesList, SamplesList)));
+            
     qreal magnitude = m_gen->getMaxVoltageAmplitude();
     setGeneratorMagnitude(magnitude); // call before signals connection - avoid recursion trap
     connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
     connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
-
+    
     connect(ui->buttonHintAdjustGenerator, SIGNAL(clicked()), this, SLOT(showHint()));
     connect(ui->buttonHintCheckInputLevel, SIGNAL(clicked()), this, SLOT(showHint()));
     connect(ui->buttonHintPlayTone, SIGNAL(clicked()), this, SLOT(showHint()));
@@ -168,7 +168,7 @@ void FormCalibration::checkInputLevel(bool start)
 {
     qDebug() << "Run checking voltage on Audio input:" << start;
     if (start) {
-
+    
     }
     m_capture->startCapturing(start);
 }

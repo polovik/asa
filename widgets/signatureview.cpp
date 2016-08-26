@@ -28,7 +28,7 @@ void SignatureView::loadPreviousSignature(const QList<QPointF> &graphData)
 {
     QVector<double> keys;
     QVector<double> values;
-    foreach (const QPointF &point, graphData) {
+    foreach(const QPointF &point, graphData) {
         keys.append(point.x());
         values.append(point.y());
     }
@@ -50,10 +50,10 @@ void SignatureView::getView(QImage &renderedView, QList<QPointF> &graphData)
     m_graphPrevSignature->setVisible(true);
     replot(QCustomPlot::rpImmediate);
     renderedView = view.toImage();
-
+    
     QCPDataMap *rawData = m_graphCurSignature->data();
     graphData.clear();
-    foreach (const QCPData &point, rawData->values()) {
+    foreach(const QCPData &point, rawData->values()) {
         QPointF pt(point.key, point.value);
         graphData.append(pt);
     }
@@ -66,7 +66,7 @@ void SignatureView::saveView()
     QPixmap view = toPixmap();
     m_graphPrevSignature->setVisible(true);
     replot(QCustomPlot::rpImmediate);
-
+    
     QDir currentDir = QDir::current();
     if (!currentDir.exists("signature")) {
         if (!currentDir.mkdir("signature")) {
@@ -78,16 +78,16 @@ void SignatureView::saveView()
         qWarning() << "Can't enter in folder \"signature\" from" << currentDir.absolutePath();
         return;
     }
-
+    
     QDateTime currentDate = QDateTime::currentDateTime();
     QString dateTime = currentDate.toString("hh_mm_ss dd_MM_yyyy");
     QString fileName = currentDir.absolutePath() + QDir::separator() + dateTime + ".png";
-
+    
     if (!view.save(fileName)) {
         qWarning() << "Can't save Signature view to" << fileName;
         return;
     }
-
+    
     qDebug() << "signature's view has been saved to" << fileName;
 }
 

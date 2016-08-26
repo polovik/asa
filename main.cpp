@@ -23,16 +23,16 @@ QString g_logFilePath = "";
 void logging(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QByteArray localMsg = logCodec->fromUnicode(msg);
-
+    
     QString fileName(context.file);
     fileName.remove(0, fileName.lastIndexOf("\\") + 1);
     fileName.remove(0, fileName.lastIndexOf("/") + 1);
     QByteArray file = logCodec->fromUnicode(fileName);
-
+    
     QTime time = QTime::currentTime();
     QString formatedTime = time.toString("hh:mm:ss.zzz");
     fprintf(logStream, "%s ", qPrintable(formatedTime));
-
+    
     switch (type) {
     case QtDebugMsg:
         fprintf(logStream, "Debug: %s (`%s:%u, %s`)\n", localMsg.constData(), file.constData(), context.line, context.function);
@@ -54,7 +54,7 @@ void logging(QtMsgType type, const QMessageLogContext &context, const QString &m
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
+    
     //  Configure and redirect log output to stderr or in text file
     QByteArray envVar = qgetenv("RUN_IN_QTCREATOR");   //  this variable is only set when run application in QtCreator
     if (envVar.isEmpty()) {
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     logCodec = QTextCodec::codecForName("Windows-1251");
     qInstallMessageHandler(logging);
     qDebug() << "Start application. Write log to" << g_logFilePath;
-
+    
     QStringList appArguments = QApplication::arguments();
     if (appArguments.contains("-v")) {
         qDebug() << "Enable verbose output";
@@ -78,9 +78,9 @@ int main(int argc, char *argv[])
     } else {
         qDebug() << "Verbose output is disabled";
     }
-
+    
     MainWindow w;
     w.show();
-
+    
     return a.exec();
 }

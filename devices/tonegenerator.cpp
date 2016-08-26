@@ -107,7 +107,7 @@ qint64 AudioOutputDevice::readData(char *data, qint64 maxSize)
         }
         ++m_sampleIndex;
     }
-
+    
     return maxSize;
 }
 
@@ -126,7 +126,7 @@ ToneGenerator::ToneGenerator(QObject *parent) : QThread(parent)
     m_activeChannels = CHANNEL_NONE;
     m_relativeAmplitude = -1;
     m_maxVoltageAmplitude = -10.;
-
+    
     // Set up the format, eg.
     m_toneFrequency = 100;
     m_audioFormat.setSampleRate(44100);
@@ -161,7 +161,7 @@ QStringList ToneGenerator::enumerateDevices()
     }
     bool highlighted = false;
     m_audioDeviceInfos.clear();
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
+    foreach(const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
         if (info.isNull()) {
             continue;
         }
@@ -203,7 +203,7 @@ QStringList ToneGenerator::enumerateDevices()
             }
         }
     }
-
+    
     qDebug() << "Detected audio output devices:" << devices;
     return devices;
 }
@@ -236,7 +236,7 @@ void ToneGenerator::switchOutputDevice(QString name)
         return;
     }
     qDebug() << "Switch audio output device to" << name;
-    foreach (const QAudioDeviceInfo &info, m_audioDeviceInfos) {
+    foreach(const QAudioDeviceInfo &info, m_audioDeviceInfos) {
         if (info.deviceName() == name) {
             m_curAudioDeviceInfo = info;
             break;
@@ -311,7 +311,7 @@ void ToneGenerator::run()
     m_outputBuffer = new AudioOutputDevice();
     m_outputBuffer->open(QIODevice::ReadOnly);
     emit deviceReady(true);
-
+    
     bool generationStarted = false;
     QEventLoop loop;
     forever {
@@ -352,24 +352,29 @@ void ToneGenerator::stateChanged(QAudio::State state)
     qDebug() << "Metronome::stateChanged State=" << state << ", Error=" << error;
     qDebug() << "Metronome::stateChanged" << m_audioOutput->bufferSize() << m_audioOutput->bytesFree() << m_audioOutput->periodSize();
     qDebug() << "elapsedUSecs = " << m_audioOutput->elapsedUSecs()
-               << ", " << "processedUSecs = " << m_audioOutput->processedUSecs();
-    if (state == QAudio::IdleState)
-    {
+             << ", " << "processedUSecs = " << m_audioOutput->processedUSecs();
+    if (state == QAudio::IdleState) {
         qDebug() << "Metronome::stateChanged IdleState Stop output";
         // http://www.bitchx.com/log/qt-f/qt-f-20-Apr-2010/qt-f-20-Apr-2010-05.php
         //audioOutput->stop(); // This line run crash!!! It immediatelly call again stateChanged slot. Be care
     }
-    if (error != QAudio::NoError)
-    {
-        switch (error)
-        {
-            case 0 : qDebug() << "Metronome QAudio::NoError State =" << state; break;
-            case 1 : qDebug() << "Metronome QAudio::OpenError State =" << state; break;
-            case 2 : qDebug() << "Metronome QAudio::IOError State =" << state; break;
-            case 3 :
-                  qDebug() << "Metronome QAudio::UnderrunError State =" << state;
-                break;
-            case 4 : qDebug() << "Metronome QAudio::FatalError State =" << state; break;
+    if (error != QAudio::NoError) {
+        switch (error) {
+        case 0 :
+            qDebug() << "Metronome QAudio::NoError State =" << state;
+            break;
+        case 1 :
+            qDebug() << "Metronome QAudio::OpenError State =" << state;
+            break;
+        case 2 :
+            qDebug() << "Metronome QAudio::IOError State =" << state;
+            break;
+        case 3 :
+            qDebug() << "Metronome QAudio::UnderrunError State =" << state;
+            break;
+        case 4 :
+            qDebug() << "Metronome QAudio::FatalError State =" << state;
+            break;
         }
     }
 }

@@ -13,10 +13,10 @@ public:
     void loadPreviousSignature(const QList<QPointF> &graphData);
     void draw(const QVector<double> &keys, const QVector<double> &values);
     void getView(QImage &renderedView, QList<QPointF> &graphData);
-
+    
 public slots:
     void saveView();
-
+    
 private:
     QCPItemPixmap *m_previousSignature;
     QCPGraph *m_graphPrevSignature;

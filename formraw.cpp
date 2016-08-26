@@ -11,7 +11,7 @@ FormRaw::FormRaw(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent)
     ui(new Ui::FormRaw)
 {
     ui->setupUi(this);
-
+    
     //  Tone generation
     m_gen = gen;
     connect(m_gen, SIGNAL(deviceReady(bool)), this, SLOT(switchOutputFrequency()));
@@ -20,18 +20,18 @@ FormRaw::FormRaw(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent)
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_square.png"), "Square", QVariant(ToneWaveForm::WAVE_SQUARE));
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_saw.png"), "Sawtooth", QVariant(ToneWaveForm::WAVE_SAWTOOTH));
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_triangle.png"), "Triangle", QVariant(ToneWaveForm::WAVE_TRIANGLE));
-
+    
     // Audio capture
     m_dataForSingleCaptureAcqured = true;
     m_triggerChannel = CHANNEL_NONE;
     m_samplingRate = -1;
     m_frameLength = -1;
     m_capture = capture;
-    connect(m_capture, SIGNAL (initiated (int)),
-             SLOT (captureDeviceInitiated (int)), Qt::QueuedConnection); // wait while main window initiated
-    connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList,SamplesList)),
-            this, SLOT(processOscilloscopeData(SamplesList,SamplesList)));
-
+    connect(m_capture, SIGNAL(initiated(int)),
+            SLOT(captureDeviceInitiated(int)), Qt::QueuedConnection);   // wait while main window initiated
+    connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList, SamplesList)),
+            this, SLOT(processOscilloscopeData(SamplesList, SamplesList)));
+            
     changeTriggerSettings();
     connect(ui->boxTriggerAuto, SIGNAL(clicked()), this, SLOT(changeTriggerSettings()));
     connect(ui->boxTriggerNormal, SIGNAL(clicked()), this, SLOT(changeTriggerSettings()));
@@ -39,7 +39,7 @@ FormRaw::FormRaw(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent)
     connect(ui->boxSlopeRising, SIGNAL(clicked()), this, SLOT(changeTriggerSettings()));
     connect(ui->boxSlopeFalling, SIGNAL(clicked()), this, SLOT(changeTriggerSettings()));
     connect(ui->boxTriggerChannel, SIGNAL(currentIndexChanged(int)), this, SLOT(changeTriggerSettings()));
-
+    
     // create plot (from quadratic plot example):
     QVector<double> x(1024), y(1024);
     for (int i = 0; i < 100; ++i) {
@@ -60,7 +60,7 @@ FormRaw::FormRaw(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent)
     }
     m_dataX = x;
     m_dataY = y;
-
+    
     m_triggerLevel = 0.;
     ui->oscilloscope->setTriggerLevel(m_triggerLevel);
 //    ui->sliderPrecedingInterval->setValue(150);
@@ -70,11 +70,11 @@ FormRaw::FormRaw(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent)
     ui->oscilloscope->setXaxisRange(0, 1000 * 8000. / 44100);
     draw(CHANNEL_LEFT, m_dataY);
     connect(ui->oscilloscope, SIGNAL(triggerLevelChanged(double)), this, SLOT(updateTriggerLevel(double)));
-
+    
     connect(ui->buttonGenerate, SIGNAL(toggled(bool)), this, SLOT(startToneGenerator(bool)));
     connect(ui->boxFrequency, SIGNAL(valueChanged(int)), this, SLOT(switchOutputFrequency()));
     connect(ui->boxWaveForm, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputWaveForm()));
-
+    
     connect(ui->buttonCapture, SIGNAL(toggled(bool)), this, SLOT(startAudioCapture(bool)));
     connect(ui->boxChannelLeft, SIGNAL(toggled(bool)), this, SLOT(changeCapturedChannels()));
     connect(ui->boxChannelRight, SIGNAL(toggled(bool)), this, SLOT(changeCapturedChannels()));
@@ -113,7 +113,7 @@ void FormRaw::startToneGenerator(bool start)
     m_gen->runGenerator(start);
 }
 
-void FormRaw::captureDeviceInitiated (int samplingRate)
+void FormRaw::captureDeviceInitiated(int samplingRate)
 {
     if (!ui->buttonCapture->isChecked()) {
         return;
@@ -122,12 +122,12 @@ void FormRaw::captureDeviceInitiated (int samplingRate)
     audioCaptureReady = true;
     m_samplingRate = samplingRate;
     Q_ASSERT(m_capture);
-
+    
     m_frameLength = m_samplingRate / OSCILLOSCOPE_PLOT_FREQUENCY_HZ;
     double bound = 1000. * (m_frameLength / 2.) / m_samplingRate;
     ui->oscilloscope->setXaxisRange(-bound, bound);
     qDebug() << "Capture device is ready with sampling rate =" << samplingRate << "Frame len =" << m_frameLength;
-
+    
     if (m_triggerMode == TRIG_SINGLE) {
         m_dataForSingleCaptureAcqured = false;
     } else {
@@ -376,7 +376,7 @@ void FormRaw::changeTriggerSettings()
             m_dataForSingleCaptureAcqured = true;
         }
     }
-
+    
     OscTriggerSlope slope = m_triggerSlope;
     if (ui->boxSlopeRising->isChecked())
         slope = TRIG_RISING;
@@ -388,7 +388,7 @@ void FormRaw::changeTriggerSettings()
         qDebug() << "Oscilloscope trigger slope has been changed from" << m_triggerSlope << "to" << slope;
         m_triggerSlope = slope;
     }
-
+    
     AudioChannels channel;
     if (ui->boxTriggerChannel->currentIndex() == 0) {
         channel = CHANNEL_LEFT;

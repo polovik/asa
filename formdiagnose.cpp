@@ -20,9 +20,9 @@ FormDiagnose::FormDiagnose(QWidget *parent) :
 {
     ui->setupUi(this);
     m_dialogCamera = NULL;
-
+    
     m_camerasList = QCameraInfo::availableCameras();
-    foreach (const QCameraInfo &cameraInfo, m_camerasList) {
+    foreach(const QCameraInfo &cameraInfo, m_camerasList) {
         qDebug() << "Found camera:" << cameraInfo.deviceName() << cameraInfo.description()
                  << cameraInfo.orientation() << cameraInfo.position();
         ui->boxCameras->addItem(cameraInfo.description(), QVariant(cameraInfo.deviceName()));
@@ -40,7 +40,7 @@ FormDiagnose::FormDiagnose(QWidget *parent) :
     connect(ui->buttonLockMeasure, SIGNAL(pressed()), this, SLOT(captureSignature()));
     freezeForm(false);
     ui->buttonLockMeasure->setEnabled(false);
-
+    
     ui->boardView->setAlignment(Qt::AlignCenter);
     ui->boardView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->boardView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -48,12 +48,12 @@ FormDiagnose::FormDiagnose(QWidget *parent) :
     ui->boardView->setLineWidth(0);
     ui->boardView->setMidLineWidth(0);
     ui->boardView->setBackgroundBrush(QBrush(Qt::black));
-
-    connect(ui->boardView, SIGNAL(testpointAdded(int,QPoint)),  this, SLOT(testpointAdd(int,QPoint)));
-    connect(ui->boardView, SIGNAL(testpointSelected(int)),      this, SLOT(testpointSelect(int)));
-    connect(ui->boardView, SIGNAL(testpointMoved(int,QPoint)),  this, SLOT(testpointMove(int,QPoint)));
-    connect(ui->boardView, SIGNAL(testpointRemoved(int)),       this, SLOT(testpointRemove(int)));
-    connect(ui->boardView, SIGNAL(testpointIdChanged(int,int)), this, SLOT(testpointChangeId(int,int)));
+    
+    connect(ui->boardView, SIGNAL(testpointAdded(int, QPoint)),  this, SLOT(testpointAdd(int, QPoint)));
+    connect(ui->boardView, SIGNAL(testpointSelected(int)),       this, SLOT(testpointSelect(int)));
+    connect(ui->boardView, SIGNAL(testpointMoved(int, QPoint)),  this, SLOT(testpointMove(int, QPoint)));
+    connect(ui->boardView, SIGNAL(testpointRemoved(int)),        this, SLOT(testpointRemove(int)));
+    connect(ui->boardView, SIGNAL(testpointIdChanged(int, int)), this, SLOT(testpointChangeId(int, int)));
 }
 
 FormDiagnose::~FormDiagnose()
@@ -96,11 +96,11 @@ void FormDiagnose::showCamera()
     hboxLayout->addWidget(buttonCancel);
     vboxLayout->addLayout(hboxLayout, 0);
     qDebug() << "Dialog for grab a photo is opened";
-
+    
     QCameraInfo info = m_camerasList.at(ui->boxCameras->currentIndex());
     QCamera *camera = new QCamera(info, m_dialogCamera);
     camera->setViewfinder(cameraVideo);
-
+    
     QCameraImageCapture *imageCapture = new QCameraImageCapture(camera);
     imageCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
     QImageEncoderSettings imageSettings;
@@ -108,11 +108,11 @@ void FormDiagnose::showCamera()
     imageCapture->setEncodingSettings(imageSettings);
     connect(buttonTakePhoto, SIGNAL(pressed()), imageCapture, SLOT(capture()));
     connect(m_dialogCamera, SIGNAL(rejected()), this, SLOT(closeCamera()));
-    connect(imageCapture, SIGNAL(imageCaptured(int,QImage)), this, SLOT(savePhoto(int,QImage)));
-
+    connect(imageCapture, SIGNAL(imageCaptured(int, QImage)), this, SLOT(savePhoto(int, QImage)));
+    
     camera->setCaptureMode(QCamera::CaptureStillImage);
     camera->start();
-
+    
     m_dialogCamera->showMaximized();
 }
 
@@ -136,7 +136,7 @@ void FormDiagnose::savePhoto(int id, const QImage &preview)
     dialog.setWindowTitle(tr("Save Photo"));
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setNameFilter(tr("Images (*.tif *.tiff)"));
-
+    
     if (dialog.exec() != QDialog::Accepted) {
         qDebug() << "Photo" << preview.size() << "is discarded";
         return;
@@ -152,7 +152,7 @@ void FormDiagnose::savePhoto(int id, const QImage &preview)
         && !filePath.endsWith(".tiff", Qt::CaseInsensitive)) {
         filePath.append(".tiff");
     }
-
+    
     ImageTiff tiff;
     QList<TestpointMeasure> testpoints;
     if (tiff.writeImageSeries(filePath, preview, QImage(), testpoints)) {
@@ -190,14 +190,14 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
     m_testpoints.clear();
     QVector<double> keys, values;
     ui->viewSignature->draw(keys, values);
-
+    
     ImageTiff tiff;
     QImage boardPhoto;
     tiff.readImageSeries(m_boardPhotoPath, boardPhoto, m_testpoints);
     QPixmap pix = QPixmap::fromImage(boardPhoto);
-
+    
     TestpointsList testpoints;
-    foreach (const TestpointMeasure &meas, m_testpoints) {
+    foreach(const TestpointMeasure &meas, m_testpoints) {
         testpoints.insert(meas.id, meas.pos);
     }
     testpointSelect(-1);
@@ -231,7 +231,7 @@ void FormDiagnose::testpointAdd(int id, QPoint pos)
     point.signalVoltage = 0;
     point.isCurrent = false;
     point.data.clear();
-    foreach (const TestpointMeasure &pt, m_testpoints) {
+    foreach(const TestpointMeasure &pt, m_testpoints) {
         if (pt.id == id) {
             qWarning() << "Testpoint" << id << "is already presented in array";
             Q_ASSERT(false);
@@ -340,7 +340,7 @@ void FormDiagnose::saveMeasures()
     QImage boardPhotoWithMarkers;
     ui->boardView->getBoardPhoto(boardPhoto, boardPhotoWithMarkers);
     tiff.writeImageSeries(m_boardPhotoPath + ".tiff", boardPhoto, boardPhotoWithMarkers, m_testpoints);
-
+    
     freezeForm(false);
 }
 

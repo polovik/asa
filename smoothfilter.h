@@ -18,15 +18,17 @@ New sample (multiplied by smoothFactor) overwrite oldest in array - ring address
 class SmoothFilter
 {
 public:
-    SmoothFilter ();
-    SmoothFilter (int length, double smoothFactor);
-    ~SmoothFilter ();
-
-    double processSample (double sample);
-    int getLength () const { return length; }
-
+    SmoothFilter();
+    SmoothFilter(int length, double smoothFactor);
+    ~SmoothFilter();
+    
+    double processSample(double sample);
+    int getLength() const {
+        return length;
+    }
+    
 private:
-    double* filter;
+    double *filter;
     int length;
     double smoothFactor;
     int globalPos; // store count of processed samples

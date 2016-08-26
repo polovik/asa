@@ -5,7 +5,8 @@
 #include "common_types.h"
 #include "devices/audioinputdevice.h"
 
-namespace Ui {
+namespace Ui
+{
 class FormRaw;
 }
 
@@ -14,34 +15,34 @@ class ToneGenerator;
 class FormRaw : public QWidget
 {
     Q_OBJECT
-
+    
 public:
     explicit FormRaw(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent = 0);
     ~FormRaw();
-
+    
 public slots:
     void enterForm();
     void leaveForm();
-
+    
 private slots:
     void startToneGenerator(bool start);
-    void captureDeviceInitiated (int samplingRate);
+    void captureDeviceInitiated(int samplingRate);
     void draw(AudioChannels channel, const QVector<double> &values);
-    void processOscilloscopeData (SamplesList leftChannelData, SamplesList rightChannelData);
+    void processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData);
     void startAudioCapture(bool start);
     void switchOutputWaveForm();
     void switchOutputFrequency();
     void updateTriggerLevel(double voltage);
     void changeTriggerSettings();
     void changeCapturedChannels();
-
+    
 private:
     void displayOscilloscopeChannelData(int dislayFrom, int displayedLength, int removeFrom);
-
+    
     Ui::FormRaw *ui;
     ToneGenerator *m_gen;
     AudioInputThread *m_capture;
-
+    
     QVector<double> m_dataX;
     QVector<double> m_dataY;
     double m_triggerLevel;

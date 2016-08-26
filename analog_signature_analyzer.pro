@@ -58,7 +58,6 @@ include($$PWD/tiff/libtiff.pri)
 
 # DEPLOY
 #translationsSource = $$PWD/languages/lang_ru_RU.qm
-#database = $$PWD/asa.accdb
 debug_bat = $$PWD/run_debug_version.bat
 resourcesTarget = $$DESTDIR
 
@@ -66,19 +65,16 @@ win32 {
 #    system(lupdate -verbose . -ts languages\\lang_ru_RU.ts)
 #    system(lrelease languages\\lang_ru_RU.ts languages\\lang_ru_RU.qm)
 #    translationsSource = $$replace(translationsSource, /, \\)
-#    database = $$replace(database, /, \\)
     debug_bat = $$replace(debug_bat, /, \\)
     resourcesTarget = $$replace(resourcesTarget, /, \\)
     system(mkdir $$resourcesTarget)
 #    system(xcopy /Y /V $$translationsSource $$resourcesTarget\\languages\\)
-#    system(xcopy /Y /V $$database $$resourcesTarget\\)
     system(xcopy /Y /V $$debug_bat $$resourcesTarget\\)
 
     # Qt libraries
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Core.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Gui.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5PrintSupport.dll" $$resourcesTarget)
-#    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Sql.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Multimedia.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Network.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Widgets.dll" $$resourcesTarget)
@@ -87,7 +83,6 @@ win32 {
     system(xcopy /V /R /Y "%QTDIR%\bin\libstdc++-6.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\icu*.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\plugins\audio\qtaudio_windows.dll" $$resourcesTarget\audio\\)
-#    system(xcopy /V /R /Y "%QTDIR%\plugins\sqldrivers\qsqlodbc.dll" $$resourcesTarget\sqldrivers\\)
     system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qminimal.dll" $$resourcesTarget\platforms\\)
     system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qoffscreen.dll" $$resourcesTarget\platforms\\)
     system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qwindows.dll" $$resourcesTarget\platforms\\)

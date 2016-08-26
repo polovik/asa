@@ -7,7 +7,8 @@
 #include <formanalyze.h>
 #include <formdiagnose.h>
 
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
 
@@ -17,24 +18,24 @@ class AudioInputThread;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
+    
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
+    
 private slots:
     void showForm();
-
+    
 private:
     Ui::MainWindow *ui;
     ToneGenerator *m_gen;
     AudioInputThread *m_capture;
-
+    
     FormCalibration *m_formCalibration;
     FormRaw *m_formRaw;
     FormAnalyze *m_formAnalyze;
     FormDiagnose *m_formDiagnose;
-
+    
     QWidget *m_currentForm;
 };
 

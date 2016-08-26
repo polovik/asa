@@ -4,7 +4,8 @@
 #include <QWidget>
 #include "common_types.h"
 
-namespace Ui {
+namespace Ui
+{
 class FormAnalyze;
 }
 
@@ -14,15 +15,15 @@ class AudioInputThread;
 class FormAnalyze : public QWidget
 {
     Q_OBJECT
-
+    
 public:
     explicit FormAnalyze(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent = 0);
     ~FormAnalyze();
-
+    
 public slots:
     void enterForm();
     void leaveForm();
-
+    
 private slots:
     void setFrequency(int frequency);
     void setVoltage(double voltage);
@@ -30,11 +31,11 @@ private slots:
     void switchOutputWaveForm();
     void runAnalyze(bool start);
     void saveSignature();
-    void captureDeviceInitiated (int samplingRate);
+    void captureDeviceInitiated(int samplingRate);
     void processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData);
     void openSignature();
     void lockSignature(bool lock);
-
+    
 private:
     Ui::FormAnalyze *ui;
     ToneGenerator *m_gen;

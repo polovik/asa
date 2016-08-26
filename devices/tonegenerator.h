@@ -12,7 +12,7 @@ class AudioOutputDevice : public QIODevice
 {
     Q_OBJECT
 public:
-    explicit AudioOutputDevice (QObject *parent = 0);
+    explicit AudioOutputDevice(QObject *parent = 0);
     ~AudioOutputDevice();
     void configure(const QAudioFormat &format, qint32 frequency,
                    ToneWaveForm form, AudioChannels activeChannels,
@@ -21,9 +21,9 @@ public:
 public slots:
 
 protected:
-    qint64 readData (char *data, qint64 maxSize);
-    qint64 writeData (const char *data, qint64 maxSize);
-
+    qint64 readData(char *data, qint64 maxSize);
+    qint64 writeData(const char *data, qint64 maxSize);
+    
 private slots:
 
 private:
@@ -34,7 +34,7 @@ private:
     AudioChannels m_activeChannels;
     qreal m_volume;
     QMutex m_settingsMutex;
-
+    
 signals:
 };
 
@@ -48,7 +48,7 @@ public:
     QString getDeviceName();
     qreal getCurVoltageAmplitude();
     qreal getMaxVoltageAmplitude();
-
+    
 public slots:
     void runGenerator(bool start);
     void changeFrequency(int freq);
@@ -57,16 +57,16 @@ public slots:
     void setActiveChannels(AudioChannels channels);
     void setCurVoltageAmplitude(qreal voltage);
     void setMaxVoltageAmplitude(qreal voltage);
-
+    
 signals:
     void deviceReady(bool ready);
-
+    
 protected:
     void run() Q_DECL_OVERRIDE;
-
+    
 private slots:
     void stateChanged(QAudio::State state);
-
+    
 private:
     QAudioFormat m_audioFormat;
     QAudioOutput *m_audioOutput;

@@ -9,7 +9,7 @@ class SquareWidgetHolder : public QWidget
 public:
     explicit SquareWidgetHolder(QWidget *parent = 0);
     ~SquareWidgetHolder();
-
+    
 public slots:
 
 signals:

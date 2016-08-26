@@ -23,13 +23,13 @@ void AudioInputDevice::setChannels(AudioChannels channels)
     m_channels = channels;
 }
 
-qint64 AudioInputDevice::readData (char* data, qint64 maxSize)
+qint64 AudioInputDevice::readData(char *data, qint64 maxSize)
 {
     qDebug() << "AudioInputDevice::readData" << data;
     return maxSize;
 }
 
-qreal charToReal (const char* ch, bool littleEndian = true)
+qreal charToReal(const char *ch, bool littleEndian = true)
 {
     uchar val1 = uchar(ch[0]);
     uchar val2 = uchar(ch[1]);
@@ -40,24 +40,23 @@ qreal charToReal (const char* ch, bool littleEndian = true)
     } else {
         val = (val1 << 8) | val2;
     }
-    res = qreal (val);
+    res = qreal(val);
     // 2^16=65536, signed range = [-32768; 32767]
     res /= 32768;
     return res;
 }
 
-qint64 AudioInputDevice::writeData (const char* data, qint64 maxSize)
+qint64 AudioInputDevice::writeData(const char *data, qint64 maxSize)
 {
-    Q_ASSERT (maxSize % 4 == 0);
+    Q_ASSERT(maxSize % 4 == 0);
     SamplesList samplesLeft;
     SamplesList samplesRight;
-    for (int i = 0; i < maxSize; i += 4) // choose only left channel
-    {
+    for (int i = 0; i < maxSize; i += 4) { // choose only left channel
         // convert from char* to real
         if (m_channels & CHANNEL_LEFT)
-            samplesLeft.append (charToReal(&data[i], true));
+            samplesLeft.append(charToReal(&data[i], true));
         if (m_channels & CHANNEL_RIGHT)
-            samplesRight.append (charToReal(&data[i + 2], true));
+            samplesRight.append(charToReal(&data[i + 2], true));
     }
 //    qDebug() << samplesLeft.size() << samplesRight.size();
     // TODO attach timestamp
@@ -69,8 +68,8 @@ qint64 AudioInputDevice::writeData (const char* data, qint64 maxSize)
 }
 
 //============================AudioInputThread================================//
-AudioInputThread::AudioInputThread () :
-        compressorFrameSize (0), volumeIndicatorFrameSize (0), tunerFrameSize (0), oscilloscopeFrameSize(0)
+AudioInputThread::AudioInputThread() :
+    compressorFrameSize(0), volumeIndicatorFrameSize(0), tunerFrameSize(0), oscilloscopeFrameSize(0)
 {
     m_capturedChannels = CHANNEL_NONE;
     m_captureEnabled = false;
@@ -86,14 +85,14 @@ AudioInputThread::AudioInputThread () :
              << m_audioFormat.sampleRate() << m_audioFormat.sampleSize() << m_audioFormat.sampleType();
 }
 
-void AudioInputThread::run ()
+void AudioInputThread::run()
 {
     m_inputBuffer = new AudioInputDevice();
     m_inputBuffer->open(QIODevice::ReadWrite | QIODevice::Truncate);
 //    connect(m_inputBuffer, SIGNAL(samplesReceived(AudioChannels,SamplesList)), SLOT (updateBuffers(AudioChannels,SamplesList)), Qt::QueuedConnection);
 //    connect(m_inputBuffer, SIGNAL(samplesReceived(AudioChannels,SamplesList)), SIGNAL(dataForOscilloscope(AudioChannels,SamplesList)), Qt::QueuedConnection);
-    connect(m_inputBuffer, SIGNAL(samplesReceived(SamplesList,SamplesList)), SIGNAL(dataForOscilloscope(SamplesList,SamplesList)), Qt::QueuedConnection);
-
+    connect(m_inputBuffer, SIGNAL(samplesReceived(SamplesList, SamplesList)), SIGNAL(dataForOscilloscope(SamplesList, SamplesList)), Qt::QueuedConnection);
+    
     bool captureStarted = false;
     QEventLoop loop;
     forever {
@@ -114,11 +113,11 @@ void AudioInputThread::run ()
         if (captureStarted == false) {
             qDebug() << "Start audio capture";
             setCapturedChannels(CHANNEL_NONE);
-            m_audioInput = new QAudioInput (m_curAudioDeviceInfo, m_audioFormat);
+            m_audioInput = new QAudioInput(m_curAudioDeviceInfo, m_audioFormat);
             connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), SLOT(stateChanged(QAudio::State)));
             m_audioInput->start(m_inputBuffer);
             captureStarted = true;
-            emit initiated (m_sampleRate);
+            emit initiated(m_sampleRate);
         }
 //        qDebug() << "AudioInputThread::run" << m_audioOutput->bufferSize() << m_audioOutput->bytesFree() << m_audioOutput->periodSize();
 //        qDebug() << "AudioInputThread::run" << m_outputBuffer->pos();
@@ -126,19 +125,18 @@ void AudioInputThread::run ()
 }
 
 void AudioInputThread::stateChanged(QAudio::State newState)
- {
-    Q_ASSERT (m_audioInput);
+{
+    Q_ASSERT(m_audioInput);
     qDebug() << "QAudio stateChanged" << newState;
-    if (m_audioInput->error() != QAudio::NoError)
-    {
+    if (m_audioInput->error() != QAudio::NoError) {
         qDebug() << "QAudio error" << m_audioInput->error();
-        Q_ASSERT (false);
+        Q_ASSERT(false);
     }
 }
 
 
 /*  Start or stop capture   */
-void AudioInputThread::startCapturing (bool start)
+void AudioInputThread::startCapturing(bool start)
 {
     qDebug() << "run audio capture process:" << start;
     m_captureEnabled = start;
@@ -148,38 +146,32 @@ void AudioInputThread::startCapturing (bool start)
     If 'size' > 0 then capturing samples will be stored in appropriate buffer,
     otherwise they will be skip
 */
-void AudioInputThread::changeFrameSize (ThreadPurpose purpose, int size)
+void AudioInputThread::changeFrameSize(ThreadPurpose purpose, int size)
 {
-    switch (purpose)
-    {
-        case COMPRESSOR :
-        {
-            compressorFrameSize = size;
-            bufferCompressor.clear ();
-            break;
-        }
-        case VOLUME_INDICATOR :
-        {
-            volumeIndicatorFrameSize = size;
-            bufferIndicator.clear ();
-            break;
-        }
-        case TUNER :
-        {
-            tunerFrameSize = size;
-            bufferTuner.clear ();
-            break;
-        }
-        case OSCILLOSCOPE :
-        {
-            oscilloscopeFrameSize = size;
-            bufferOscilloscope.clear ();
-            break;
-        }
-        default :
-        {
-            Q_ASSERT (false);
-        }
+    switch (purpose) {
+    case COMPRESSOR : {
+        compressorFrameSize = size;
+        bufferCompressor.clear();
+        break;
+    }
+    case VOLUME_INDICATOR : {
+        volumeIndicatorFrameSize = size;
+        bufferIndicator.clear();
+        break;
+    }
+    case TUNER : {
+        tunerFrameSize = size;
+        bufferTuner.clear();
+        break;
+    }
+    case OSCILLOSCOPE : {
+        oscilloscopeFrameSize = size;
+        bufferOscilloscope.clear();
+        break;
+    }
+    default : {
+        Q_ASSERT(false);
+    }
     }
 }
 
@@ -199,7 +191,7 @@ QStringList AudioInputThread::enumerateDevices()
     }
     bool highlighted = false;
     m_audioDeviceInfos.clear();
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
+    foreach(const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
         if (info.isNull()) {
             continue;
         }
@@ -237,7 +229,7 @@ QStringList AudioInputThread::enumerateDevices()
             }
         }
     }
-
+    
     qDebug() << "Detected audio input devices:" << devices;
     return devices;
 }
@@ -257,7 +249,7 @@ QString AudioInputThread::getDeviceName()
     After appropriated buffer filled then samples emit.
     If certain frame size equal to 0 - do not store samples in this buffer
 */
-void AudioInputThread::updateBuffers (AudioChannels channel, SamplesList samples)
+void AudioInputThread::updateBuffers(AudioChannels channel, SamplesList samples)
 {
     qDebug() << "Got" << samples.length() << "samples";
 //    if (compressorFrameSize > 0)
@@ -309,7 +301,7 @@ void AudioInputThread::switchInputDevice(QString name)
         return;
     }
     qDebug() << "Switch audio input device to" << name;
-    foreach (const QAudioDeviceInfo &info, m_audioDeviceInfos) {
+    foreach(const QAudioDeviceInfo &info, m_audioDeviceInfos) {
         if (info.deviceName() == name) {
             m_curAudioDeviceInfo = info;
             break;

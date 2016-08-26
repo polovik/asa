@@ -17,17 +17,17 @@ public:
         WAVE_TRIANGLE   = 4,
         WAVE_LAST       = 5   // mark of enum's end
     } Id;
-
+    
     ToneWaveForm();
     ToneWaveForm(Id id);
     ToneWaveForm(QString name);
-
+    
     Id id();
     void setId(Id id);
-
+    
     QString getName() const;
     static QString getName(Id id);
-
+    
 private:
     Id m_id;
 };
