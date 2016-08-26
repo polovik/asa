@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include "common_types.h"
-#include "audioinputdevice.h"
+#include "devices/audioinputdevice.h"
 
 namespace Ui {
 class FormRaw;

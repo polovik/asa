@@ -1,8 +1,8 @@
 #include <QDebug>
 #include "formraw.h"
 #include "ui_formraw.h"
-#include "ToneGenerator.h"
-#include "audioinputdevice.h"
+#include "devices/tonegenerator.h"
+#include "devices/audioinputdevice.h"
 
 extern bool g_verboseOutput;
 

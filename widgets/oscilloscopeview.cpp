@@ -1,4 +1,4 @@
-#include "OscilloscopeView.h"
+#include "oscilloscopeview.h"
 #include "qcustomplot/qcustomplot.h"
 
 OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)

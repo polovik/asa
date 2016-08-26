@@ -1,8 +1,8 @@
 #include <QDebug>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "ToneGenerator.h"
-#include "audioinputdevice.h"
+#include "devices/tonegenerator.h"
+#include "devices/audioinputdevice.h"
 
 Q_DECLARE_METATYPE (SamplesList)
 Q_DECLARE_METATYPE (AudioChannels)

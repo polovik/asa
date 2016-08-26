@@ -1,8 +1,8 @@
 #include <QDebug>
 #include "formcalibration.h"
 #include "ui_formcalibration.h"
-#include "ToneGenerator.h"
-#include "audioinputdevice.h"
+#include "devices/tonegenerator.h"
+#include "devices/audioinputdevice.h"
 
 FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent) :
     QWidget(parent),

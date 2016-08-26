@@ -473,17 +473,17 @@ Vpk</string>
   <customwidget>
    <class>VolumeIndicator</class>
    <extends>QGraphicsView</extends>
-   <header location="global">volumeindicator.h</header>
+   <header location="global">widgets/volumeindicator.h</header>
   </customwidget>
   <customwidget>
    <class>SignatureView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">signatureview.h</header>
+   <header location="global">widgets/signatureview.h</header>
   </customwidget>
   <customwidget>
    <class>SquareWidgetHolder</class>
    <extends>QWidget</extends>
-   <header location="global">squarewidgetholder.h</header>
+   <header location="global">widgets/squarewidgetholder.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

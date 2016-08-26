@@ -2,8 +2,8 @@
 #include "formanalyze.h"
 #include "ui_formanalyze.h"
 #include "common_types.h"
-#include "ToneGenerator.h"
-#include "audioinputdevice.h"
+#include "devices/tonegenerator.h"
+#include "devices/audioinputdevice.h"
 #include "settings.h"
 #include "tiff/imagetiff.h"
 

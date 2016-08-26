@@ -246,7 +246,7 @@
   <customwidget>
    <class>OscilloscopeView</class>
    <extends>QWidget</extends>
-   <header location="global">OscilloscopeView.h</header>
+   <header location="global">widgets/oscilloscopeview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

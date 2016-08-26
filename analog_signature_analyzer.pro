@@ -8,37 +8,37 @@ DESTDIR = ../build
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    ToneGenerator.cpp \
+    devices/tonegenerator.cpp \
     qcustomplot/qcustomplot.cpp \
-    OscilloscopeView.cpp \
-    audioinputdevice.cpp \
+    widgets/oscilloscopeview.cpp \
+    devices/audioinputdevice.cpp \
     formcalibration.cpp \
     formraw.cpp \
     formdiagnose.cpp \
-    boardview.cpp \
-    signatureview.cpp \
+    widgets/boardview.cpp \
+    widgets/signatureview.cpp \
     formanalyze.cpp \
-    squarewidgetholder.cpp \
+    widgets/squarewidgetholder.cpp \
     smoothfilter.cpp \
-    volumeindicator.cpp \
+    widgets/volumeindicator.cpp \
     settings.cpp \
     common_types.cpp
 
 HEADERS  += mainwindow.h \
-    ToneGenerator.h \
+    devices/tonegenerator.h \
     qcustomplot/qcustomplot.h \
-    OscilloscopeView.h \
-    audioinputdevice.h \
+    widgets/oscilloscopeview.h \
+    devices/audioinputdevice.h \
     formcalibration.h \
     formraw.h \
     formdiagnose.h \
-    boardview.h \
-    signatureview.h \
+    widgets/boardview.h \
+    widgets/signatureview.h \
     common_types.h \
     formanalyze.h \
-    squarewidgetholder.h \
+    widgets/squarewidgetholder.h \
     smoothfilter.h \
-    volumeindicator.h \
+    widgets/volumeindicator.h \
     settings.h
 
 FORMS    += mainwindow.ui \

@@ -136,12 +136,12 @@
   <customwidget>
    <class>BoardView</class>
    <extends>QGraphicsView</extends>
-   <header>boardview.h</header>
+   <header>widgets/boardview.h</header>
   </customwidget>
   <customwidget>
    <class>SignatureView</class>
    <extends>QGraphicsView</extends>
-   <header>signatureview.h</header>
+   <header>widgets/signatureview.h</header>
   </customwidget>
  </customwidgets>
  <resources>

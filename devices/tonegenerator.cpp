@@ -5,7 +5,7 @@
 #include <QBuffer>
 #include <QEventLoop>
 #include <QtMath>
-#include "ToneGenerator.h"
+#include "tonegenerator.h"
 #include "settings.h"
 
 AudioOutputDevice::AudioOutputDevice(QObject *parent) : QIODevice(parent)
