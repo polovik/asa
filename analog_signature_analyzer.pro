@@ -3,6 +3,8 @@ QT       += core gui multimedia printsupport multimediawidgets
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = analog_signature_analyzer
+VERSION = 1.0.0
+
 TEMPLATE = app
 DESTDIR = ../build
 
@@ -55,6 +57,13 @@ DISTFILES += \
     icons/license.txt
 
 include($$PWD/tiff/libtiff.pri)
+
+win32 {
+    RC_ICONS += icons/app_icon.ico
+    QMAKE_TARGET_DESCRIPTION = "Analog signature analyzer"
+    QMAKE_TARGET_COPYRIGHT = "Opensource"
+    QMAKE_TARGET_PRODUCT = "Analog signature analyzer"
+}
 
 # DEPLOY
 #translationsSource = $$PWD/languages/lang_ru_RU.qm
