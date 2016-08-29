@@ -76,16 +76,15 @@ F 3 "" H 5050 3700 50  0000 C CNN
 	4    5000 3500
 	1    0    0    -1  
 $EndComp
-NoConn ~ 4000 3700
 $Comp
 L GND #PWR01
 U 1 1 57BD55DE
-P 3400 3900
-F 0 "#PWR01" H 3400 3650 50  0001 C CNN
-F 1 "GND" H 3400 3750 50  0000 C CNN
-F 2 "" H 3400 3900 50  0000 C CNN
-F 3 "" H 3400 3900 50  0000 C CNN
-	1    3400 3900
+P 3200 4400
+F 0 "#PWR01" H 3200 4150 50  0001 C CNN
+F 1 "GND" H 3200 4250 50  0000 C CNN
+F 2 "" H 3200 4400 50  0000 C CNN
+F 3 "" H 3200 4400 50  0000 C CNN
+	1    3200 4400
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -127,7 +126,7 @@ U 1 1 57BD57AB
 P 3400 3000
 F 0 "RV1" H 3400 2920 50  0000 C CNN
 F 1 "100k" H 3400 3000 50  0000 C CNN
-F 2 "Potentiometers:Potentiometer_Bourns_3005_Angular_ScrewFront" H 3400 3000 50  0001 C CNN
+F 2 "footprints:Potentiometer_CP3-36" H 3400 3000 50  0001 C CNN
 F 3 "" H 3400 3000 50  0000 C CNN
 	1    3400 3000
 	1    0    0    -1  
@@ -138,7 +137,7 @@ U 1 1 57BD58CC
 P 5600 2800
 F 0 "RV3" H 5600 2720 50  0000 C CNN
 F 1 "100k" H 5600 2800 50  0000 C CNN
-F 2 "Potentiometers:Potentiometer_Bourns_3005_Angular_ScrewFront" H 5600 2800 50  0001 C CNN
+F 2 "footprints:Potentiometer_CP3-36" H 5600 2800 50  0001 C CNN
 F 3 "" H 5600 2800 50  0000 C CNN
 	1    5600 2800
 	0    1    1    0   
@@ -149,7 +148,7 @@ U 1 1 57BD5903
 P 5600 3650
 F 0 "RV2" H 5600 3570 50  0000 C CNN
 F 1 "100k" H 5600 3650 50  0000 C CNN
-F 2 "Potentiometers:Potentiometer_Bourns_3005_Angular_ScrewFront" H 5600 3650 50  0001 C CNN
+F 2 "footprints:Potentiometer_CP3-36" H 5600 3650 50  0001 C CNN
 F 3 "" H 5600 3650 50  0000 C CNN
 	1    5600 3650
 	0    1    1    0   
@@ -176,30 +175,6 @@ F 3 "" H 5600 3850 50  0000 C CNN
 	1    5600 3850
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	5300 2650 5600 2650
-Wire Wire Line
-	4700 2750 4700 3000
-Wire Wire Line
-	4700 3000 5350 3000
-Wire Wire Line
-	5350 3000 5350 2650
-Connection ~ 5350 2650
-Wire Wire Line
-	5600 3500 5300 3500
-Wire Wire Line
-	4700 3600 4700 3850
-Wire Wire Line
-	4700 3850 5350 3850
-Wire Wire Line
-	5350 3850 5350 3500
-Connection ~ 5350 3500
-Wire Wire Line
-	5600 3800 5600 3850
-Wire Wire Line
-	3400 2650 3400 2850
-Wire Wire Line
-	3550 3000 4050 3000
 $Comp
 L GND #PWR04
 U 1 1 57BD62A5
@@ -211,10 +186,6 @@ F 3 "" H 3200 3100 50  0000 C CNN
 	1    3200 3100
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	3200 3100 3200 3000
-Wire Wire Line
-	3200 3000 3250 3000
 $Comp
 L GND #PWR05
 U 1 1 57BD632F
@@ -226,20 +197,6 @@ F 3 "" H 3100 2800 50  0000 C CNN
 	1    3100 2800
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	3100 2750 3100 2800
-Wire Wire Line
-	2550 2450 3400 2450
-Wire Wire Line
-	4700 2550 4450 2550
-Wire Wire Line
-	4000 2550 4150 2550
-Wire Wire Line
-	4050 2550 4050 3400
-Connection ~ 4050 2550
-Wire Wire Line
-	4050 3400 4700 3400
-Connection ~ 4050 3000
 NoConn ~ 3600 2850
 NoConn ~ 3600 2250
 NoConn ~ 4900 2350
@@ -268,15 +225,6 @@ F 3 "" H 3600 4050 50  0000 C CNN
 	1    3600 4050
 	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	5600 3000 5600 2950
-Wire Wire Line
-	3600 4000 3600 4050
-Wire Wire Line
-	3600 3400 3600 3350
-Wire Wire Line
-	3400 3600 3400 3900
-Connection ~ 3400 3800
 $Comp
 L PWR_FLAG #FLG07
 U 1 1 57BD744C
@@ -310,9 +258,6 @@ F 3 "" H 2600 3400 50  0000 C CNN
 	1    2600 3400
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	2150 3400 2600 3400
-Connection ~ 2250 3400
 $Comp
 L GND #PWR09
 U 1 1 57BD8243
@@ -347,10 +292,10 @@ F 3 "" H 1950 4200 50  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L -12V #PWR4
+L -12V #PWR3
 U 1 1 57BD83A0
 P 2600 4200
-F 0 "#PWR4" H 2600 4300 50  0001 C CNN
+F 0 "#PWR3" H 2600 4300 50  0001 C CNN
 F 1 "-12V" H 2600 4350 50  0000 C CNN
 F 2 "" H 2600 4200 50  0000 C CNN
 F 3 "" H 2600 4200 50  0000 C CNN
@@ -379,12 +324,6 @@ F 3 "" H 2250 4200 50  0000 C CNN
 	1    2250 4200
 	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	2150 4200 2600 4200
-Connection ~ 2250 4200
-Wire Wire Line
-	2150 3800 2600 3800
-Connection ~ 2250 3800
 $Comp
 L CONN_01X01 P4
 U 1 1 57BD8750
@@ -418,15 +357,6 @@ F 3 "" H 4750 2100 50  0000 C CNN
 	1    4750 2100
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	4850 2050 4750 2050
-Wire Wire Line
-	4750 2050 4750 2100
-Wire Wire Line
-	4600 1800 4600 2550
-Connection ~ 4600 2550
-Wire Wire Line
-	4850 1800 4600 1800
 $Comp
 L JACK_2P J1
 U 1 1 57BD9337
@@ -472,6 +402,138 @@ F 3 "" H 6100 3300 50  0000 C CNN
 	1    6100 3300
 	1    0    0    -1  
 $EndComp
+$Comp
+L D D1
+U 1 1 57C3D329
+P 4300 4050
+F 0 "D1" H 4300 4150 50  0000 C CNN
+F 1 "D" H 4300 3950 50  0000 C CNN
+F 2 "" H 4300 4050 50  0001 C CNN
+F 3 "" H 4300 4050 50  0000 C CNN
+	1    4300 4050
+	-1   0    0    1   
+$EndComp
+$Comp
+L R R3
+U 1 1 57C3D3FD
+P 4900 4200
+F 0 "R3" V 4980 4200 50  0000 C CNN
+F 1 "1k" V 4900 4200 50  0000 C CNN
+F 2 "footprints:Resistor_Horizontal_RM20mm_0.25W" V 4830 4200 50  0001 C CNN
+F 3 "" H 4900 4200 50  0000 C CNN
+	1    4900 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L CP1 C1
+U 1 1 57C3D44E
+P 4600 4200
+F 0 "C1" H 4625 4300 50  0000 L CNN
+F 1 "100u" H 4625 4100 50  0000 L CNN
+F 2 "" H 4600 4200 50  0001 C CNN
+F 3 "" H 4600 4200 50  0000 C CNN
+	1    4600 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D2
+U 1 1 57C3D493
+P 4900 4650
+F 0 "D2" H 4900 4750 50  0000 C CNN
+F 1 "LED" H 4900 4550 50  0000 C CNN
+F 2 "" H 4900 4650 50  0001 C CNN
+F 3 "" H 4900 4650 50  0000 C CNN
+	1    4900 4650
+	0    -1   -1   0   
+$EndComp
+$Comp
+L POT RV4
+U 1 1 57C3E022
+P 3400 4300
+F 0 "RV4" H 3400 4220 50  0000 C CNN
+F 1 "100k" H 3400 4300 50  0000 C CNN
+F 2 "footprints:Potentiometer_CP3-36" H 3400 4300 50  0001 C CNN
+F 3 "" H 3400 4300 50  0000 C CNN
+	1    3400 4300
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR015
+U 1 1 57C3EFA0
+P 4600 4900
+F 0 "#PWR015" H 4600 4650 50  0001 C CNN
+F 1 "GND" H 4600 4750 50  0000 C CNN
+F 2 "" H 4600 4900 50  0000 C CNN
+F 3 "" H 4600 4900 50  0000 C CNN
+	1    4600 4900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5300 2650 5600 2650
+Wire Wire Line
+	4700 2750 4700 3000
+Wire Wire Line
+	4700 3000 5350 3000
+Wire Wire Line
+	5350 3000 5350 2650
+Connection ~ 5350 2650
+Wire Wire Line
+	5600 3500 5300 3500
+Wire Wire Line
+	4700 3600 4700 3850
+Wire Wire Line
+	4700 3850 5350 3850
+Wire Wire Line
+	5350 3850 5350 3500
+Connection ~ 5350 3500
+Wire Wire Line
+	5600 3800 5600 3850
+Wire Wire Line
+	3400 2650 3400 2850
+Wire Wire Line
+	3550 3000 4050 3000
+Wire Wire Line
+	3200 3100 3200 3000
+Wire Wire Line
+	3200 3000 3250 3000
+Wire Wire Line
+	3100 2750 3100 2800
+Wire Wire Line
+	2550 2450 3400 2450
+Wire Wire Line
+	4700 2550 4450 2550
+Wire Wire Line
+	4000 2550 4150 2550
+Wire Wire Line
+	4050 2550 4050 3400
+Connection ~ 4050 2550
+Wire Wire Line
+	4050 3400 4700 3400
+Connection ~ 4050 3000
+Wire Wire Line
+	5600 3000 5600 2950
+Wire Wire Line
+	3600 4000 3600 4050
+Wire Wire Line
+	3600 3400 3600 3350
+Wire Wire Line
+	2150 3400 2600 3400
+Connection ~ 2250 3400
+Wire Wire Line
+	2150 4200 2600 4200
+Connection ~ 2250 4200
+Wire Wire Line
+	2150 3800 2600 3800
+Connection ~ 2250 3800
+Wire Wire Line
+	4850 2050 4750 2050
+Wire Wire Line
+	4750 2050 4750 2100
+Wire Wire Line
+	4600 1800 4600 2550
+Connection ~ 4600 2550
+Wire Wire Line
+	4850 1800 4600 1800
 Wire Wire Line
 	6350 3250 6100 3250
 Wire Wire Line
@@ -489,4 +551,34 @@ Wire Wire Line
 Wire Wire Line
 	2750 2600 2550 2600
 Connection ~ 3100 2450
+Wire Wire Line
+	3400 3800 3400 4150
+Wire Wire Line
+	3200 4400 3200 4300
+Wire Wire Line
+	3200 4300 3250 4300
+Wire Wire Line
+	3550 4300 4050 4300
+Wire Wire Line
+	4050 4300 4050 3700
+Wire Wire Line
+	4050 3700 4000 3700
+Wire Wire Line
+	2950 2450 2950 3600
+Wire Wire Line
+	2950 3600 3400 3600
+Connection ~ 2950 2450
+Wire Wire Line
+	4150 4050 4050 4050
+Connection ~ 4050 4050
+Wire Wire Line
+	4450 4050 4900 4050
+Connection ~ 4600 4050
+Wire Wire Line
+	4900 4350 4900 4450
+Wire Wire Line
+	4900 4850 4600 4850
+Wire Wire Line
+	4600 4350 4600 4900
+Connection ~ 4600 4850
 $EndSCHEMATC
