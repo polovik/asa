@@ -13,12 +13,16 @@
 #include <QImageEncoderSettings>
 #include <QFileDialog>
 #include "tiff/imagetiff.h"
+#include "devices/tonegenerator.h"
+#include "devices/audioinputdevice.h"
 
-FormDiagnose::FormDiagnose(QWidget *parent) :
+FormDiagnose::FormDiagnose(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FormDiagnose)
 {
     ui->setupUi(this);
+    m_gen = gen;
+    m_capture = capture;
     m_dialogCamera = NULL;
     
     m_camerasList = QCameraInfo::availableCameras();
@@ -59,6 +63,17 @@ FormDiagnose::FormDiagnose(QWidget *parent) :
 FormDiagnose::~FormDiagnose()
 {
     delete ui;
+}
+
+void FormDiagnose::enterForm()
+{
+    qreal max = m_gen->getMaxVoltageAmplitude();
+    ui->viewSignature->setMaximumAmplitude(max);
+}
+
+void FormDiagnose::leaveForm()
+{
+    qDebug() << "Leave form \"Diagnose\"";
 }
 
 void FormDiagnose::switchCamera(int index)

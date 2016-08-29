@@ -70,6 +70,7 @@ public slots:
 signals:
     void initiated(int);
     // This is signal emit same data but with different rate
+    // TODO remove unused signals
     void dataForCompressor(SamplesList);
     void dataForVolumeIndicator(SamplesList);
     void dataForTuner(SamplesList);
@@ -80,6 +81,7 @@ private slots:
     void stateChanged(QAudio::State newState);
     
 private:
+    // TODO remove unused members
     int compressorFrameSize;
     int volumeIndicatorFrameSize;
     int tunerFrameSize;

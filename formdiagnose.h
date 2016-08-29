@@ -10,15 +10,20 @@ namespace Ui
 class FormDiagnose;
 }
 
+class ToneGenerator;
+class AudioInputThread;
+
 class FormDiagnose : public QWidget
 {
     Q_OBJECT
     
 public:
-    explicit FormDiagnose(QWidget *parent = 0);
+    explicit FormDiagnose(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent = 0);
     ~FormDiagnose();
     
 public slots:
+    void enterForm();
+    void leaveForm();
     void saveMeasures();
     
 signals:
@@ -48,6 +53,8 @@ private:
     QString m_boardPhotoPath;
     bool m_needSave;
     QList<TestpointMeasure> m_testpoints;
+    ToneGenerator *m_gen;
+    AudioInputThread *m_capture;
 };
 
 #endif // FORMDIAGNOSE_H

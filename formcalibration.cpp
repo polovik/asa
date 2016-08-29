@@ -206,6 +206,7 @@ void FormCalibration::setGeneratorMagnitude(double voltage)
     }
     qDebug() << "Set max generator voltage: Vpk" << peak << "Vrms" << rms;
     m_gen->setMaxVoltageAmplitude(peak);
+    ui->viewSignature->setMaximumAmplitude(peak);
 }
 
 void FormCalibration::showHint()

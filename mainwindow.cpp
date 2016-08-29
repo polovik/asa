@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_formCalibration = new FormCalibration(m_gen, m_capture);
     m_formRaw = new FormRaw(m_gen, m_capture);
     m_formAnalyze = new FormAnalyze(m_gen, m_capture);
-    m_formDiagnose = new FormDiagnose();
+    m_formDiagnose = new FormDiagnose(m_gen, m_capture);
     ui->mainArea->addWidget(m_formCalibration);
     ui->mainArea->addWidget(m_formRaw);
     ui->mainArea->addWidget(m_formAnalyze);
@@ -77,6 +77,7 @@ void MainWindow::showForm()
         m_formAnalyze->leaveForm();
     } else if (m_currentForm == m_formDiagnose) {
         qDebug() << "Close form \"Diagnose\"";
+        m_formDiagnose->leaveForm();
     } else {
         qWarning() << "Unknown Form:" << button;
         Q_ASSERT(false);
@@ -93,6 +94,7 @@ void MainWindow::showForm()
         m_formAnalyze->enterForm();
     } else if (m_currentForm == m_formDiagnose) {
         qDebug() << "Open form \"Diagnose\"";
+        m_formDiagnose->enterForm();
     } else {
         qWarning() << "Unknown Form:" << button;
         Q_ASSERT(false);

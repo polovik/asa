@@ -71,6 +71,7 @@ void FormAnalyze::enterForm()
         qWarning() << "Invalid format of signal form:" << waveForm << ". Select \"sine\"";
         ui->boxWaveForm->setCurrentIndex(0);
     }
+    ui->viewSignature->setMaximumAmplitude(maxVV);
 }
 
 void FormAnalyze::leaveForm()

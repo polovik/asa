@@ -7,10 +7,9 @@ SignatureView::SignatureView(QWidget *parent) : QCustomPlot(parent)
     m_graphCurSignature = addGraph();
     m_graphPrevSignature->setPen(QColor("black"));
     m_graphCurSignature->setPen(QColor("red"));
-    xAxis->setLabel(tr("U (Volts)"));
-    yAxis->setLabel(tr("I (mA)"));
-    xAxis->setRange(-1.1, 1.1);
-    yAxis->setRange(-1.1, 1.1);
+    xAxis->setLabel(tr("Ugenerator, Volts"));
+    yAxis->setLabel(tr("Uprobe, Volts"));
+    setMaximumAmplitude(30.);
     QPen zeroLinePen;
     zeroLinePen.setColor("lightsalmon");
     zeroLinePen.setStyle(Qt::SolidLine);
@@ -22,6 +21,13 @@ SignatureView::SignatureView(QWidget *parent) : QCustomPlot(parent)
 SignatureView::~SignatureView()
 {
 
+}
+
+void SignatureView::setMaximumAmplitude(qreal voltage)
+{
+    xAxis->setRange(-voltage * 1.1, voltage * 1.1);
+    yAxis->setRange(-voltage * 1.1, voltage * 1.1);
+    replot();
 }
 
 void SignatureView::loadPreviousSignature(const QList<QPointF> &graphData)

@@ -146,6 +146,7 @@ void AudioInputThread::startCapturing(bool start)
     If 'size' > 0 then capturing samples will be stored in appropriate buffer,
     otherwise they will be skip
 */
+// TODO remove this method
 void AudioInputThread::changeFrameSize(ThreadPurpose purpose, int size)
 {
     switch (purpose) {
@@ -249,6 +250,7 @@ QString AudioInputThread::getDeviceName()
     After appropriated buffer filled then samples emit.
     If certain frame size equal to 0 - do not store samples in this buffer
 */
+// TODO remove this method
 void AudioInputThread::updateBuffers(AudioChannels channel, SamplesList samples)
 {
     qDebug() << "Got" << samples.length() << "samples";
