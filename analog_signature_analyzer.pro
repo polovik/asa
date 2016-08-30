@@ -54,7 +54,19 @@ RESOURCES += \
 
 DISTFILES += \
     run_debug_version.bat \
-    icons/license.txt
+    icons/license.txt \
+    asa.desktop
+
+win32 {
+    LIBS += -L$$PWD/zlib/win32-compiled/lib/ -lzdll
+    INCLUDEPATH += $$PWD/zlib/win32-compiled/include
+    DEPENDPATH += $$PWD/zlib/win32-compiled/include
+}
+unix {
+    # TODO try to use zlib from system's filesystem
+    INCLUDEPATH += $$PWD/zlib
+    include($$PWD/zlib/zlib.pri)
+}
 
 include($$PWD/tiff/libtiff.pri)
 
@@ -67,26 +79,40 @@ win32 {
 
 # DEPLOY
 #translationsSource = $$PWD/languages/lang_ru_RU.qm
-debug_bat = $$PWD/run_debug_version.bat
 resourcesTarget = $$DESTDIR
 
+unix {
+    first.commands = @echo ************Deploy application************ $$escape_expand(\n\t) \
+                     cp $${PWD}/icons/app_icon.png $${DESTDIR} $$escape_expand(\n\t) \
+                     cp $${PWD}/asa.desktop $${DESTDIR}
+    QMAKE_EXTRA_TARGETS += first
+}
 win32 {
 #    system(lupdate -verbose . -ts languages\\lang_ru_RU.ts)
 #    system(lrelease languages\\lang_ru_RU.ts languages\\lang_ru_RU.qm)
 #    translationsSource = $$replace(translationsSource, /, \\)
+    debug_bat = $$PWD/run_debug_version.bat
     debug_bat = $$replace(debug_bat, /, \\)
+    zlib_dll = $$PWD/zlib/win32-compiled/zlib1.dll
+    zlib_dll = $$replace(zlib_dll, /, \\)
     resourcesTarget = $$replace(resourcesTarget, /, \\)
     system(mkdir $$resourcesTarget)
 #    system(xcopy /Y /V $$translationsSource $$resourcesTarget\\languages\\)
     system(xcopy /Y /V $$debug_bat $$resourcesTarget\\)
+    system(xcopy /V /R /Y $$zlib_dll $$resourcesTarget)
 
     # Qt libraries
+#    first.commands = @echo ************Copy libraries************ $$escape_expand(\n\t) \
+#                     windeployqt $${DESTDIR} $$escape_expand(\n\t)
+#    QMAKE_EXTRA_TARGETS += first
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Core.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Gui.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5PrintSupport.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Multimedia.dll" $$resourcesTarget)
+    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5MultimediaWidgets.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Network.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Widgets.dll" $$resourcesTarget)
+    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5OpenGL.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\libgcc_s_dw2-1.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\libwinpthread-1.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\libstdc++-6.dll" $$resourcesTarget)

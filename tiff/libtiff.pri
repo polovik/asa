@@ -41,8 +41,5 @@ win32:        SOURCES += $$PWD/libtiff/libtiff/tif_win32.c
 else:         SOURCES += $$PWD/libtiff/libtiff/tif_unix.c
 android:      SOURCES += $$PWD/libtiff/port/lfind.c
 
-INCLUDEPATH += $$PWD/../zlib
-include($$PWD/../zlib/zlib.pri)
-
 HEADERS += \
     $$PWD/imagetiff.h
