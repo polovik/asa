@@ -13,5 +13,7 @@
         <file>icons/photo.ico</file>
         <file>icons/microphone.ico</file>
         <file>icons/speaker.ico</file>
+        <file>icons/flag_russian_federation.ico</file>
+        <file>icons/flag_united_states_of_america_usa.ico</file>
     </qresource>
 </RCC>

@@ -7,6 +7,7 @@
 #include <QTextCodec>
 #include <QLocale>
 #include <QTime>
+#include "settings.h"
 
 bool g_verboseOutput = false;
 static QTextCodec *logCodec = NULL;
@@ -71,6 +72,21 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(logging);
     qDebug() << "Start application. Write log to" << g_logFilePath;
     
+    QTranslator translator;
+    Settings *settings = Settings::getSettings();
+    QString locale = settings->value("Global/Locale", "en_US").toString();
+    QString filename = QString("languages%1lang_%2").arg(QDir::separator()).arg(locale);
+    if (translator.load(filename) ){
+        QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
+        qDebug() << "Translation file loaded" << filename;
+        if (!QCoreApplication::installTranslator(&translator)) {
+            qWarning() << "Translator couldn't be installed";
+            Q_ASSERT(false);
+        }
+    } else {
+        qWarning() << "Translation file not loaded:" << filename;
+    }
+
     QStringList appArguments = QApplication::arguments();
     if (appArguments.contains("-v")) {
         qDebug() << "Enable verbose output";

@@ -6,6 +6,7 @@
 #include <formraw.h>
 #include <formanalyze.h>
 #include <formdiagnose.h>
+#include <formoptions.h>
 
 namespace Ui
 {
@@ -35,6 +36,7 @@ private:
     FormRaw *m_formRaw;
     FormAnalyze *m_formAnalyze;
     FormDiagnose *m_formDiagnose;
+    FormOptions *m_formOptions;
     
     QWidget *m_currentForm;
 };

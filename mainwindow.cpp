@@ -19,7 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->buttonRaw, SIGNAL(pressed()), this, SLOT(showForm()));
     connect(ui->buttonAnalyze, SIGNAL(pressed()), this, SLOT(showForm()));
     connect(ui->buttonDiagnose, SIGNAL(pressed()), this, SLOT(showForm()));
-    
+    connect(ui->buttonOptions, SIGNAL(pressed()), this, SLOT(showForm()));
+
     m_gen = new ToneGenerator;
     m_capture = new AudioInputThread;
     
@@ -27,11 +28,13 @@ MainWindow::MainWindow(QWidget *parent) :
     m_formRaw = new FormRaw(m_gen, m_capture);
     m_formAnalyze = new FormAnalyze(m_gen, m_capture);
     m_formDiagnose = new FormDiagnose(m_gen, m_capture);
+    m_formOptions = new FormOptions;
     ui->mainArea->addWidget(m_formCalibration);
     ui->mainArea->addWidget(m_formRaw);
     ui->mainArea->addWidget(m_formAnalyze);
     ui->mainArea->addWidget(m_formDiagnose);
-    
+    ui->mainArea->addWidget(m_formOptions);
+
     m_currentForm = m_formCalibration;
     ui->mainArea->setCurrentWidget(m_currentForm);
     ui->buttonCalibration->setChecked(true);
@@ -58,6 +61,8 @@ void MainWindow::showForm()
         newForm = m_formAnalyze;
     } else if (button == ui->buttonDiagnose) {
         newForm = m_formDiagnose;
+    } else if (button == ui->buttonOptions) {
+        newForm = m_formOptions;
     } else {
         qWarning() << "Unknown Form:" << button;
         Q_ASSERT(false);
@@ -78,6 +83,8 @@ void MainWindow::showForm()
     } else if (m_currentForm == m_formDiagnose) {
         qDebug() << "Close form \"Diagnose\"";
         m_formDiagnose->leaveForm();
+    } else if (m_currentForm == m_formOptions) {
+        qDebug() << "Close form \"Options\"";
     } else {
         qWarning() << "Unknown Form:" << button;
         Q_ASSERT(false);
@@ -95,6 +102,8 @@ void MainWindow::showForm()
     } else if (m_currentForm == m_formDiagnose) {
         qDebug() << "Open form \"Diagnose\"";
         m_formDiagnose->enterForm();
+    } else if (m_currentForm == m_formOptions) {
+        qDebug() << "Open form \"Options\"";
     } else {
         qWarning() << "Unknown Form:" << button;
         Q_ASSERT(false);

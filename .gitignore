@@ -1,5 +1,6 @@
 /*.user
 /icons/license.txt~
+/languages/*.qm
 /schematic/*.bak
 /schematic/*-bak
 /schematic/main_board/*.bak

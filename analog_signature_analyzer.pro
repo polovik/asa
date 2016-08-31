@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     smoothfilter.cpp \
     widgets/volumeindicator.cpp \
     settings.cpp \
-    common_types.cpp
+    common_types.cpp \
+    formoptions.cpp
 
 HEADERS  += mainwindow.h \
     devices/tonegenerator.h \
@@ -41,13 +42,15 @@ HEADERS  += mainwindow.h \
     widgets/squarewidgetholder.h \
     smoothfilter.h \
     widgets/volumeindicator.h \
-    settings.h
+    settings.h \
+    formoptions.h
 
 FORMS    += mainwindow.ui \
     formcalibration.ui \
     formraw.ui \
     formdiagnose.ui \
-    formanalyze.ui
+    formanalyze.ui \
+    formoptions.ui
 
 RESOURCES += \
     analog_signature_analyzer.qrc
@@ -55,7 +58,8 @@ RESOURCES += \
 DISTFILES += \
     run_debug_version.bat \
     icons/license.txt \
-    asa.desktop
+    asa.desktop \
+    languages/lang_ru_RU.ts
 
 win32 {
     LIBS += -L$$PWD/zlib/win32-compiled/lib/ -lzdll
@@ -78,27 +82,36 @@ win32 {
 }
 
 # DEPLOY
-#translationsSource = $$PWD/languages/lang_ru_RU.qm
-resourcesTarget = $$DESTDIR
-
 unix {
+    system(mkdir -p $${DESTDIR}/languages)
+    system(lupdate -verbose . -ts languages/lang_ru_RU.ts)
+    system(lupdate -verbose . -ts languages/lang_en_US.ts)
+    system(lrelease languages/lang_ru_RU.ts languages/lang_ru_RU.qm)
+    system(lrelease languages/lang_en_US.ts languages/lang_en_US.qm)
+    system(cp languages/*.qm $${DESTDIR}/languages/)
     first.commands = @echo ************Deploy application************ $$escape_expand(\n\t) \
                      cp $${PWD}/icons/app_icon.png $${DESTDIR} $$escape_expand(\n\t) \
                      cp $${PWD}/asa.desktop $${DESTDIR}
     QMAKE_EXTRA_TARGETS += first
 }
 win32 {
-#    system(lupdate -verbose . -ts languages\\lang_ru_RU.ts)
-#    system(lrelease languages\\lang_ru_RU.ts languages\\lang_ru_RU.qm)
-#    translationsSource = $$replace(translationsSource, /, \\)
+    translationsSource = $$PWD/languages
+    translationsSource = $$replace(translationsSource, /, \\)
+    resourcesTarget = $$DESTDIR
+    resourcesTarget = $$replace(resourcesTarget, /, \\)
+    system(mkdir $$resourcesTarget)
+    system(mkdir $$resourcesTarget\\languages)
+    system(lupdate -verbose . -ts languages\\lang_ru_RU.ts)
+    system(lupdate -verbose . -ts languages\\lang_en_US.ts)
+    system(lrelease languages\\lang_ru_RU.ts languages\\lang_ru_RU.qm)
+    system(lrelease languages\\lang_en_US.ts languages\\lang_en_US.qm)
+    system(xcopy /Y /R /V $$translationsSource\\lang_ru_RU.qm $$resourcesTarget\\languages\\)
+    system(xcopy /Y /R /V $$translationsSource\\lang_en_US.qm $$resourcesTarget\\languages\\)
     debug_bat = $$PWD/run_debug_version.bat
     debug_bat = $$replace(debug_bat, /, \\)
     zlib_dll = $$PWD/zlib/win32-compiled/zlib1.dll
     zlib_dll = $$replace(zlib_dll, /, \\)
-    resourcesTarget = $$replace(resourcesTarget, /, \\)
-    system(mkdir $$resourcesTarget)
-#    system(xcopy /Y /V $$translationsSource $$resourcesTarget\\languages\\)
-    system(xcopy /Y /V $$debug_bat $$resourcesTarget\\)
+    system(xcopy /V /R /Y $$debug_bat $$resourcesTarget)
     system(xcopy /V /R /Y $$zlib_dll $$resourcesTarget)
 
     # Qt libraries
