@@ -48,32 +48,18 @@ class AudioInputThread : public QThread
     Q_OBJECT
     
 public:
-    enum ThreadPurpose {
-        COMPRESSOR,
-        VOLUME_INDICATOR,
-        TUNER,
-        OSCILLOSCOPE
-    };
-    
     AudioInputThread();
     void run();
     void startCapturing(bool start);
-    void changeFrameSize(ThreadPurpose purpose, int size);
     QStringList enumerateDevices();
     void setCapturedChannels(AudioChannels channels);
     QString getDeviceName();
     
 public slots:
-    void updateBuffers(AudioChannels channel, SamplesList samples);
     void switchInputDevice(QString name);
     
 signals:
     void initiated(int);
-    // This is signal emit same data but with different rate
-    // TODO remove unused signals
-    void dataForCompressor(SamplesList);
-    void dataForVolumeIndicator(SamplesList);
-    void dataForTuner(SamplesList);
     void dataForOscilloscope(AudioChannels channel, SamplesList data);
     void dataForOscilloscope(SamplesList leftChannelData, SamplesList rightChannelData);
     
@@ -81,17 +67,6 @@ private slots:
     void stateChanged(QAudio::State newState);
     
 private:
-    // TODO remove unused members
-    int compressorFrameSize;
-    int volumeIndicatorFrameSize;
-    int tunerFrameSize;
-    int oscilloscopeFrameSize;
-    // FIFO buffers with same data but with different size
-    SamplesList bufferCompressor;
-    SamplesList bufferIndicator;
-    SamplesList bufferTuner;
-    SamplesList bufferOscilloscope;
-    
     qint32 m_sampleRate;
     QAudioInput *m_audioInput;
     AudioInputDevice *m_inputBuffer;

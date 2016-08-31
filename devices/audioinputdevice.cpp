@@ -68,8 +68,7 @@ qint64 AudioInputDevice::writeData(const char *data, qint64 maxSize)
 }
 
 //============================AudioInputThread================================//
-AudioInputThread::AudioInputThread() :
-    compressorFrameSize(0), volumeIndicatorFrameSize(0), tunerFrameSize(0), oscilloscopeFrameSize(0)
+AudioInputThread::AudioInputThread()
 {
     m_capturedChannels = CHANNEL_NONE;
     m_captureEnabled = false;
@@ -142,40 +141,6 @@ void AudioInputThread::startCapturing(bool start)
     m_captureEnabled = start;
 }
 
-/*
-    If 'size' > 0 then capturing samples will be stored in appropriate buffer,
-    otherwise they will be skip
-*/
-// TODO remove this method
-void AudioInputThread::changeFrameSize(ThreadPurpose purpose, int size)
-{
-    switch (purpose) {
-    case COMPRESSOR : {
-        compressorFrameSize = size;
-        bufferCompressor.clear();
-        break;
-    }
-    case VOLUME_INDICATOR : {
-        volumeIndicatorFrameSize = size;
-        bufferIndicator.clear();
-        break;
-    }
-    case TUNER : {
-        tunerFrameSize = size;
-        bufferTuner.clear();
-        break;
-    }
-    case OSCILLOSCOPE : {
-        oscilloscopeFrameSize = size;
-        bufferOscilloscope.clear();
-        break;
-    }
-    default : {
-        Q_ASSERT(false);
-    }
-    }
-}
-
 QStringList AudioInputThread::enumerateDevices()
 {
     extern bool g_verboseOutput;
@@ -244,56 +209,6 @@ void AudioInputThread::setCapturedChannels(AudioChannels channels)
 QString AudioInputThread::getDeviceName()
 {
     return m_curAudioDeviceInfo.deviceName();
-}
-
-/*
-    After appropriated buffer filled then samples emit.
-    If certain frame size equal to 0 - do not store samples in this buffer
-*/
-// TODO remove this method
-void AudioInputThread::updateBuffers(AudioChannels channel, SamplesList samples)
-{
-    qDebug() << "Got" << samples.length() << "samples";
-//    if (compressorFrameSize > 0)
-//    {
-//        bufferCompressor.append (samples);
-//        while (bufferCompressor.size() >= compressorFrameSize)
-//        {
-//            SamplesList data = bufferCompressor.mid (0, compressorFrameSize);
-//            bufferCompressor = bufferCompressor.mid (compressorFrameSize);
-//            emit dataForCompressor (data);
-//        }
-//    }
-//    if (volumeIndicatorFrameSize > 0)
-//    {
-//        bufferIndicator.append (samples);
-//        while (bufferIndicator.size() >= volumeIndicatorFrameSize)
-//        {
-//            SamplesList data = bufferIndicator.mid (0, volumeIndicatorFrameSize);
-//            bufferIndicator = bufferIndicator.mid (volumeIndicatorFrameSize);
-//            emit dataForVolumeIndicator (data);
-//        }
-//    }
-//    if (tunerFrameSize > 0)
-//    {
-//        bufferTuner.append (samples);
-//        while (bufferTuner.size() >= tunerFrameSize)
-//        {
-//            SamplesList data = bufferTuner.mid (0, tunerFrameSize);
-//            bufferTuner = bufferTuner.mid (tunerFrameSize);
-//            emit dataForTuner (data);
-//        }
-//    }
-//    if (oscilloscopeFrameSize > 0)
-//    {
-//        bufferOscilloscope.append (samples);
-//        while (bufferOscilloscope.size() >= oscilloscopeFrameSize)
-//        {
-//            SamplesList data = bufferOscilloscope.mid (0, oscilloscopeFrameSize);
-//            bufferOscilloscope = bufferOscilloscope.mid (oscilloscopeFrameSize);
-//            emit dataForOscilloscope (data);
-//        }
-//    }
 }
 
 void AudioInputThread::switchInputDevice(QString name)
