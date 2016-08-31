@@ -83,7 +83,10 @@ void FormAnalyze::leaveForm()
 
 void FormAnalyze::setFrequency(int frequency)
 {
-    // TODO avoid recursion at all when frequency is changed by user
+    // for avoid recursion, stop processing signal "valueChanged" until UI boxes are updated
+    disconnect(ui->boxFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
+    disconnect(ui->sliderFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
+
     if (ui->boxFrequency->value() != frequency) {
         ui->boxFrequency->setValue(frequency);
     }
@@ -95,11 +98,17 @@ void FormAnalyze::setFrequency(int frequency)
     }
     Settings *settings = Settings::getSettings();
     settings->setValue("Analyzer/SignalFrequency", frequency);
+
+    connect(ui->boxFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
+    connect(ui->sliderFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
 }
 
 void FormAnalyze::setVoltage(double voltage)
 {
-    // TODO avoid recursion at all when amplitude is changed by user
+    // for avoid recursion, stop processing signal "valueChanged" until UI boxes are updated
+    disconnect(ui->boxVoltage, SIGNAL(valueChanged(double)), this, SLOT(setVoltage(double)));
+    disconnect(ui->sliderVoltage, SIGNAL(valueChanged(int)), this, SLOT(setVoltage(int)));
+
     int v = qRound(voltage * 10.);
     double curV = v / 10.;
     int prevV = qRound(ui->boxVoltage->value() * 10.);
@@ -109,9 +118,14 @@ void FormAnalyze::setVoltage(double voltage)
     if (ui->sliderVoltage->value() != v) {
         ui->sliderVoltage->setValue(v);
     }
+    if (ui->buttonRun->isChecked()) {
+        m_gen->setCurVoltageAmplitude(curV);
+    }
     Settings *settings = Settings::getSettings();
     settings->setValue("Analyzer/SignalAmplitude", curV);
-    m_gen->setCurVoltageAmplitude(curV);
+
+    connect(ui->boxVoltage, SIGNAL(valueChanged(double)), this, SLOT(setVoltage(double)));
+    connect(ui->sliderVoltage, SIGNAL(valueChanged(int)), this, SLOT(setVoltage(int)));
 }
 
 void FormAnalyze::setVoltage(int vol10)

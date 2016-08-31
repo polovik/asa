@@ -61,12 +61,11 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList, SamplesList)),
             this, SLOT(processOscilloscopeData(SamplesList, SamplesList)));
             
-    // TODO avoid recursion at all when magnitude is changed by user
     qreal magnitude = m_gen->getMaxVoltageAmplitude();
-    setGeneratorMagnitude(magnitude); // call before signals connection - avoid recursion trap
     connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
     connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
-    
+    setGeneratorMagnitude(magnitude);
+
     connect(ui->buttonHintAdjustGenerator, SIGNAL(clicked()), this, SLOT(showHint()));
     connect(ui->buttonHintCheckInputLevel, SIGNAL(clicked()), this, SLOT(showHint()));
     connect(ui->buttonHintPlayTone, SIGNAL(clicked()), this, SLOT(showHint()));
@@ -189,6 +188,10 @@ void FormCalibration::adjustGenerator(bool start)
 
 void FormCalibration::setGeneratorMagnitude(double voltage)
 {
+    // for avoid recursion, stop processing signal "valueChanged" until UI boxes are updated
+    disconnect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
+    disconnect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
+
     double peak = -1.;
     double rms = -1.;
     if (sender() == ui->boxGeneratorPeak) {
@@ -209,6 +212,9 @@ void FormCalibration::setGeneratorMagnitude(double voltage)
     m_gen->setMaxVoltageAmplitude(peak);
     m_gen->setCurVoltageAmplitude(peak);
     ui->viewSignature->setMaximumAmplitude(peak);
+
+    connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
+    connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
 }
 
 void FormCalibration::showHint()
