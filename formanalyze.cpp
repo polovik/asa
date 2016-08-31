@@ -83,6 +83,7 @@ void FormAnalyze::leaveForm()
 
 void FormAnalyze::setFrequency(int frequency)
 {
+    // TODO avoid recursion at all when frequency is changed by user
     if (ui->boxFrequency->value() != frequency) {
         ui->boxFrequency->setValue(frequency);
     }
@@ -98,6 +99,7 @@ void FormAnalyze::setFrequency(int frequency)
 
 void FormAnalyze::setVoltage(double voltage)
 {
+    // TODO avoid recursion at all when amplitude is changed by user
     int v = qRound(voltage * 10.);
     double curV = v / 10.;
     int prevV = qRound(ui->boxVoltage->value() * 10.);

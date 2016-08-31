@@ -61,6 +61,7 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList, SamplesList)),
             this, SLOT(processOscilloscopeData(SamplesList, SamplesList)));
             
+    // TODO avoid recursion at all when magnitude is changed by user
     qreal magnitude = m_gen->getMaxVoltageAmplitude();
     setGeneratorMagnitude(magnitude); // call before signals connection - avoid recursion trap
     connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
@@ -206,6 +207,7 @@ void FormCalibration::setGeneratorMagnitude(double voltage)
     }
     qDebug() << "Set max generator voltage: Vpk" << peak << "Vrms" << rms;
     m_gen->setMaxVoltageAmplitude(peak);
+    m_gen->setCurVoltageAmplitude(peak);
     ui->viewSignature->setMaximumAmplitude(peak);
 }
 
