@@ -222,25 +222,25 @@ void FormCalibration::showHint()
     QString title;
     QString text;
     if (sender() == ui->buttonHintAdjustGenerator) {
-        title = "Adjust max generated voltage";
-        text = "This button helps to adjust tone generator's amplitude.\n"
+        title = tr("Adjust max generated voltage");
+        text = tr("This button helps to adjust tone generator's amplitude.\n"
                "Button pressing leads to play tone on left and right channel simultaneously.\n"
                "Tone is Sine 50Hz with maximal amplitude.\n"
                "Measured voltage should be written in corresponding field:\n"
                "- Amplitude (Vpk) - when real oscilloscope is used\n"
-               "- RMS - when ordinary voltmeter for ~U is used";
+               "- RMS - when ordinary voltmeter for ~U is used");
     } else if (sender() == ui->buttonHintCheckInputLevel) {
-        title = "Check input channel";
-        text = "This area helps to adjust maximal voltage on audio input pins.\n"
+        title = tr("Check input channel");
+        text = tr("This area helps to adjust maximal voltage on audio input pins.\n"
                "Button pressing leads to play tone on left and right channel simultaneously.\n"
                "Tone is Sine 50Hz with maximal amplitude.\n"
                "Potentiometers on the board have to be adjusted for making the same voltage "
-               "on both audio input pins.";
+               "on both audio input pins.");
     } else if (sender() == ui->buttonHintPlayTone) {
-        title = "Play tone";
-        text = "This buttons help to distinguish audio output pins.\n"
+        title = tr("Play tone");
+        text = tr("This buttons help to distinguish audio output pins.\n"
                "Button pressing leads to play tone on specific channel.\n"
-               "Tone is Sine 50Hz with maximal amplitude.";
+               "Tone is Sine 50Hz with maximal amplitude.");
     }
     QMessageBox::information(this, title, text);
 }

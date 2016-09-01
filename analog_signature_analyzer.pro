@@ -7,6 +7,7 @@ VERSION = 1.0.0
 
 TEMPLATE = app
 DESTDIR = ../build
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -25,7 +26,8 @@ SOURCES += main.cpp\
     widgets/volumeindicator.cpp \
     settings.cpp \
     common_types.cpp \
-    formoptions.cpp
+    formoptions.cpp \
+    formabout.cpp
 
 HEADERS  += mainwindow.h \
     devices/tonegenerator.h \
@@ -43,14 +45,16 @@ HEADERS  += mainwindow.h \
     smoothfilter.h \
     widgets/volumeindicator.h \
     settings.h \
-    formoptions.h
+    formoptions.h \
+    formabout.h
 
 FORMS    += mainwindow.ui \
     formcalibration.ui \
     formraw.ui \
     formdiagnose.ui \
     formanalyze.ui \
-    formoptions.ui
+    formoptions.ui \
+    formabout.ui
 
 RESOURCES += \
     analog_signature_analyzer.qrc

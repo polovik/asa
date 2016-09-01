@@ -18,8 +18,7 @@
     <widget class="QLabel" name="label_10">
      <property name="text">
       <string>This form allows to select input and output devices and configure it. Also it provide helps for confirure the board.
-
-- add logo, information about programm</string>
+ - simplify form Calibration - unite buttons &quot;Adjust generator and Check input level&quot;</string>
      </property>
     </widget>
    </item>

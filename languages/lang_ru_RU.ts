@@ -20,6 +20,69 @@
     </message>
 </context>
 <context>
+    <name>FormAbout</name>
+    <message>
+        <location filename="../formabout.ui" line="14"/>
+        <source>Form</source>
+        <translation>Форма</translation>
+    </message>
+    <message>
+        <location filename="../formabout.ui" line="134"/>
+        <source>License</source>
+        <translation>Лицензия</translation>
+    </message>
+    <message>
+        <location filename="../formabout.ui" line="141"/>
+        <source>MIT and GPL</source>
+        <translation>MIT and GPL</translation>
+    </message>
+    <message>
+        <location filename="../formabout.ui" line="148"/>
+        <source>Version</source>
+        <translation>Версия</translation>
+    </message>
+    <message>
+        <location filename="../formabout.ui" line="155"/>
+        <source>TextLabel</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../formabout.ui" line="114"/>
+        <source>Sources</source>
+        <translation>Исходный код</translation>
+    </message>
+    <message>
+        <location filename="../formabout.ui" line="121"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/polovik/asa&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/polovik/asa&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/polovik/asa&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/polovik/asa&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../formabout.ui" line="80"/>
+        <source>Author</source>
+        <translation>Автор</translation>
+    </message>
+    <message>
+        <location filename="../formabout.ui" line="87"/>
+        <source>Dmitry Valento</source>
+        <translation>Дмитрий Валенто</translation>
+    </message>
+    <message>
+        <location filename="../formabout.ui" line="25"/>
+        <source>Analog signature analyzer</source>
+        <translation>Analog signature analyzer</translation>
+    </message>
+    <message>
+        <location filename="../formabout.ui" line="94"/>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <location filename="../formabout.ui" line="101"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/polovik/asa/wiki&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/polovik/asa/wiki&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/polovik/asa/wiki&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/polovik/asa/wiki&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
     <name>FormAnalyze</name>
     <message>
         <location filename="../formanalyze.ui" line="14"/>
@@ -89,84 +152,131 @@
         <translation type="vanished">Эта форма</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="26"/>
-        <source>This form allows to select input and output devices and configure it. Also it provide helps for confirure the board.
-
-- add russian translation
-- add logo, information about programm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../formcalibration.ui" line="42"/>
+        <location filename="../formcalibration.ui" line="305"/>
         <source>Input audio device</source>
         <translation>Входное аудио-устройство</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="79"/>
+        <location filename="../formcalibration.ui" line="34"/>
         <source>Output audio device</source>
         <translation>Выходное аудио-устройство</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="121"/>
+        <location filename="../formcalibration.ui" line="20"/>
+        <source>This form allows to select input and output devices and configure it. Also it provide helps for confirure the board.
+
+- add logo, information about programm
+ - simplify form Calibration - unite buttons &quot;Adjust generator and Check input level&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formcalibration.ui" line="71"/>
         <source>Play tone on specific channel</source>
         <translation>Проиграть на отдельном канале</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="147"/>
-        <location filename="../formcalibration.ui" line="231"/>
-        <location filename="../formcalibration.ui" line="369"/>
+        <location filename="../formcalibration.ui" line="97"/>
+        <location filename="../formcalibration.ui" line="190"/>
+        <location filename="../formcalibration.ui" line="381"/>
         <source>?</source>
         <translation>?</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="168"/>
-        <location filename="../formcalibration.ui" line="424"/>
+        <location filename="../formcalibration.ui" line="118"/>
+        <location filename="../formcalibration.ui" line="453"/>
         <source>Left</source>
         <translation>Левый</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="178"/>
-        <location filename="../formcalibration.ui" line="434"/>
+        <location filename="../formcalibration.ui" line="128"/>
+        <location filename="../formcalibration.ui" line="463"/>
         <source>Right</source>
         <translation>Правый</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="205"/>
+        <location filename="../formcalibration.ui" line="164"/>
+        <location filename="../formcalibration.cpp" line="225"/>
         <source>Adjust max generated voltage</source>
         <translation>Настройка максимального генерируемого напряжения</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="252"/>
+        <location filename="../formcalibration.ui" line="211"/>
         <source>Adjust generator (R1)</source>
         <translation>Настройка резистора (R1)</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="271"/>
-        <location filename="../formcalibration.ui" line="287"/>
+        <location filename="../formcalibration.ui" line="230"/>
+        <location filename="../formcalibration.ui" line="246"/>
         <source>V</source>
         <translation>В</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="303"/>
+        <location filename="../formcalibration.ui" line="262"/>
         <source>Amplitude
 Vpk</source>
         <translation>Амплитуда
 Vпик</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="314"/>
+        <location filename="../formcalibration.ui" line="273"/>
         <source>RMS</source>
         <translation>RMS</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="343"/>
+        <location filename="../formcalibration.ui" line="405"/>
+        <source>Check input
+channel level</source>
+        <translation>Проверка уровня
+входного напряжения</translation>
+    </message>
+    <message>
+        <location filename="../formcalibration.cpp" line="226"/>
+        <source>This button helps to adjust tone generator&apos;s amplitude.
+Button pressing leads to play tone on left and right channel simultaneously.
+Tone is Sine 50Hz with maximal amplitude.
+Measured voltage should be written in corresponding field:
+- Amplitude (Vpk) - when real oscilloscope is used
+- RMS - when ordinary voltmeter for ~U is used</source>
+        <translation>Эта кнопка помогает настроить амплитуду генератора тестовых сигналов.
+Нажатие кнопки приводит к проигрыванию тестового сигнала на левом и правом каналах одновременно.
+Сигнал - синусоида 50Гц с максимальной амплитудой.
+Измеренное напряжение должно быть введено в соответствующее поле:
+- Амплитуда (Uпик) - когда используется реальный осциллограф
+- RMS - когда используется обычный вольтметр в режиме измерения ~U</translation>
+    </message>
+    <message>
+        <location filename="../formcalibration.cpp" line="233"/>
         <source>Check input channel</source>
         <translation>Проверка входных каналов</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="390"/>
+        <location filename="../formcalibration.cpp" line="234"/>
+        <source>This area helps to adjust maximal voltage on audio input pins.
+Button pressing leads to play tone on left and right channel simultaneously.
+Tone is Sine 50Hz with maximal amplitude.
+Potentiometers on the board have to be adjusted for making the same voltage on both audio input pins.</source>
+        <translation>Эта область помогает настроить максимальное напряжение на пинах входного аудио устройства.
+Нажатие кнопки приводит к проигрыванию тестового сигнала на левом и правом каналах одновременно.
+Сигнал - синусоида 50Гц с максимальной амплитудой.
+Переменные резисторы на плате должны быть подстроены для получения одинакового напряжения на обоих пинах входного аудио устройства.</translation>
+    </message>
+    <message>
+        <location filename="../formcalibration.cpp" line="240"/>
+        <source>Play tone</source>
+        <translation>Проиграть тоновый сигнал</translation>
+    </message>
+    <message>
+        <location filename="../formcalibration.cpp" line="241"/>
+        <source>This buttons help to distinguish audio output pins.
+Button pressing leads to play tone on specific channel.
+Tone is Sine 50Hz with maximal amplitude.</source>
+        <translation>Эти кнопки помогают различить пины выходного аудио канала.
+Нажатие кнопки приводит к проигрыванию тестового сигнала на определённом канале.
+Сигнал - синусоида 50Гц с максимальной амплитудой.</translation>
+    </message>
+    <message>
         <source>Check level</source>
-        <translation>Проверка уровня</translation>
+        <translation type="vanished">Проверка уровня</translation>
     </message>
 </context>
 <context>
@@ -382,6 +492,11 @@ Vпик</translation>
         <location filename="../mainwindow.ui" line="167"/>
         <source>Options</source>
         <translation>Настройки</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="186"/>
+        <source>About</source>
+        <translation>О программе</translation>
     </message>
     <message>
         <location filename="../qcustomplot/examples/interactions/mainwindow.ui" line="14"/>

@@ -7,6 +7,7 @@
 #include <formanalyze.h>
 #include <formdiagnose.h>
 #include <formoptions.h>
+#include <formabout.h>
 
 namespace Ui
 {
@@ -37,7 +38,8 @@ private:
     FormAnalyze *m_formAnalyze;
     FormDiagnose *m_formDiagnose;
     FormOptions *m_formOptions;
-    
+    FormAbout *m_formAbout;
+
     QWidget *m_currentForm;
 };
 
