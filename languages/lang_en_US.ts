@@ -85,7 +85,7 @@
         <location filename="../formcalibration.ui" line="26"/>
         <source>This form allows to select input and output devices and configure it. Also it provide helps for confirure the board.
 
-- add russian translation and selecting - to Options.
+- add russian translation
 - add logo, information about programm</source>
         <translation type="unfinished"></translation>
     </message>
@@ -233,12 +233,12 @@ Vpk</source>
         <translation>Russian</translation>
     </message>
     <message>
-        <location filename="../formoptions.cpp" line="46"/>
+        <location filename="../formoptions.cpp" line="47"/>
         <source>Language switching</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formoptions.cpp" line="46"/>
+        <location filename="../formoptions.cpp" line="47"/>
         <source>Language will be changed after the application restart</source>
         <translation type="unfinished"></translation>
     </message>

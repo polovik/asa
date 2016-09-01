@@ -25,7 +25,6 @@
    <property name="plainText">
     <string>This form allows to select input and output devices and configure it. Also it provide helps for confirure the board.
 
-- add russian translation and selecting - to Options.
 - add logo, information about programm</string>
    </property>
   </widget>

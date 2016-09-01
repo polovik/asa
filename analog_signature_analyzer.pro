@@ -59,7 +59,8 @@ DISTFILES += \
     run_debug_version.bat \
     icons/license.txt \
     asa.desktop \
-    languages/lang_ru_RU.ts
+    languages/lang_ru_RU.ts \
+    languages/lang_en_US.ts
 
 win32 {
     LIBS += -L$$PWD/zlib/win32-compiled/lib/ -lzdll

@@ -6,17 +6,17 @@
     <message>
         <location filename="../widgets/boardview.cpp" line="225"/>
         <source>Add testpoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить тестовую точку</translation>
     </message>
     <message>
         <location filename="../widgets/boardview.cpp" line="226"/>
         <source>Remove testpoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить тестовую точку</translation>
     </message>
     <message>
         <location filename="../widgets/boardview.cpp" line="227"/>
         <source>Fit to window</source>
-        <translation type="unfinished"></translation>
+        <translation>Отмасштабировать по размеру окна</translation>
     </message>
 </context>
 <context>
@@ -24,54 +24,54 @@
     <message>
         <location filename="../formanalyze.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished">Форма</translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location filename="../formanalyze.ui" line="20"/>
         <source>Probing signal</source>
-        <translation type="unfinished"></translation>
+        <translation>Тестирующий сигнал</translation>
     </message>
     <message>
         <location filename="../formanalyze.ui" line="31"/>
         <source>V</source>
-        <translation type="unfinished"></translation>
+        <translation>В</translation>
     </message>
     <message>
         <location filename="../formanalyze.ui" line="50"/>
         <source>Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>Гц</translation>
     </message>
     <message>
         <location filename="../formanalyze.ui" line="129"/>
         <source>Run</source>
-        <translation type="unfinished"></translation>
+        <translation>Запуск</translation>
     </message>
     <message>
         <location filename="../formanalyze.ui" line="201"/>
         <location filename="../formanalyze.cpp" line="238"/>
         <source>Open signature</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть сигнатуру</translation>
     </message>
     <message>
         <location filename="../formanalyze.ui" line="227"/>
         <source>Lock signature</source>
-        <translation type="unfinished"></translation>
+        <translation>Захватить сигнатуру</translation>
     </message>
     <message>
         <location filename="../formanalyze.ui" line="256"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить</translation>
     </message>
     <message>
         <location filename="../formanalyze.cpp" line="169"/>
         <source>Save Signature</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить сигнатуру</translation>
     </message>
     <message>
         <location filename="../formanalyze.cpp" line="171"/>
         <location filename="../formanalyze.cpp" line="240"/>
         <source>Images (*.tif *.tiff)</source>
-        <translation type="unfinished"></translation>
+        <translation>Изображения (*.tif *.tiff)</translation>
     </message>
 </context>
 <context>
@@ -79,86 +79,94 @@
     <message>
         <location filename="../formcalibration.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished">Форма</translation>
+        <translation>Форма</translation>
+    </message>
+    <message>
+        <source>This form allows to select input and output devices and configure it. Also it provide helps for confirure the board.
+
+- add russian translation and selecting - to Options.
+- add logo, information about programm</source>
+        <translation type="vanished">Эта форма</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="26"/>
         <source>This form allows to select input and output devices and configure it. Also it provide helps for confirure the board.
 
-- add russian translation and selecting - to Options.
+- add russian translation
 - add logo, information about programm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="42"/>
         <source>Input audio device</source>
-        <translation type="unfinished"></translation>
+        <translation>Входное аудио-устройство</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="79"/>
         <source>Output audio device</source>
-        <translation type="unfinished"></translation>
+        <translation>Выходное аудио-устройство</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="121"/>
         <source>Play tone on specific channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Проиграть на отдельном канале</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="147"/>
         <location filename="../formcalibration.ui" line="231"/>
         <location filename="../formcalibration.ui" line="369"/>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="168"/>
         <location filename="../formcalibration.ui" line="424"/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Левый</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="178"/>
         <location filename="../formcalibration.ui" line="434"/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation>Правый</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="205"/>
         <source>Adjust max generated voltage</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройка максимального генерируемого напряжения</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="252"/>
         <source>Adjust generator (R1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройка резистора (R1)</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="271"/>
         <location filename="../formcalibration.ui" line="287"/>
         <source>V</source>
-        <translation type="unfinished"></translation>
+        <translation>В</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="303"/>
         <source>Amplitude
 Vpk</source>
-        <translation type="unfinished"></translation>
+        <translation>Амплитуда
+Vпик</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="314"/>
         <source>RMS</source>
-        <translation type="unfinished"></translation>
+        <translation>RMS</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="343"/>
         <source>Check input channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка входных каналов</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="390"/>
         <source>Check level</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка уровня</translation>
     </message>
 </context>
 <context>
@@ -166,48 +174,48 @@ Vpk</source>
     <message>
         <location filename="../formdiagnose.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished">Форма</translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location filename="../formdiagnose.ui" line="36"/>
         <source>Grab picture from camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить картинку с камеры</translation>
     </message>
     <message>
         <location filename="../formdiagnose.ui" line="53"/>
         <source>Select picture from file</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать картинку из файла</translation>
     </message>
     <message>
         <location filename="../formdiagnose.ui" line="82"/>
         <source>Lock measure</source>
-        <translation type="unfinished"></translation>
+        <translation>Захватить сигнатуру</translation>
     </message>
     <message>
         <location filename="../formdiagnose.ui" line="108"/>
         <source>Save measures to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить сигнатуру в файл</translation>
     </message>
     <message>
         <location filename="../formdiagnose.ui" line="121"/>
         <source>Discard changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Отменить изменения</translation>
     </message>
     <message>
         <location filename="../formdiagnose.cpp" line="151"/>
         <source>Save Photo</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить фотографию</translation>
     </message>
     <message>
         <location filename="../formdiagnose.cpp" line="153"/>
         <location filename="../formdiagnose.cpp" line="187"/>
         <source>Images (*.tif *.tiff)</source>
-        <translation type="unfinished"></translation>
+        <translation>Изображения (*.tif *.tiff)</translation>
     </message>
     <message>
         <location filename="../formdiagnose.cpp" line="185"/>
         <source>Open board by photo</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть плату по фотографии</translation>
     </message>
 </context>
 <context>
@@ -233,12 +241,12 @@ Vpk</source>
         <translation>Русский</translation>
     </message>
     <message>
-        <location filename="../formoptions.cpp" line="46"/>
+        <location filename="../formoptions.cpp" line="47"/>
         <source>Language switching</source>
         <translation>Изменение языка</translation>
     </message>
     <message>
-        <location filename="../formoptions.cpp" line="46"/>
+        <location filename="../formoptions.cpp" line="47"/>
         <source>Language will be changed after the application restart</source>
         <translation>Язык будет изменён после перезапуска приложения</translation>
     </message>
@@ -248,98 +256,98 @@ Vpk</source>
     <message>
         <location filename="../formraw.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished">Форма</translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="20"/>
         <source>Tone Generator</source>
-        <translation type="unfinished"></translation>
+        <translation>Генератор тона</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="26"/>
         <source>output device name</source>
-        <translation type="unfinished"></translation>
+        <translation>выходное устройство</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="38"/>
         <source>Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>Гц</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="57"/>
         <source>Generate</source>
-        <translation type="unfinished"></translation>
+        <translation>Генерировать</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="76"/>
         <location filename="../formraw.ui" line="219"/>
         <source>Capture</source>
-        <translation type="unfinished"></translation>
+        <translation>Захват</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="82"/>
         <source>input device name</source>
-        <translation type="unfinished"></translation>
+        <translation>входное устройство</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="91"/>
         <source>Trigger Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим триггера</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="97"/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Авто</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="107"/>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Нормальный</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="114"/>
         <source>Single</source>
-        <translation type="unfinished"></translation>
+        <translation>Одиночный</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="122"/>
         <source>track left channel</source>
-        <translation type="unfinished"></translation>
+        <translation>следить за левым каналом</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="131"/>
         <source>track right channel</source>
-        <translation type="unfinished"></translation>
+        <translation>следить за правым каналом</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="146"/>
         <source>Trigger Slope</source>
-        <translation type="unfinished"></translation>
+        <translation>Срабатывание по</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="152"/>
         <source>Rising</source>
-        <translation type="unfinished"></translation>
+        <translation>Фронту</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="166"/>
         <source>Falling</source>
-        <translation type="unfinished"></translation>
+        <translation>Спаду</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="180"/>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Канал</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="186"/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Левый</translation>
     </message>
     <message>
         <location filename="../formraw.ui" line="200"/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation>Правый</translation>
     </message>
 </context>
 <context>
@@ -357,7 +365,8 @@ Vpk</source>
     <message>
         <location filename="../mainwindow.ui" line="97"/>
         <source>Raw</source>
-        <translation type="unfinished"></translation>
+        <translation>Ручной
+режим</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="116"/>
@@ -439,12 +448,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../widgets/oscilloscopeview.cpp" line="12"/>
         <source>Milliseconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Милисекунды</translation>
     </message>
     <message>
         <location filename="../widgets/oscilloscopeview.cpp" line="13"/>
         <source>Volts</source>
-        <translation type="unfinished"></translation>
+        <translation>Вольт</translation>
     </message>
     <message>
         <location filename="../widgets/oscilloscopeview.cpp" line="50"/>
@@ -452,13 +461,13 @@ p, li { white-space: pre-wrap; }
         <location filename="../widgets/oscilloscopeview.cpp" line="283"/>
         <location filename="../widgets/oscilloscopeview.cpp" line="326"/>
         <source>%1ms, %2V</source>
-        <translation type="unfinished"></translation>
+        <translation>%1мс, %2В</translation>
     </message>
     <message>
         <location filename="../widgets/oscilloscopeview.cpp" line="87"/>
         <location filename="../widgets/oscilloscopeview.cpp" line="332"/>
         <source> ms</source>
-        <translation type="unfinished"></translation>
+        <translation> мс</translation>
     </message>
     <message>
         <location filename="../widgets/oscilloscopeview.cpp" line="109"/>
@@ -467,7 +476,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../widgets/oscilloscopeview.cpp" line="277"/>
         <location filename="../widgets/oscilloscopeview.cpp" line="312"/>
         <source> V</source>
-        <translation type="unfinished"></translation>
+        <translation> В</translation>
     </message>
 </context>
 <context>
@@ -475,12 +484,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../widgets/signatureview.cpp" line="10"/>
         <source>Ugenerator, Volts</source>
-        <translation type="unfinished"></translation>
+        <translation>Uгенератора, Вольт</translation>
     </message>
     <message>
         <location filename="../widgets/signatureview.cpp" line="11"/>
         <source>Uprobe, Volts</source>
-        <translation type="unfinished"></translation>
+        <translation>Uисследуемой точки, Вольт</translation>
     </message>
 </context>
 </TS>
