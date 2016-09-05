@@ -38,11 +38,10 @@ private slots:
     void loadBoardData(QString boardPhotoPath);
     void captureSignature();
     
-    void testpointAdd(int id, QPoint pos);
-    void testpointSelect(int id);
-    void testpointMove(int id, QPoint pos);
-    void testpointRemove(int id);
-    void testpointChangeId(int oldId, int newId);
+    void testpointAdd(int uid, QPoint pos);
+    void testpointSelect(int uid);
+    void testpointMove(int uid, QPoint pos);
+    void testpointRemove(int uid);
     
 private:
     void freezeForm(bool changesNotStored);
@@ -52,7 +51,7 @@ private:
     QDialog *m_dialogCamera;
     QString m_boardPhotoPath;
     bool m_needSave;
-    QList<TestpointMeasure> m_testpoints;
+    QMap<int, TestpointMeasure> m_testpoints; // key is UID of QGraphicItem
     ToneGenerator *m_gen;
     AudioInputThread *m_capture;
 };

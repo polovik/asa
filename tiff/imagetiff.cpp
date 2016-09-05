@@ -459,6 +459,13 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
 //            free(dataY);
         }
 
+        QImage signatureImage;
+        if (!readPage(signatureImage)) {
+            qWarning() << "Can't read signature image from file:"
+                       << filePath << "at page" << page;
+            goto error;
+        }
+
         TestpointMeasure measure;
         measure.id = id;
         measure.pos = QPoint(x, y);
@@ -466,6 +473,7 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         measure.signalFrequency = freq;
         measure.signalVoltage = volt;
         measure.isCurrent = false;
+        measure.signature = signatureImage;
         measure.data = samples;
         testpoints.append(measure);
     }

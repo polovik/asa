@@ -118,7 +118,7 @@
     <message>
         <location filename="../formanalyze.ui" line="227"/>
         <source>Lock signature</source>
-        <translation>Захватить сигнатуру</translation>
+        <translation>Удержать сигнатуру</translation>
     </message>
     <message>
         <location filename="../formanalyze.ui" line="256"/>
@@ -299,7 +299,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
     <message>
         <location filename="../formdiagnose.ui" line="82"/>
         <source>Lock measure</source>
-        <translation>Захватить сигнатуру</translation>
+        <translation>Удержать сигнатуру</translation>
     </message>
     <message>
         <location filename="../formdiagnose.ui" line="108"/>

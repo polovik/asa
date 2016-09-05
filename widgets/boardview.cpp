@@ -38,8 +38,9 @@ BoardView::~BoardView()
 
 }
 
-void BoardView::showBoard(QPixmap pixmap, TestpointsList testpoints)
+QMap<int, int> BoardView::showBoard(QPixmap pixmap, TestpointsList testpoints)
 {
+    QMap<int, int> ids;
     m_boardPhoto = NULL;
     stopAnimation();
     m_currentTestpoint = NULL;
@@ -52,8 +53,10 @@ void BoardView::showBoard(QPixmap pixmap, TestpointsList testpoints)
 //    ui->boardView->setFocus();
     foreach(int id, testpoints.keys()) {
         QPoint pos = testpoints.value(id);
-        insertTestpoint(id, pos);
+        int uid = insertTestpoint(pos);
+        ids.insert(uid, id);
     }
+    return ids;
 }
 
 void BoardView::getBoardPhoto(QImage &boardPhoto, QImage &boardPhotoWithMarkers)
@@ -80,6 +83,28 @@ void BoardView::getBoardPhoto(QImage &boardPhoto, QImage &boardPhotoWithMarkers)
     boardPhotoWithMarkers.fill(Qt::black);
     QPainter painter(&boardPhotoWithMarkers);
     render(&painter);
+}
+
+void BoardView::testpointChangeText(int uid, QString text)
+{
+    QGraphicsEllipseItem *pin = getPinByUid(uid);
+    if (pin == NULL) {
+        qWarning() << "Testpoint" << uid << "isn't present";
+        return;
+    }
+    QGraphicsTextItem *itemId = NULL;
+    foreach(QGraphicsItem *item, pin->childItems()) {
+        itemId = qgraphicsitem_cast<QGraphicsTextItem *>(item);
+        if (itemId != NULL) {
+            break;
+        }
+    }
+    if (itemId == NULL) {
+        qWarning() << "Testpoint view" << uid << "doesn't contain the ID item";
+        return;
+    }
+    itemId->setPlainText(text);
+    updateTestpointView(pin);
 }
 
 void BoardView::mousePressEvent(QMouseEvent *event)
@@ -111,7 +136,7 @@ void BoardView::mousePressEvent(QMouseEvent *event)
         }
         if (testpoint != NULL) {
             bool ok = false;
-            int id = testpoint->data(DATA_TESTPOINT_ID).toInt(&ok);
+            int id = testpoint->data(DATA_TESTPOINT_UID).toInt(&ok);
             qDebug() << "Testpoint is" << id << "selected";
             if (ok) {
                 stopAnimation();
@@ -120,7 +145,7 @@ void BoardView::mousePressEvent(QMouseEvent *event)
                 startAnimation();
                 emit testpointSelected(id);
             } else {
-                qCritical() << "Testpoint have invalid ID:" << testpoint->data(DATA_TESTPOINT_ID);
+                qCritical() << "Testpoint have invalid ID:" << testpoint->data(DATA_TESTPOINT_UID);
                 Q_ASSERT(false);
             }
         }
@@ -157,9 +182,9 @@ void BoardView::mouseReleaseEvent(QMouseEvent *event)
     m_entireViewIsDragging = false;
     if (m_testpointDragging) {
         bool ok = false;
-        int id = m_currentTestpoint->data(DATA_TESTPOINT_ID).toInt(&ok);
+        int id = m_currentTestpoint->data(DATA_TESTPOINT_UID).toInt(&ok);
         if (!ok) {
-            qCritical() << "Testpoint have invalid ID:" << m_currentTestpoint->data(DATA_TESTPOINT_ID);
+            qCritical() << "Testpoint have invalid ID:" << m_currentTestpoint->data(DATA_TESTPOINT_UID);
             Q_ASSERT(false);
         }
         QPointF scenePos = mapToScene(m_lastMousePos);
@@ -203,18 +228,41 @@ void BoardView::wheelEvent(QWheelEvent *event)
     event->accept();
 }
 
-void BoardView::insertTestpoint(int id, QPointF posOnScene)
+int BoardView::insertTestpoint(QPointF posOnScene)
 {
-    qDebug() << "add testpoint" << id << "at" << posOnScene;
+    int uid = getUID();
+    qDebug() << "add testpoint" << uid << "at" << posOnScene;
     QGraphicsEllipseItem *item = new QGraphicsEllipseItem();
-    item->setData(DATA_TESTPOINT_ID, QVariant(id));
+    item->setData(DATA_TESTPOINT_UID, QVariant(uid));
     QGraphicsTextItem *itemId = new QGraphicsTextItem(item);
     itemId->setDefaultTextColor(Qt::green);
-    QString label = QString::number(id);
-    itemId->setPlainText(label);
-    updateTestpointView(item);
     scene()->addItem(item);
     item->setPos(posOnScene);
+    return uid;
+}
+
+QGraphicsEllipseItem *BoardView::getPinByUid(int uid)
+{
+    foreach(QGraphicsItem *item, scene()->items()) {
+        QGraphicsEllipseItem *testpoint = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
+        if (testpoint == NULL) {
+            continue;
+        }
+        bool ok = false;
+        int id = testpoint->data(DATA_TESTPOINT_UID).toInt(&ok);
+        if (!ok) {
+            qCritical() << "Testpoint have invalid ID:" << testpoint->data(DATA_TESTPOINT_UID);
+            Q_ASSERT(false);
+            continue;
+        }
+        if (id == uid) {
+            qDebug() << "Testpoint" << uid << "has been found at" << testpoint->pos();
+            return testpoint;
+        }
+    }
+    qCritical() << "Testpoint" << uid << "has not been found";
+    Q_ASSERT(false);
+    return NULL;
 }
 
 void BoardView::contextMenuEvent(QContextMenuEvent *event)
@@ -270,30 +318,12 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
             updateTestpointView(pin);
         }
     } else if (action == &actionAddTestpoint) {
-        // TODO move logic about ID manipulation to the FormDiagnose
-        QList<int> ids;
-        ids.append(-1);
-        foreach(QGraphicsItem *item, scene()->items()) {
-            QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
-            if (pin == NULL) {
-                continue;
-            }
-            bool ok = false;
-            int id = pin->data(DATA_TESTPOINT_ID).toInt(&ok);
-            if (!ok) {
-                qCritical() << "Testpoint have invalid ID:" << pin->data(DATA_TESTPOINT_ID);
-                Q_ASSERT(false);
-            }
-            ids.append(id);
-        }
-        qSort(ids);
-        int testpointId = ids.last() + 1;
         QPointF scenePos = mapToScene(event->pos());
-        insertTestpoint(testpointId, scenePos);
-        emit testpointAdded(testpointId, scenePos.toPoint());
+        int uid = insertTestpoint(scenePos);
+        emit testpointAdded(uid, scenePos.toPoint());
     } else if (action == &actionRemoveTestpoint) {
         bool ok = false;
-        int id = testpoint->data(DATA_TESTPOINT_ID).toInt(&ok);
+        int id = testpoint->data(DATA_TESTPOINT_UID).toInt(&ok);
         qDebug() << "remove testpoint" << id << "at" << event->pos();
         if (m_currentTestpoint == testpoint) {
             stopAnimation();
@@ -304,48 +334,9 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
         if (ok) {
             emit testpointRemoved(id);
         } else {
-            qCritical() << "Testpoint have invalid ID:" << testpoint->data(DATA_TESTPOINT_ID);
+            qCritical() << "Testpoint have invalid ID:" << testpoint->data(DATA_TESTPOINT_UID);
             Q_ASSERT(false);
             return;
-        }
-        // Reenumerate rest of testpoints - they have to had sequential number (for simplify TIFF store procedure)
-        foreach(QGraphicsItem *item, scene()->items()) {
-            QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
-            if (pin == NULL) {
-                continue;
-            }
-            bool ok = false;
-            int curId = pin->data(DATA_TESTPOINT_ID).toInt(&ok);
-            if (!ok) {
-                qCritical() << "Testpoint have invalid ID:" << pin->data(DATA_TESTPOINT_ID);
-                Q_ASSERT(false);
-                return;
-            }
-            if (curId < id) {
-                continue;
-            }
-            if (curId == id) {
-                qCritical() << "Testpoint" << curId << "have the same ID as removed testpoint";
-                Q_ASSERT(false);
-                return;
-            }
-            QGraphicsTextItem *itemId = NULL;
-            foreach(QGraphicsItem *child, item->childItems()) {
-                itemId = qgraphicsitem_cast<QGraphicsTextItem *>(child);
-                if (itemId != NULL) {
-                    break;
-                }
-            }
-            if (itemId == NULL) {
-                qCritical() << "Testpoint" << curId << "doesn't contain the ID item";
-                Q_ASSERT(false);
-                return;
-            }
-            curId = curId - 1;
-            QString label = QString::number(curId);
-            itemId->setPlainText(label);
-            pin->setData(DATA_TESTPOINT_ID, QVariant(curId));
-            emit testpointIdChanged(curId + 1, curId);
         }
     }
 }
@@ -446,3 +437,30 @@ void BoardView::timeslotAnimate()
     m_currentTestpoint->setPen(pen);
 }
 
+int BoardView::getUID()
+{
+    int uid = 0;
+    while (true) {
+        int i = qrand();
+        if (i < 100000) {
+            continue;
+        }
+        while (i > 999999) {
+            i = i / 11;
+        }
+        if (i < 100000) {
+            continue;
+        }
+        if (m_uids.contains(i)) {
+            qWarning() << "UID not unique:" << uid;
+            continue;
+        }
+        uid = i;
+        break;
+    }
+    if ((uid < 100000) || (uid > 999999) || m_uids.contains(uid)) {
+        qCritical() << "Invalid UID generation:" << uid << m_uids.contains(uid);
+        Q_ASSERT(false);
+    }
+    return uid;
+}
