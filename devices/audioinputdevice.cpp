@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QtMath>
 #include <QTime>
 #include <QEventLoop>
 #include <QtCore/qendian.h>
@@ -9,6 +10,7 @@ AudioInputDevice::AudioInputDevice(QObject *parent) :
     QIODevice(parent)
 {
     m_channels = CHANNEL_NONE;
+    m_scaleFactor = 100.;
 }
 
 AudioInputDevice::~AudioInputDevice()
@@ -21,6 +23,12 @@ void AudioInputDevice::setChannels(AudioChannels channels)
              << ((channels & CHANNEL_LEFT) ? "on," : "off,")
              << "right -" << ((channels & CHANNEL_RIGHT) ? "on" : "off");
     m_channels = channels;
+}
+
+void AudioInputDevice::setVoltageScaleFactor(qreal maxVoltage)
+{
+    m_scaleFactor = maxVoltage;
+    qDebug() << "Set voltage scale factor to" << m_scaleFactor << "V";
 }
 
 qint64 AudioInputDevice::readData(char *data, qint64 maxSize)
@@ -53,10 +61,16 @@ qint64 AudioInputDevice::writeData(const char *data, qint64 maxSize)
     SamplesList samplesRight;
     for (int i = 0; i < maxSize; i += 4) { // choose only left channel
         // convert from char* to real
-        if (m_channels & CHANNEL_LEFT)
-            samplesLeft.append(charToReal(&data[i], true));
-        if (m_channels & CHANNEL_RIGHT)
-            samplesRight.append(charToReal(&data[i + 2], true));
+        if (m_channels & CHANNEL_LEFT) {
+            qreal sample = charToReal(&data[i], true);
+            sample = sample * m_scaleFactor;
+            samplesLeft.append(sample);
+        }
+        if (m_channels & CHANNEL_RIGHT) {
+            qreal sample = charToReal(&data[i + 2], true);
+            sample = sample * m_scaleFactor;
+            samplesRight.append(sample);
+        }
     }
 //    qDebug() << samplesLeft.size() << samplesRight.size();
     // TODO attach timestamp
@@ -70,8 +84,11 @@ qint64 AudioInputDevice::writeData(const char *data, qint64 maxSize)
 //============================AudioInputThread================================//
 AudioInputThread::AudioInputThread()
 {
+    m_inputBuffer = NULL;
+    m_audioInput = NULL;
     m_capturedChannels = CHANNEL_NONE;
     m_captureEnabled = false;
+    m_maxInputVoltage = 0.01;
     // set up the format you want, eg.
     m_sampleRate = 44100;
     m_audioFormat.setSampleRate(m_sampleRate);
@@ -88,6 +105,7 @@ void AudioInputThread::run()
 {
     m_inputBuffer = new AudioInputDevice();
     m_inputBuffer->open(QIODevice::ReadWrite | QIODevice::Truncate);
+    m_inputBuffer->setVoltageScaleFactor(m_maxInputVoltage);
 //    connect(m_inputBuffer, SIGNAL(samplesReceived(AudioChannels,SamplesList)), SLOT (updateBuffers(AudioChannels,SamplesList)), Qt::QueuedConnection);
 //    connect(m_inputBuffer, SIGNAL(samplesReceived(AudioChannels,SamplesList)), SIGNAL(dataForOscilloscope(AudioChannels,SamplesList)), Qt::QueuedConnection);
     connect(m_inputBuffer, SIGNAL(samplesReceived(SamplesList, SamplesList)), SIGNAL(dataForOscilloscope(SamplesList, SamplesList)), Qt::QueuedConnection);
@@ -209,6 +227,14 @@ void AudioInputThread::setCapturedChannels(AudioChannels channels)
 QString AudioInputThread::getDeviceName()
 {
     return m_curAudioDeviceInfo.deviceName();
+}
+
+void AudioInputThread::setSensivity(qreal maxInputVoltage)
+{
+    m_maxInputVoltage = maxInputVoltage;
+    if (m_inputBuffer != NULL) {
+        m_inputBuffer->setVoltageScaleFactor(m_maxInputVoltage);
+    }
 }
 
 void AudioInputThread::switchInputDevice(QString name)

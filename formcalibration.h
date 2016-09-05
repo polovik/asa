@@ -29,8 +29,7 @@ private slots:
     void playTestTone();
     void captureDeviceInitiated(int samplingRate);
     void processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData);
-    void checkInputLevel(bool start);
-    void adjustGenerator(bool start);
+    void runCalibration(bool start);
     void setGeneratorMagnitude(double voltage);
     void showHint();
     

@@ -364,7 +364,7 @@ void FormDiagnose::saveMeasures()
         qDebug() << "There are no changes. Do not store diagnostic data";
         return;
     }
-    // ToDo add save filedialog
+    // TODO add save filedialog
     ImageTiff tiff;
     QImage boardPhoto;
     QImage boardPhotoWithMarkers;

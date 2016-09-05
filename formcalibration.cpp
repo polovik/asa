@@ -52,10 +52,7 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     
     connect(ui->buttonLeftOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
     connect(ui->buttonRightOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
-    connect(ui->buttonCheckInputLevel, SIGNAL(clicked(bool)), this, SLOT(checkInputLevel(bool)));
-    connect(ui->buttonAdjustGenerator, SIGNAL(clicked(bool)), this, SLOT(adjustGenerator(bool)));
-//    connect(ui->buttonGenerate, SIGNAL(toggled(bool)), ui->boxAudioOutputDevice, SLOT(setDisabled(bool)));
-//    connect(ui->buttonCupture, SIGNAL(toggled(bool)), ui->boxAudioInputDevice, SLOT(setDisabled(bool)));
+    connect(ui->buttonCalibrate, SIGNAL(clicked(bool)), this, SLOT(runCalibration(bool)));
     connect(m_capture, SIGNAL(initiated(int)),
             SLOT(captureDeviceInitiated(int)), Qt::QueuedConnection);   // wait while main window initiated
     connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList, SamplesList)),
@@ -83,8 +80,7 @@ void FormCalibration::leaveForm()
     m_capture->startCapturing(false);
     ui->buttonLeftOutputChannel->setChecked(false);
     ui->buttonRightOutputChannel->setChecked(false);
-    ui->buttonCheckInputLevel->setChecked(false);
-    ui->buttonAdjustGenerator->setChecked(false);
+    ui->buttonCalibrate->setChecked(false);
 }
 
 void FormCalibration::switchOutputAudioDevice(int index)
@@ -123,7 +119,6 @@ void FormCalibration::playTestTone()
         m_gen->runGenerator(false);
         return;
     }
-    ui->buttonAdjustGenerator->setChecked(false);
     int channels = CHANNEL_NONE;
     if (ui->buttonLeftOutputChannel->isChecked()) {
         channels = CHANNEL_LEFT;
@@ -140,7 +135,7 @@ void FormCalibration::playTestTone()
 
 void FormCalibration::captureDeviceInitiated(int samplingRate)
 {
-    if (!ui->buttonCheckInputLevel->isChecked()) {
+    if (!ui->buttonCalibrate->isChecked()) {
         return;
     }
     // Audio device ready to capture - display this
@@ -152,7 +147,7 @@ void FormCalibration::captureDeviceInitiated(int samplingRate)
 
 void FormCalibration::processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData)
 {
-    if (!ui->buttonCheckInputLevel->isChecked()) {
+    if (!ui->buttonCalibrate->isChecked()) {
         return;
     }
     ui->viewLeftChannelLevel->processSamples(leftChannelData);
@@ -164,17 +159,9 @@ void FormCalibration::processOscilloscopeData(SamplesList leftChannelData, Sampl
     ui->viewSignature->draw(voltage, current);
 }
 
-void FormCalibration::checkInputLevel(bool start)
+void FormCalibration::runCalibration(bool start)
 {
     qDebug() << "Run checking voltage on Audio input:" << start;
-    if (start) {
-    
-    }
-    m_capture->startCapturing(start);
-}
-
-void FormCalibration::adjustGenerator(bool start)
-{
     if (start) {
         m_gen->changeFrequency(50);
         m_gen->switchWaveForm(ToneWaveForm::WAVE_SINE);
@@ -183,6 +170,7 @@ void FormCalibration::adjustGenerator(bool start)
         ui->buttonLeftOutputChannel->setChecked(false);
         ui->buttonRightOutputChannel->setChecked(false);
     }
+    m_capture->startCapturing(start);
     m_gen->runGenerator(start);
 }
 
@@ -211,7 +199,10 @@ void FormCalibration::setGeneratorMagnitude(double voltage)
     qDebug() << "Set max generator voltage: Vpk" << peak << "Vrms" << rms;
     m_gen->setMaxVoltageAmplitude(peak);
     m_gen->setCurVoltageAmplitude(peak);
+    m_capture->setSensivity(peak);
     ui->viewSignature->setMaximumAmplitude(peak);
+    ui->viewLeftChannelLevel->setMaximumAmplitude(peak);
+    ui->viewRightChannelLevel->setMaximumAmplitude(peak);
 
     connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
     connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));

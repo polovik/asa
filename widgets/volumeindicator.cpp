@@ -5,7 +5,7 @@
 
 VolumeIndicator::VolumeIndicator(QWidget *parent) :
     QGraphicsView(parent), smoothFilter(0), volumeItem(0), global_counter(-1),
-    maxVolume(0.0)
+    maxVolume(0.0), m_maxInputVoltage(0.01)
 {
     // Do not show scroll bars for correct calculate and display of volume level
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -31,6 +31,11 @@ void VolumeIndicator::setSamplingRate(int samplingRate)
     //double smoothFactor = 1. / updateVolumeInterval;
 }
 
+void VolumeIndicator::setMaximumAmplitude(qreal voltage)
+{
+    m_maxInputVoltage = voltage;
+}
+
 /*
  Periodic signal have even positive and negative half-periods.
  For calc mean value of volume need smooth only absolute values
@@ -42,7 +47,9 @@ void VolumeIndicator::processSamples(SamplesList samples)
     int length = samples.size();
     //double minVolume = 100;
     for (int i = 0; i < length; i++) {
-        double smoothedLevel = smoothFilter->processSample(qAbs(samples.at(i)));
+        qreal sample = qAbs(samples.at(i));
+        sample = sample / m_maxInputVoltage;
+        double smoothedLevel = smoothFilter->processSample(sample);
         maxVolume = qMax(maxVolume, qAbs(samples.at(i)));
         global_counter++;
         if (global_counter % updateVolumeInterval == 0) {

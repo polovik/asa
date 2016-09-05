@@ -13,6 +13,7 @@ public:
     VolumeIndicator(QWidget *parent = 0);
     ~VolumeIndicator();
     void setSamplingRate(int samplingRate);
+    void setMaximumAmplitude(qreal voltage);
     static const int updateTemp = 24; // how much refresh indicator per second
     
 private:
@@ -23,6 +24,7 @@ private:
     int updatePeakInterval; // in samples
     int global_counter;
     double maxVolume;
+    qreal m_maxInputVoltage;
     
     void drawVolumeLevel(double level);
     

@@ -16,6 +16,7 @@ public:
     
 public slots:
     void setChannels(AudioChannels channels);
+    void setVoltageScaleFactor(qreal maxVoltage);
     
 protected:
     qint64 readData(char * /*data*/, qint64 /*maxSize*/);
@@ -25,6 +26,7 @@ private:
     QTime timer;
     qreal samplesReaded;    // use for determinate time of current frame from start
     AudioChannels m_channels;
+    qreal m_scaleFactor;
     
 signals:
     void samplesReceived(AudioChannels channel, SamplesList data);
@@ -54,6 +56,7 @@ public:
     QStringList enumerateDevices();
     void setCapturedChannels(AudioChannels channels);
     QString getDeviceName();
+    void setSensivity(qreal maxInputVoltage);
     
 public slots:
     void switchInputDevice(QString name);
@@ -75,6 +78,7 @@ private:
     QAudioDeviceInfo m_curAudioDeviceInfo;
     QList<QAudioDeviceInfo> m_audioDeviceInfos;
     AudioChannels m_capturedChannels;
+    qreal m_maxInputVoltage;
 };
 
 #endif // AUDIOINPUTDEVICE_H
