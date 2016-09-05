@@ -15,3 +15,27 @@ Thanks to Mandarancio
 
 Files "flag_russian_federation.ico", "flag_united_states_of_america_usa.ico" was obtained from http://findicons.com/icon/32264/russian_federation, http://findicons.com/icon/32355/united_states_of_america_usa
 Thanks to IconDrawer (Eugen Buzuk)
+
+Files "minus.ico", "plus.ico" was obtained from http://findicons.com/icon/88639/moins, http://findicons.com/icon/88626/plus
+Thanks to Tidav
+
+File "fit_to_width.ico" was obtained from http://findicons.com/icon/558815/fit_to_width
+Thanks to VisualPharm
+
+File "application_x_desktop.ico" was obtained from http://findicons.com/icon/238220/application_x_desktop
+Thanks to Oxygen Team
+
+File "get_info.ico" was obtained from http://findicons.com/icon/131777/get_info
+Thanks to David Lanham
+
+File "diagram_v2_14.ico" was obtained from http://findicons.com/icon/175730/diagram_v2_14
+Thanks to Jack Cai
+
+File "oscilloscope.ico" was obtained from http://findicons.com/icon/440685/oscilloscope
+Thanks to webdesignerdepot.com
+
+File "potentiometer.ico" was obtained from http://findicons.com/icon/567870/potentiometer
+Thanks to VisualPharm
+
+File "Lissajous_curve_1by2.svg.pngwas obtained from https://commons.wikimedia.org/wiki/File%3ALissajous_curve_1by2.svg
+Thanks to By Alessio Damato

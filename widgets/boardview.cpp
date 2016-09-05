@@ -270,9 +270,9 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
 //    qDebug() << "show context menu";
     event->accept();
     QMenu menu(this);
-    QAction actionAddTestpoint(tr("Add testpoint"), &menu);
-    QAction actionRemoveTestpoint(tr("Remove testpoint"), &menu);
-    QAction actionFitBoardToView(tr("Fit to window"), &menu);
+    QAction actionAddTestpoint(QIcon(":/icons/plus.ico"), tr("Add testpoint"), &menu);
+    QAction actionRemoveTestpoint(QIcon(":/icons/minus.ico"), tr("Remove testpoint"), &menu);
+    QAction actionFitBoardToView(QIcon(":/icons/fit_to_width.ico"), tr("Fit to window"), &menu);
     actionAddTestpoint.setEnabled(false);
     actionRemoveTestpoint.setEnabled(false);
     actionFitBoardToView.setEnabled(false);

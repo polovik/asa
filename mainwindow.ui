@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>807</width>
-    <height>490</height>
+    <height>494</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,6 +74,10 @@
          <property name="text">
           <string>Calibration</string>
          </property>
+         <property name="icon">
+          <iconset resource="analog_signature_analyzer.qrc">
+           <normaloff>:/icons/potentiometer.ico</normaloff>:/icons/potentiometer.ico</iconset>
+         </property>
          <property name="checkable">
           <bool>true</bool>
          </property>
@@ -96,6 +100,10 @@
          <property name="text">
           <string>Raw</string>
          </property>
+         <property name="icon">
+          <iconset resource="analog_signature_analyzer.qrc">
+           <normaloff>:/icons/oscilloscope.ico</normaloff>:/icons/oscilloscope.ico</iconset>
+         </property>
          <property name="checkable">
           <bool>true</bool>
          </property>
@@ -115,6 +123,10 @@
          <property name="text">
           <string>Analyze</string>
          </property>
+         <property name="icon">
+          <iconset resource="analog_signature_analyzer.qrc">
+           <normaloff>:/icons/Lissajous_curve_1by2.svg.png</normaloff>:/icons/Lissajous_curve_1by2.svg.png</iconset>
+         </property>
          <property name="checkable">
           <bool>true</bool>
          </property>
@@ -133,6 +145,10 @@
          </property>
          <property name="text">
           <string>Diagnose</string>
+         </property>
+         <property name="icon">
+          <iconset resource="analog_signature_analyzer.qrc">
+           <normaloff>:/icons/diagram_v2_14.ico</normaloff>:/icons/diagram_v2_14.ico</iconset>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -166,6 +182,10 @@
          <property name="text">
           <string>Options</string>
          </property>
+         <property name="icon">
+          <iconset resource="analog_signature_analyzer.qrc">
+           <normaloff>:/icons/application_x_desktop.ico</normaloff>:/icons/application_x_desktop.ico</iconset>
+         </property>
          <property name="checkable">
           <bool>true</bool>
          </property>
@@ -185,6 +205,10 @@
          <property name="text">
           <string>About</string>
          </property>
+         <property name="icon">
+          <iconset resource="analog_signature_analyzer.qrc">
+           <normaloff>:/icons/get_info.ico</normaloff>:/icons/get_info.ico</iconset>
+         </property>
         </widget>
        </item>
       </layout>
@@ -199,6 +223,8 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="analog_signature_analyzer.qrc"/>
+ </resources>
  <connections/>
 </ui>
