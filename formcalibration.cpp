@@ -63,8 +63,7 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
     setGeneratorMagnitude(magnitude);
 
-    connect(ui->buttonHintAdjustGenerator, SIGNAL(clicked()), this, SLOT(showHint()));
-    connect(ui->buttonHintCheckInputLevel, SIGNAL(clicked()), this, SLOT(showHint()));
+    connect(ui->buttonHintCalibrate, SIGNAL(clicked()), this, SLOT(showHint()));
     connect(ui->buttonHintPlayTone, SIGNAL(clicked()), this, SLOT(showHint()));
 }
 
@@ -212,21 +211,17 @@ void FormCalibration::showHint()
 {
     QString title;
     QString text;
-    if (sender() == ui->buttonHintAdjustGenerator) {
-        title = tr("Adjust max generated voltage");
-        text = tr("This button helps to adjust tone generator's amplitude.\n"
-               "Button pressing leads to play tone on left and right channel simultaneously.\n"
-               "Tone is Sine 50Hz with maximal amplitude.\n"
-               "Measured voltage should be written in corresponding field:\n"
-               "- Amplitude (Vpk) - when real oscilloscope is used\n"
-               "- RMS - when ordinary voltmeter for ~U is used");
-    } else if (sender() == ui->buttonHintCheckInputLevel) {
-        title = tr("Check input channel");
+    if (sender() == ui->buttonHintCalibrate) {
+        title = tr("Perform calibration");
         text = tr("This area helps to adjust maximal voltage on audio input pins.\n"
-               "Button pressing leads to play tone on left and right channel simultaneously.\n"
-               "Tone is Sine 50Hz with maximal amplitude.\n"
-               "Potentiometers on the board have to be adjusted for making the same voltage "
-               "on both audio input pins.");
+                  "Button pressing leads to play tone on left and right channel simultaneously.\n"
+                  "Tone is Sine 50Hz with maximal amplitude.\n"
+                  "Potentiometers on the board have to be adjusted for making the same voltage "
+                  "on both audio input pins.\n"
+                  "For correct signature displaying, it needs to specify range of axes."
+                  "Measured voltage should be written in corresponding field:\n"
+                  "- Amplitude (Vpk) - when real oscilloscope is used\n"
+                  "- RMS - when ordinary voltmeter for ~U is used");
     } else if (sender() == ui->buttonHintPlayTone) {
         title = tr("Play tone");
         text = tr("This buttons help to distinguish audio output pins.\n"

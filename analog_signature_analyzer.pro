@@ -22,7 +22,7 @@ SOURCES += main.cpp\
     widgets/signatureview.cpp \
     formanalyze.cpp \
     widgets/squarewidgetholder.cpp \
-    smoothfilter.cpp \
+    widgets/smoothfilter.cpp \
     widgets/volumeindicator.cpp \
     settings.cpp \
     common_types.cpp \
@@ -42,7 +42,7 @@ HEADERS  += mainwindow.h \
     common_types.h \
     formanalyze.h \
     widgets/squarewidgetholder.h \
-    smoothfilter.h \
+    widgets/smoothfilter.h \
     widgets/volumeindicator.h \
     settings.h \
     formoptions.h \

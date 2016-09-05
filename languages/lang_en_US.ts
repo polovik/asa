@@ -4,17 +4,17 @@
 <context>
     <name>BoardView</name>
     <message>
-        <location filename="../widgets/boardview.cpp" line="225"/>
+        <location filename="../widgets/boardview.cpp" line="273"/>
         <source>Add testpoint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/boardview.cpp" line="226"/>
+        <location filename="../widgets/boardview.cpp" line="274"/>
         <source>Remove testpoint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/boardview.cpp" line="227"/>
+        <location filename="../widgets/boardview.cpp" line="275"/>
         <source>Fit to window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -145,111 +145,88 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="305"/>
+        <location filename="../formcalibration.ui" line="139"/>
         <source>Input audio device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="34"/>
+        <location filename="../formcalibration.ui" line="24"/>
         <source>Output audio device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="20"/>
-        <source>This form allows to select input and output devices and configure it. Also it provide helps for confirure the board.
-
-- add logo, information about programm
- - simplify form Calibration - unite buttons &quot;Adjust generator and Check input level&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../formcalibration.ui" line="71"/>
+        <location filename="../formcalibration.ui" line="63"/>
         <source>Play tone on specific channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="97"/>
-        <location filename="../formcalibration.ui" line="190"/>
-        <location filename="../formcalibration.ui" line="381"/>
+        <location filename="../formcalibration.ui" line="89"/>
+        <location filename="../formcalibration.ui" line="215"/>
         <source>?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="118"/>
-        <location filename="../formcalibration.ui" line="453"/>
+        <location filename="../formcalibration.ui" line="110"/>
+        <location filename="../formcalibration.ui" line="398"/>
         <source>Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="128"/>
-        <location filename="../formcalibration.ui" line="463"/>
+        <location filename="../formcalibration.ui" line="120"/>
+        <location filename="../formcalibration.ui" line="408"/>
         <source>Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="164"/>
-        <location filename="../formcalibration.cpp" line="225"/>
-        <source>Adjust max generated voltage</source>
+        <location filename="../formcalibration.ui" line="239"/>
+        <source>Calibrate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="211"/>
-        <source>Adjust generator (R1)</source>
+        <location filename="../formcalibration.ui" line="264"/>
+        <source>Generator&apos;s tone volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="230"/>
-        <location filename="../formcalibration.ui" line="246"/>
+        <location filename="../formcalibration.ui" line="292"/>
+        <location filename="../formcalibration.ui" line="320"/>
         <source>V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="262"/>
+        <location filename="../formcalibration.ui" line="336"/>
         <source>Amplitude
 Vpk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="273"/>
+        <location filename="../formcalibration.ui" line="347"/>
         <source>RMS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="405"/>
-        <source>Check input
-channel level</source>
+        <location filename="../formcalibration.cpp" line="215"/>
+        <source>Perform calibration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="226"/>
-        <source>This button helps to adjust tone generator&apos;s amplitude.
+        <location filename="../formcalibration.cpp" line="216"/>
+        <source>This area helps to adjust maximal voltage on audio input pins.
 Button pressing leads to play tone on left and right channel simultaneously.
 Tone is Sine 50Hz with maximal amplitude.
-Measured voltage should be written in corresponding field:
+Potentiometers on the board have to be adjusted for making the same voltage on both audio input pins.
+For correct signature displaying, it needs to specify range of axes.Measured voltage should be written in corresponding field:
 - Amplitude (Vpk) - when real oscilloscope is used
 - RMS - when ordinary voltmeter for ~U is used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="233"/>
-        <source>Check input channel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../formcalibration.cpp" line="234"/>
-        <source>This area helps to adjust maximal voltage on audio input pins.
-Button pressing leads to play tone on left and right channel simultaneously.
-Tone is Sine 50Hz with maximal amplitude.
-Potentiometers on the board have to be adjusted for making the same voltage on both audio input pins.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../formcalibration.cpp" line="240"/>
+        <location filename="../formcalibration.cpp" line="226"/>
         <source>Play tone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="241"/>
+        <location filename="../formcalibration.cpp" line="227"/>
         <source>This buttons help to distinguish audio output pins.
 Button pressing leads to play tone on specific channel.
 Tone is Sine 50Hz with maximal amplitude.</source>
@@ -289,18 +266,18 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="151"/>
+        <location filename="../formdiagnose.cpp" line="150"/>
         <source>Save Photo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="153"/>
-        <location filename="../formdiagnose.cpp" line="187"/>
+        <location filename="../formdiagnose.cpp" line="152"/>
+        <location filename="../formdiagnose.cpp" line="186"/>
         <source>Images (*.tif *.tiff)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="185"/>
+        <location filename="../formdiagnose.cpp" line="184"/>
         <source>Open board by photo</source>
         <translation type="unfinished"></translation>
     </message>
