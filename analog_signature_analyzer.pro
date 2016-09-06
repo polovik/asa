@@ -27,7 +27,10 @@ SOURCES += main.cpp\
     settings.cpp \
     common_types.cpp \
     formoptions.cpp \
-    formabout.cpp
+    formabout.cpp \
+    widgets/FancyTabBar/fancytab.cpp \
+    widgets/FancyTabBar/fancytabbar.cpp \
+    widgets/FancyTabBar/stylehelper.cpp
 
 HEADERS  += mainwindow.h \
     devices/tonegenerator.h \
@@ -46,7 +49,10 @@ HEADERS  += mainwindow.h \
     widgets/volumeindicator.h \
     settings.h \
     formoptions.h \
-    formabout.h
+    formabout.h \
+    widgets/FancyTabBar/fancytab.h \
+    widgets/FancyTabBar/fancytabbar.h \
+    widgets/FancyTabBar/stylehelper.h
 
 FORMS    += mainwindow.ui \
     formcalibration.ui \
@@ -78,6 +84,8 @@ unix {
 }
 
 include($$PWD/tiff/libtiff.pri)
+
+QMAKE_CXXFLAGS += -std=c++0x
 
 win32 {
     RC_ICONS += icons/app_icon.ico

@@ -3,6 +3,7 @@
 #include "ui_mainwindow.h"
 #include "devices/tonegenerator.h"
 #include "devices/audioinputdevice.h"
+#include "widgets/FancyTabBar/fancytabbar.h"
 
 Q_DECLARE_METATYPE(SamplesList)
 Q_DECLARE_METATYPE(AudioChannels)
@@ -15,12 +16,23 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType <AudioChannels> ();
     
     ui->setupUi(this);
-    connect(ui->buttonCalibration, SIGNAL(pressed()), this, SLOT(showForm()));
-    connect(ui->buttonRaw, SIGNAL(pressed()), this, SLOT(showForm()));
-    connect(ui->buttonAnalyze, SIGNAL(pressed()), this, SLOT(showForm()));
-    connect(ui->buttonDiagnose, SIGNAL(pressed()), this, SLOT(showForm()));
-    connect(ui->buttonOptions, SIGNAL(pressed()), this, SLOT(showForm()));
-    connect(ui->buttonAbout, SIGNAL(pressed()), this, SLOT(showForm()));
+
+    FancyTabBar* mainTabs = new FancyTabBar(FancyTabBar::TabBarPosition::Left);
+    mainTabs->insertTab(0, QIcon(":/icons/potentiometer.ico"), tr("Calibration"));
+    mainTabs->insertTab(1, QIcon(":/icons/oscilloscope.ico"), tr("Raw"));
+    mainTabs->insertTab(2, QIcon(":/icons/Lissajous_curve_1by2.svg.png"), tr("Analyze"));
+    mainTabs->insertTab(3, QIcon(":/icons/diagram_v2_14.ico"), tr("Diagnose"));
+    mainTabs->insertTab(4, QIcon(":/icons/application_x_desktop.ico"), tr("Options"));
+    mainTabs->insertTab(5, QIcon(":/icons/get_info.ico"), tr("About"));
+    mainTabs->setTabEnabled(0, true);
+    mainTabs->setTabEnabled(1, true);
+    mainTabs->setTabEnabled(2, true);
+    mainTabs->setTabEnabled(3, true);
+    mainTabs->setTabEnabled(4, true);
+    mainTabs->setTabEnabled(5, true);
+    mainTabs->setCurrentIndex(0);
+    ui->horizontalLayout->insertWidget(0, mainTabs);
+    connect(mainTabs, SIGNAL(currentChanged(int)), this, SLOT(showForm(int)));
 
     m_gen = new ToneGenerator;
     m_capture = new AudioInputThread;
@@ -40,7 +52,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_currentForm = m_formCalibration;
     ui->mainArea->setCurrentWidget(m_currentForm);
-    ui->buttonCalibration->setChecked(true);
     
     //  Start audio device only after enumeration completion
     m_gen->start();
@@ -52,24 +63,30 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::showForm()
+void MainWindow::showForm(int formId)
 {
-    QPushButton *button = qobject_cast<QPushButton *>(sender());
     QWidget *newForm = NULL;
-    if (button == ui->buttonCalibration) {
+    switch (formId) {
+    case 0:
         newForm = m_formCalibration;
-    } else if (button == ui->buttonRaw) {
+        break;
+    case 1:
         newForm = m_formRaw;
-    } else if (button == ui->buttonAnalyze) {
+        break;
+    case 2:
         newForm = m_formAnalyze;
-    } else if (button == ui->buttonDiagnose) {
+        break;
+    case 3:
         newForm = m_formDiagnose;
-    } else if (button == ui->buttonOptions) {
+        break;
+    case 4:
         newForm = m_formOptions;
-    } else if (button == ui->buttonAbout) {
+        break;
+    case 5:
         newForm = m_formAbout;
-    } else {
-        qWarning() << "Unknown Form:" << button;
+        break;
+    default:
+        qWarning() << "Unknown Form:" << formId;
         Q_ASSERT(false);
         return;
     }
@@ -93,7 +110,7 @@ void MainWindow::showForm()
     } else if (m_currentForm == m_formAbout) {
         qDebug() << "Close form \"About\"";
     } else {
-        qWarning() << "Unknown Form:" << button;
+        qWarning() << "Unknown Form:" << formId;
         Q_ASSERT(false);
         return;
     }
@@ -114,7 +131,7 @@ void MainWindow::showForm()
     } else if (m_currentForm == m_formAbout) {
         qDebug() << "Open form \"About\"";
     } else {
-        qWarning() << "Unknown Form:" << button;
+        qWarning() << "Unknown Form:" << formId;
         Q_ASSERT(false);
         return;
     }

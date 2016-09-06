@@ -26,7 +26,7 @@ public:
     ~MainWindow();
     
 private slots:
-    void showForm();
+    void showForm(int formId);
     
 private:
     Ui::MainWindow *ui;
