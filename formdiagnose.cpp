@@ -364,16 +364,39 @@ void FormDiagnose::saveMeasures()
         qDebug() << "There are no changes. Do not store diagnostic data";
         return;
     }
-    // TODO add save filedialog
+
+    QFileDialog dialog(this);
+    dialog.setWindowTitle(tr("Save Diagnostic Results"));
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilter(tr("Images (*.tif *.tiff)"));
+    if (dialog.exec() != QDialog::Accepted) {
+        qDebug() << "Diagnostic results saving is discarded";
+        return;
+    }
+    QStringList files = dialog.selectedFiles();
+    if (files.count() != 1) {
+        qWarning() << "Incorrect selected dir for store diagnostic results:" << files;
+        Q_ASSERT(false);
+        return;
+    }
+    QString filePath = files.first();
+    if (!filePath.endsWith(".tif", Qt::CaseInsensitive)
+        && !filePath.endsWith(".tiff", Qt::CaseInsensitive)) {
+        filePath.append(".tiff");
+    }
+
     ImageTiff tiff;
     QImage boardPhoto;
     QImage boardPhotoWithMarkers;
     ui->boardView->getBoardPhoto(boardPhoto, boardPhotoWithMarkers);
-    // TODO save in ascending order
     // TODO display measure environment on the testpoint's signature
+    QMap<int, TestpointMeasure> sortedTestpoints;
+    foreach (const TestpointMeasure &pt, m_testpoints.values()) {
+        sortedTestpoints.insert(pt.id, pt);
+    }
     QList<TestpointMeasure> savedTestpoints;
-    savedTestpoints = m_testpoints.values();
-    tiff.writeImageSeries(m_boardPhotoPath + ".tiff", boardPhoto, boardPhotoWithMarkers, savedTestpoints);
+    savedTestpoints = sortedTestpoints.values();
+    tiff.writeImageSeries(filePath, boardPhoto, boardPhotoWithMarkers, savedTestpoints);
     
     freezeForm(false);
 }
