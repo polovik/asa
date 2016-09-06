@@ -1,0 +1,18 @@
+Source: asa
+Section: electronics
+Priority: optional
+Maintainer: dima <decobramegra@gmail.com>
+Build-Depends: debhelper (>= 8.0.0), qt5-default, qttools5-dev-tools, qtmultimedia5-dev
+Standards-Version: 3.9.4
+Homepage: https://github.com/polovik/asa
+Vcs-Git: https://github.com/polovik/asa
+Vcs-Browser: https://github.com/polovik/asa
+
+Package: asa
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: analog signature analizer
+ This utility is used for create signatures for black boxes on pins
+ and then match with another boxes.
+ .
+ It needs to create additianal schematic to perform diagnose.
