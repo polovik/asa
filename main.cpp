@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_WIN
         logStream = _wfopen(g_logFilePath.toStdWString().c_str(), L"w");
 #else
+        // TODO move log to the /var/log/
         logStream = fopen(g_logFilePath.toUtf8().data(), "w");
 #endif
     } else {
@@ -75,7 +76,7 @@ int main(int argc, char *argv[])
     QTranslator translator;
     Settings *settings = Settings::getSettings();
     QString locale = settings->value("Global/Locale", "en_US").toString();
-    QString filename = QString("languages%1lang_%2").arg(QDir::separator()).arg(locale);
+    QString filename = QString(":/languages%1lang_%2").arg(QDir::separator()).arg(locale);
     if (translator.load(filename) ){
         QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
         qDebug() << "Translation file loaded" << filename;

@@ -15,7 +15,6 @@
         <file>icons/speaker.ico</file>
         <file>icons/flag_russian_federation.ico</file>
         <file>icons/flag_united_states_of_america_usa.ico</file>
-        <file>icons/app_icon.png</file>
         <file>icons/minus.ico</file>
         <file>icons/plus.ico</file>
         <file>icons/fit_to_width.ico</file>
@@ -25,5 +24,8 @@
         <file>icons/diagram_v2_14.ico</file>
         <file>icons/get_info.ico</file>
         <file>icons/application_x_desktop.ico</file>
+        <file>languages/lang_ru_RU.qm</file>
+        <file>languages/lang_en_US.qm</file>
+        <file>icons/asa.png</file>
     </qresource>
 </RCC>

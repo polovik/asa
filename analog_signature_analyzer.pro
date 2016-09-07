@@ -2,11 +2,10 @@ QT       += core gui multimedia printsupport multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = analog_signature_analyzer
+TARGET = asa
 VERSION = 1.0.0
 
 TEMPLATE = app
-DESTDIR = ../build
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 SOURCES += main.cpp\
@@ -79,8 +78,15 @@ win32 {
 }
 unix {
     # TODO try to use zlib from system's filesystem
+    # TODO try to use tiff from system's filesystem
     INCLUDEPATH += $$PWD/zlib
     include($$PWD/zlib/zlib.pri)
+
+    system(lupdate -verbose . -ts languages/lang_ru_RU.ts)
+    system(lupdate -verbose . -ts languages/lang_en_US.ts)
+    system(lrelease languages/lang_ru_RU.ts languages/lang_ru_RU.qm)
+    system(lrelease languages/lang_en_US.ts languages/lang_en_US.qm)
+    system(desktop-file-validate asa.desktop)
 }
 
 include($$PWD/tiff/libtiff.pri)
@@ -96,18 +102,27 @@ win32 {
 
 # DEPLOY
 unix {
-    system(mkdir -p $${DESTDIR}/languages)
-    system(lupdate -verbose . -ts languages/lang_ru_RU.ts)
-    system(lupdate -verbose . -ts languages/lang_en_US.ts)
-    system(lrelease languages/lang_ru_RU.ts languages/lang_ru_RU.qm)
-    system(lrelease languages/lang_en_US.ts languages/lang_en_US.qm)
-    system(cp languages/*.qm $${DESTDIR}/languages/)
-    first.commands = @echo ************Deploy application************ $$escape_expand(\n\t) \
-                     cp $${PWD}/icons/app_icon.png $${DESTDIR} $$escape_expand(\n\t) \
-                     cp $${PWD}/asa.desktop $${DESTDIR}
-    QMAKE_EXTRA_TARGETS += first
+    isEmpty(PREFIX) {
+        PREFIX = /usr
+    }
+    BINDIR = $$PREFIX/bin
+    DATADIR = $$PREFIX/share
+#    first.commands = @echo ************Deploy application************ $$escape_expand(\n\t) \
+#                     cp $${PWD}/icons/app_icon.png $${DESTDIR} $$escape_expand(\n\t) \
+#                     cp $${PWD}/asa.desktop $${DESTDIR}
+#    QMAKE_EXTRA_TARGETS += first
+
+    target.path =$$BINDIR/
+    desktop.path = $$DATADIR/applications/
+    desktop.files += asa.desktop
+    iconPixmap.path = $$DATADIR/pixmaps/
+    iconPixmap.files += icons/asa.png
+#    icon64.path = $$DATADIR/icons/hicolor/64x64/apps
+#    icon64.files += ../data/64x64/$${TARGET}.png
+    INSTALLS += target desktop iconPixmap
 }
 win32 {
+    DESTDIR = ../build
     translationsSource = $$PWD/languages
     translationsSource = $$replace(translationsSource, /, \\)
     resourcesTarget = $$DESTDIR

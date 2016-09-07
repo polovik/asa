@@ -335,6 +335,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
     <message>
         <location filename="../formdiagnose.cpp" line="152"/>
         <location filename="../formdiagnose.cpp" line="186"/>
+        <location filename="../formdiagnose.cpp" line="371"/>
         <source>Images (*.tif *.tiff)</source>
         <translation>Изображения (*.tif *.tiff)</translation>
     </message>
@@ -342,6 +343,11 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <location filename="../formdiagnose.cpp" line="184"/>
         <source>Open board by photo</source>
         <translation>Открыть плату по фотографии</translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="369"/>
+        <source>Save Diagnostic Results</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -484,33 +490,33 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation>Аналоговый сигнатурный анализатор</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="75"/>
+        <location filename="../mainwindow.cpp" line="21"/>
         <source>Calibration</source>
         <translation>Калибровка</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="101"/>
+        <location filename="../mainwindow.cpp" line="22"/>
         <source>Raw</source>
         <translation>Ручной
 режим</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="124"/>
+        <location filename="../mainwindow.cpp" line="23"/>
         <source>Analyze</source>
         <translation>Анализ</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="147"/>
+        <location filename="../mainwindow.cpp" line="24"/>
         <source>Diagnose</source>
         <translation>Диагностика</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="183"/>
+        <location filename="../mainwindow.cpp" line="25"/>
         <source>Options</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="206"/>
+        <location filename="../mainwindow.cpp" line="26"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>

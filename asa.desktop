@@ -1,7 +1,8 @@
 [Desktop Entry]
 Type=Application
-Name=asa
-Icon=/home/dima/tmp/build/app_icon.png
-TryExec=/home/dima/tmp/build/analog_signature_analyzer
-Exec=/home/dima/tmp/build/analog_signature_analyzer
+Name=Analog signature analyzer
+Icon=asa
+TryExec=/usr/bin/asa
+Exec=/usr/bin/asa
 Terminal=false
+Categories=Utility;Electronics;

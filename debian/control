@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/polovik/asa
 
 Package: asa
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5multimediawidgets5, libqt5multimedia5-plugins
 Description: analog signature analizer
  This utility is used for create signatures for black boxes on pins
  and then match with another boxes.
