@@ -2,7 +2,10 @@
 #define FORMDIAGNOSE_H
 
 #include <QWidget>
+#include <QMap>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
 #include <QCameraInfo>
+#endif
 #include "common_types.h"
 
 namespace Ui
@@ -47,7 +50,11 @@ private:
     void freezeForm(bool changesNotStored);
     
     Ui::FormDiagnose *ui;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     QList<QCameraInfo> m_camerasList;
+#else
+    QList<QByteArray> m_camerasList;
+#endif
     QDialog *m_dialogCamera;
     QString m_boardPhotoPath;
     bool m_needSave;

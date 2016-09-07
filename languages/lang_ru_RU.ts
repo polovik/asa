@@ -328,24 +328,24 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation>Отменить изменения</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="150"/>
+        <location filename="../formdiagnose.cpp" line="166"/>
         <source>Save Photo</source>
         <translation>Сохранить фотографию</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="152"/>
-        <location filename="../formdiagnose.cpp" line="186"/>
-        <location filename="../formdiagnose.cpp" line="371"/>
+        <location filename="../formdiagnose.cpp" line="168"/>
+        <location filename="../formdiagnose.cpp" line="202"/>
+        <location filename="../formdiagnose.cpp" line="387"/>
         <source>Images (*.tif *.tiff)</source>
         <translation>Изображения (*.tif *.tiff)</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="184"/>
+        <location filename="../formdiagnose.cpp" line="200"/>
         <source>Open board by photo</source>
         <translation>Открыть плату по фотографии</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="369"/>
+        <location filename="../formdiagnose.cpp" line="385"/>
         <source>Save Diagnostic Results</source>
         <translation type="unfinished"></translation>
     </message>

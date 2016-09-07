@@ -1,7 +1,9 @@
 #include "formdiagnose.h"
 #include "ui_formdiagnose.h"
 #include <QCamera>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
 #include <QCameraInfo>
+#endif
 #include <QDebug>
 #include <QCameraViewfinder>
 #include <QDialog>
@@ -25,12 +27,21 @@ FormDiagnose::FormDiagnose(ToneGenerator *gen, AudioInputThread *capture, QWidge
     m_capture = capture;
     m_dialogCamera = NULL;
     
+#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     m_camerasList = QCameraInfo::availableCameras();
     foreach(const QCameraInfo &cameraInfo, m_camerasList) {
         qDebug() << "Found camera:" << cameraInfo.deviceName() << cameraInfo.description()
                  << cameraInfo.orientation() << cameraInfo.position();
         ui->boxCameras->addItem(cameraInfo.description(), QVariant(cameraInfo.deviceName()));
     }
+#else
+    m_camerasList = QCamera::availableDevices();
+    foreach(const QByteArray &cameraDevice, m_camerasList) {
+        QString description = QCamera::deviceDescription(cameraDevice);
+        qDebug() << "Found camera:" << cameraDevice << description;
+        ui->boxCameras->addItem(description, QVariant(cameraDevice));
+    }
+#endif
     if (m_camerasList.count() > 0) {
         switchCamera(0);
         ui->buttonCamera->setEnabled(true);
@@ -111,8 +122,13 @@ void FormDiagnose::showCamera()
     vboxLayout->addLayout(hboxLayout, 0);
     qDebug() << "Dialog for grab a photo is opened";
     
+#if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     QCameraInfo info = m_camerasList.at(ui->boxCameras->currentIndex());
     QCamera *camera = new QCamera(info, m_dialogCamera);
+#else
+    QByteArray deviceName = m_camerasList.at(ui->boxCameras->currentIndex());
+    QCamera *camera = new QCamera(deviceName, m_dialogCamera);
+#endif
     camera->setViewfinder(cameraVideo);
     
     QCameraImageCapture *imageCapture = new QCameraImageCapture(camera);
