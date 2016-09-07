@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_WIN
         logStream = _wfopen(g_logFilePath.toStdWString().c_str(), L"w");
 #else
-        // TODO move log to the /var/log/
+        // for Linux - log file will be put in a User's home directory
         logStream = fopen(g_logFilePath.toUtf8().data(), "w");
 #endif
     } else {

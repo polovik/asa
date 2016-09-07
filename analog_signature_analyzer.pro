@@ -69,7 +69,8 @@ DISTFILES += \
     icons/license.txt \
     asa.desktop \
     languages/lang_ru_RU.ts \
-    languages/lang_en_US.ts
+    languages/lang_en_US.ts \
+    prepare_deb_package.sh
 
 win32 {
     LIBS += -L$$PWD/zlib/win32-compiled/lib/ -lzdll
@@ -159,8 +160,8 @@ win32 {
     system(xcopy /V /R /Y "%QTDIR%\bin\libstdc++-6.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\bin\icu*.dll" $$resourcesTarget)
     system(xcopy /V /R /Y "%QTDIR%\plugins\audio\qtaudio_windows.dll" $$resourcesTarget\audio\\)
-    system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qminimal.dll" $$resourcesTarget\platforms\\)
-    system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qoffscreen.dll" $$resourcesTarget\platforms\\)
+#    system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qminimal.dll" $$resourcesTarget\platforms\\)
+#    system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qoffscreen.dll" $$resourcesTarget\platforms\\)
     system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qwindows.dll" $$resourcesTarget\platforms\\)
     system(xcopy /V /R /Y "%QTDIR%\plugins\imageformats\qico.dll" $$resourcesTarget\imageformats\\)
     system(xcopy /V /R /Y "%QTDIR%\plugins\printsupport\windowsprintersupport.dll" $$resourcesTarget\printsupport\\)
