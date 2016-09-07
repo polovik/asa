@@ -2,7 +2,7 @@ Source: asa
 Section: electronics
 Priority: optional
 Maintainer: dima <decobramegra@gmail.com>
-Build-Depends: debhelper (>= 8.0.0), qt5-default, qttools5-dev-tools, qtmultimedia5-dev
+Build-Depends: debhelper (>= 8.0.0), qtbase5-dev, qt5-default, qttools5-dev-tools, qtmultimedia5-dev
 Standards-Version: 3.9.4
 Homepage: https://github.com/polovik/asa
 Vcs-Git: https://github.com/polovik/asa
