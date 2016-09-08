@@ -9,6 +9,7 @@ cp debian/control ../home:polovik/asa/debian.control
 cp debian/rules ../home:polovik/asa/debian.rules
 cp debian/changelog ../home:polovik/asa/debian.changelog
 cp debian/compat ../home:polovik/asa/debian.compat
+cp rpm/asa.spec ../home:polovik/asa/asa.spec
 cp ../asa_1.0.0.orig.tar.gz ../home:polovik/asa/
 #        sudo apt-get install devscripts dpkg-dev fakeroot
 #        dpkg-source -x xxx.dsc
