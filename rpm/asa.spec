@@ -21,7 +21,11 @@ Group:          Productivity/Scientific/Electronics
 License:        MIT
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 #BuildArch:      noarch
+%if 0%{?suse_version}
+BuildRequires:  gcc-c++ libstdc++-devel libqt5-qtbase-devel libqt5-qtmultimedia-devel libqt5-linguist update-desktop-files
+%else
 BuildRequires:  gcc-c++ libstdc++-devel qt5-qtbase-devel qt5-qtmultimedia-devel qt5-linguist
+%endif
 Source:         %{name}_%{version}.orig.tar.gz
 #Source0:        https://github.com/polovik/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Summary:        Analog signature analyzer
@@ -54,6 +58,9 @@ make
 rm -Rf "%buildroot";
 mkdir "%buildroot";
 make INSTALL_ROOT="%buildroot" install
+%if 0%{?suse_version}
+%suse_update_desktop_file -u -r -G 'Analog signature analyzer' %{buildroot}%{_datadir}/applications/%{name}.desktop Science Engineering
+%endif
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
