@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     formabout.cpp \
     widgets/FancyTabBar/fancytab.cpp \
     widgets/FancyTabBar/fancytabbar.cpp \
-    widgets/FancyTabBar/stylehelper.cpp
+    widgets/FancyTabBar/stylehelper.cpp \
+    tiff/imagetiff.cpp
 
 HEADERS  += mainwindow.h \
     devices/tonegenerator.h \
@@ -53,7 +54,8 @@ HEADERS  += mainwindow.h \
     formabout.h \
     widgets/FancyTabBar/fancytab.h \
     widgets/FancyTabBar/fancytabbar.h \
-    widgets/FancyTabBar/stylehelper.h
+    widgets/FancyTabBar/stylehelper.h \
+    tiff/imagetiff.h
 
 FORMS    += mainwindow.ui \
     formcalibration.ui \
@@ -78,12 +80,11 @@ win32 {
     LIBS += -L$$PWD/zlib/win32-compiled/lib/ -lzdll
     INCLUDEPATH += $$PWD/zlib/win32-compiled/include
     DEPENDPATH += $$PWD/zlib/win32-compiled/include
+    # TODO try to use precompiled tiff
+#    include($$PWD/tiff/libtiff.pri)
 }
 unix {
-    # TODO try to use zlib from system's filesystem
-    # TODO try to use tiff from system's filesystem
-    INCLUDEPATH += $$PWD/zlib
-    include($$PWD/zlib/zlib.pri)
+    LIBS += -lz -ltiff
 
     system(lupdate -verbose . -ts languages/lang_ru_RU.ts)
     system(lupdate -verbose . -ts languages/lang_en_US.ts)
@@ -91,8 +92,6 @@ unix {
     system(lrelease languages/lang_en_US.ts languages/lang_en_US.qm)
     system(desktop-file-validate asa.desktop)
 }
-
-include($$PWD/tiff/libtiff.pri)
 
 QMAKE_CXXFLAGS += -std=c++0x
 

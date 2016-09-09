@@ -2,7 +2,7 @@ Source: asa
 Section: electronics
 Priority: optional
 Maintainer: dima <decobramegra@gmail.com>
-Build-Depends: debhelper (>= 8.0.0), qtbase5-dev, qt5-default, qttools5-dev-tools, qtmultimedia5-dev
+Build-Depends: debhelper (>= 8.0.0), qtbase5-dev, qt5-default, qttools5-dev-tools, qtmultimedia5-dev, libtiff5-dev
 Standards-Version: 3.9.4
 Homepage: https://github.com/polovik/asa
 Vcs-Git: https://github.com/polovik/asa
@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/polovik/asa
 
 Package: asa
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5printsupport5, libqt5multimediawidgets5, libqt5multimedia5-plugins
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqt5printsupport5, libqt5multimediawidgets5, libqt5multimedia5-plugins, libtiff5
 Description: analog signature analizer
  This utility is used for create signatures for black boxes on pins
  and then match with another boxes.

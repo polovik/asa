@@ -22,9 +22,9 @@ License:        MIT
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 #BuildArch:      noarch
 %if 0%{?suse_version}
-BuildRequires:  gcc-c++ libstdc++-devel libqt5-qtbase-devel libqt5-qtmultimedia-devel libqt5-linguist update-desktop-files
+BuildRequires:  gcc-c++ libstdc++-devel libqt5-qtbase-devel libqt5-qtmultimedia-devel libqt5-linguist update-desktop-files zlib-devel libtiff-devel
 %else
-BuildRequires:  gcc-c++ libstdc++-devel qt5-qtbase-devel qt5-qtmultimedia-devel qt5-linguist
+BuildRequires:  gcc-c++ libstdc++-devel qt5-qtbase-devel qt5-qtmultimedia-devel qt5-linguist libtiff-devel
 %endif
 Source:         %{name}_%{version}.orig.tar.gz
 #Source0:        https://github.com/polovik/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
