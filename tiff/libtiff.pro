@@ -1,3 +1,7 @@
+TARGET = tiff
+VERSION = 4.0.6
+TEMPLATE = lib
+
 INCLUDEPATH += $$PWD/libtiff/libtiff
 SOURCES += \
     $$PWD/libtiff/libtiff/tif_aux.c \
@@ -33,13 +37,26 @@ SOURCES += \
     $$PWD/libtiff/libtiff/tif_warning.c \
     $$PWD/libtiff/libtiff/tif_write.c \
     $$PWD/libtiff/libtiff/tif_zip.c \
-    $$PWD/libtiff/port/snprintf.c \
-    $$PWD/imagetiff.cpp
+    $$PWD/libtiff/port/snprintf.c
 
 wince*:       SOURCES += $$PWD/libtiff/libtiff/tif_win32.c
 win32:        SOURCES += $$PWD/libtiff/libtiff/tif_win32.c
 else:         SOURCES += $$PWD/libtiff/libtiff/tif_unix.c
 android:      SOURCES += $$PWD/libtiff/port/lfind.c
 
-HEADERS += \
-    $$PWD/imagetiff.h
+win32 {
+    LIBS += -L$$PWD/../zlib/win32-compiled/lib/ -lzdll
+    INCLUDEPATH += $$PWD/../zlib/win32-compiled/include
+    DEPENDPATH += $$PWD/../zlib/win32-compiled/include
+    CONFIG(release) {
+        DESTDIR = ../build
+        destFolder = $$DESTDIR
+        destFolder = $$replace(destFolder, /, \\)
+        includeFolder = $$PWD/libtiff/libtiff
+        includeFolder = $$replace(includeFolder, /, \\)
+        system(xcopy /V /R /Y $$includeFolder\tiff.h $$destFolder)
+        system(xcopy /V /R /Y $$includeFolder\tiffconf.h $$destFolder)
+        system(xcopy /V /R /Y $$includeFolder\tiffio.h $$destFolder)
+        system(xcopy /V /R /Y $$includeFolder\tiffvers.h $$destFolder)
+    }
+}
