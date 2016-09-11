@@ -15,11 +15,12 @@ init:
   - if %APPVEYOR_REPO_TAG%==true (set nogitinfo=ON) else (set nogitinfo=OFF)
 
 install:
+  - cd ../
   - git clone https://github.com/polovik/3rd-party.git
   - cd 3rd-party/libtiff
   - qmake libtiff.pro
   - mingw32-make -j 4
-  - cd ../..
+  - cd ../../asa/
 
 build_script:
   - qmake analog_signature_analyzer.pro
