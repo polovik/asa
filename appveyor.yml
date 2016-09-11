@@ -14,6 +14,12 @@ init:
   - set makefiles="MinGW Makefiles"
   - if %APPVEYOR_REPO_TAG%==true (set nogitinfo=ON) else (set nogitinfo=OFF)
 
+install:
+  - git clone https://github.com/polovik/3rd-party.git
+  - cd 3rd-party/libtiff
+  - qmake libtiff.pro
+  - mingw32-make -j 4
+
 build_script:
   - qmake analog_signature_analyzer.pro
   - mingw32-make -j 4
