@@ -11,6 +11,7 @@ init:
   - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
   - set PATH=C:\Qt\Tools\mingw492_32\bin;%PATH%
   - set PATH=C:\Qt\%qt%\bin;%PATH%
+  - set QTDIR=C:\Qt\%qt%
   - set makefiles="MinGW Makefiles"
   - if %APPVEYOR_REPO_TAG%==true (set nogitinfo=ON) else (set nogitinfo=OFF)
 
