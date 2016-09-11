@@ -77,11 +77,15 @@ DISTFILES += \
     prepare_deb_package.sh
 
 win32 {
-    LIBS += -L$$PWD/zlib/win32-compiled/lib/ -lzdll
-    INCLUDEPATH += $$PWD/zlib/win32-compiled/include
-    DEPENDPATH += $$PWD/zlib/win32-compiled/include
-    # TODO try to use precompiled tiff
-#    include($$PWD/tiff/libtiff.pri)
+    # zlib
+    LIBS += -L$$PWD/../3rd-party/zlib/lib/ -lzdll
+    INCLUDEPATH += $$PWD/../3rd-party/zlib/include
+    DEPENDPATH += $$PWD/../3rd-party/zlib/include
+    # libtiff
+    LIBS += -L$$PWD/../3rd-party/libtiff-build/ -ltiff4
+    INCLUDEPATH += $$PWD/../3rd-party/libtiff-build/include
+    DEPENDPATH += $$PWD/../3rd-party/libtiff-build/include
+    # TODO inform user if these libs are missed - hint him where the libs may be downloaded
 }
 unix {
     LIBS += -lz -ltiff
@@ -139,10 +143,13 @@ win32 {
     system(xcopy /Y /R /V $$translationsSource\\lang_en_US.qm $$resourcesTarget\\languages\\)
     debug_bat = $$PWD/run_debug_version.bat
     debug_bat = $$replace(debug_bat, /, \\)
-    zlib_dll = $$PWD/zlib/win32-compiled/zlib1.dll
+    zlib_dll = $$PWD/../3rd-party/zlib/zlib1.dll
     zlib_dll = $$replace(zlib_dll, /, \\)
+    tiff_dll = $$PWD/../3rd-party/libtiff-build/tiff4.dll
+    tiff_dll = $$replace(tiff_dll, /, \\)
     system(xcopy /V /R /Y $$debug_bat $$resourcesTarget)
     system(xcopy /V /R /Y $$zlib_dll $$resourcesTarget)
+    system(xcopy /V /R /Y $$tiff_dll $$resourcesTarget)
 
     # Qt libraries
 #    first.commands = @echo ************Copy libraries************ $$escape_expand(\n\t) \
