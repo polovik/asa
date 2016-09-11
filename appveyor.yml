@@ -4,12 +4,12 @@ environment:
   # MinGW
   - name: win32
     platform: mingw
-    qt: 5.6\mingw49_32
+    qt: 5.4\mingw491_32
     suffix: mingw
 
 init:
   - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
-  - set PATH=C:\Qt\Tools\mingw492_32\bin;%PATH%
+  - set PATH=C:\Qt\Tools\mingw491_32\bin;%PATH%
   - set PATH=C:\Qt\%qt%\bin;%PATH%
   - set QTDIR=C:\Qt\%qt%
   - set makefiles="MinGW Makefiles"
@@ -20,12 +20,12 @@ install:
   - git clone https://github.com/polovik/3rd-party.git
   - cd 3rd-party/libtiff
   - qmake libtiff.pro
-  - mingw32-make -j 4
+  - mingw32-make -j 2
   - cd ../../asa/
 
 build_script:
   - qmake analog_signature_analyzer.pro
-  - mingw32-make -j 4
+  - mingw32-make -j 2
 
 after_build:
   - set buildname=asa-%APPVEYOR_BUILD_VERSION%_%APPVEYOR_REPO_COMMIT:~0,7%
