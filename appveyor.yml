@@ -27,3 +27,10 @@ build_script:
   - qmake analog_signature_analyzer.pro
   - mingw32-make -j 4
 
+after_build:
+  - cd ../
+  - set buildname=asa-%APPVEYOR_BUILD_NUMBER%_%APPVEYOR_REPO_COMMIT:~0,7%
+  - 7z a -tzip %buildname%_%name%.zip build\*
+
+artifacts:
+  - path: '*.zip'
