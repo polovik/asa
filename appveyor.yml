@@ -19,6 +19,7 @@ install:
   - cd 3rd-party/libtiff
   - qmake libtiff.pro
   - mingw32-make -j 4
+  - cd ../..
 
 build_script:
   - qmake analog_signature_analyzer.pro
