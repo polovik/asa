@@ -85,7 +85,12 @@ win32 {
     LIBS += -L$$PWD/../3rd-party/libtiff-build/ -ltiff4
     INCLUDEPATH += $$PWD/../3rd-party/libtiff-build/include
     DEPENDPATH += $$PWD/../3rd-party/libtiff-build/include
-    # TODO inform user if these libs are missed - hint him where the libs may be downloaded
+    # inform user if these libs are missed
+    !exists($$PWD/../3rd-party/zlib/zlib1.dll) | !exists($$PWD/../3rd-party/libtiff-build/tiff4.dll) {
+        message("Seems like \"3rd-party\" folder is missed.")
+        message("Check if https://github.com/polovik/3rd-party is cloned and built.")
+        error("Some required libraries are missed.")
+}
 }
 unix {
     LIBS += -lz -ltiff
@@ -152,25 +157,23 @@ win32 {
     system(xcopy /V /R /Y $$tiff_dll $$resourcesTarget)
 
     # Qt libraries
-#    first.commands = @echo ************Copy libraries************ $$escape_expand(\n\t) \
-#                     windeployqt $${DESTDIR} $$escape_expand(\n\t)
-#    QMAKE_EXTRA_TARGETS += first
-    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Core.dll" $$resourcesTarget)
-    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Gui.dll" $$resourcesTarget)
-    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5PrintSupport.dll" $$resourcesTarget)
-    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Multimedia.dll" $$resourcesTarget)
-    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5MultimediaWidgets.dll" $$resourcesTarget)
-    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Network.dll" $$resourcesTarget)
-    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Widgets.dll" $$resourcesTarget)
-    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5OpenGL.dll" $$resourcesTarget)
-    system(xcopy /V /R /Y "%QTDIR%\bin\libgcc_s_dw2-1.dll" $$resourcesTarget)
-    system(xcopy /V /R /Y "%QTDIR%\bin\libwinpthread-1.dll" $$resourcesTarget)
-    system(xcopy /V /R /Y "%QTDIR%\bin\libstdc++-6.dll" $$resourcesTarget)
-    system(xcopy /V /R /Y "%QTDIR%\bin\icu*.dll" $$resourcesTarget)
-    system(xcopy /V /R /Y "%QTDIR%\plugins\audio\qtaudio_windows.dll" $$resourcesTarget\audio\\)
-#    system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qminimal.dll" $$resourcesTarget\platforms\\)
-#    system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qoffscreen.dll" $$resourcesTarget\platforms\\)
-    system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qwindows.dll" $$resourcesTarget\platforms\\)
-    system(xcopy /V /R /Y "%QTDIR%\plugins\imageformats\qico.dll" $$resourcesTarget\imageformats\\)
-    system(xcopy /V /R /Y "%QTDIR%\plugins\printsupport\windowsprintersupport.dll" $$resourcesTarget\printsupport\\)
+    first.commands = @echo ************Copy libraries************ $$escape_expand(\n\t) \
+                     windeployqt --no-translations $${DESTDIR} $$escape_expand(\n\t)
+    QMAKE_EXTRA_TARGETS += first
+#    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Core.dll" $$resourcesTarget)
+#    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Gui.dll" $$resourcesTarget)
+#    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5PrintSupport.dll" $$resourcesTarget)
+#    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Multimedia.dll" $$resourcesTarget)
+#    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5MultimediaWidgets.dll" $$resourcesTarget)
+#    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Network.dll" $$resourcesTarget)
+#    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5Widgets.dll" $$resourcesTarget)
+#    system(xcopy /V /R /Y "%QTDIR%\bin\Qt5OpenGL.dll" $$resourcesTarget)
+#    system(xcopy /V /R /Y "%QTDIR%\bin\libgcc_s_dw2-1.dll" $$resourcesTarget)
+#    system(xcopy /V /R /Y "%QTDIR%\bin\libwinpthread-1.dll" $$resourcesTarget)
+#    system(xcopy /V /R /Y "%QTDIR%\bin\libstdc++-6.dll" $$resourcesTarget)
+#    system(xcopy /V /R /Y "%QTDIR%\bin\icu*.dll" $$resourcesTarget)
+#    system(xcopy /V /R /Y "%QTDIR%\plugins\audio\qtaudio_windows.dll" $$resourcesTarget\audio\\)
+#    system(xcopy /V /R /Y "%QTDIR%\plugins\platforms\qwindows.dll" $$resourcesTarget\platforms\\)
+#    system(xcopy /V /R /Y "%QTDIR%\plugins\imageformats\qico.dll" $$resourcesTarget\imageformats\\)
+#    system(xcopy /V /R /Y "%QTDIR%\plugins\printsupport\windowsprintersupport.dll" $$resourcesTarget\printsupport\\)
 }
