@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     widgets/FancyTabBar/fancytab.cpp \
     widgets/FancyTabBar/fancytabbar.cpp \
     widgets/FancyTabBar/stylehelper.cpp \
-    tiff/imagetiff.cpp
+    tiff/imagetiff.cpp \
+    widgets/oscilloscopeengine.cpp
 
 HEADERS  += mainwindow.h \
     devices/tonegenerator.h \
@@ -55,7 +56,8 @@ HEADERS  += mainwindow.h \
     widgets/FancyTabBar/fancytab.h \
     widgets/FancyTabBar/fancytabbar.h \
     widgets/FancyTabBar/stylehelper.h \
-    tiff/imagetiff.h
+    tiff/imagetiff.h \
+    widgets/oscilloscopeengine.h
 
 FORMS    += mainwindow.ui \
     formcalibration.ui \
