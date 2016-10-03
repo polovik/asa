@@ -32,6 +32,8 @@ void AudioOutputDevice::configure(const QAudioFormat &format, qint32 frequency,
     m_activeChannels = activeChannels;
     m_volume = volume;
     m_sampleIndex = 0;
+    // flush old audio samples from the QIODevice's buffer
+    reset();
     qDebug() << "Configure tone generator: frequency" << m_frequency
              << "waveform" << form << "active channels" << m_activeChannels
              << "current volume" << m_volume
@@ -320,6 +322,7 @@ void ToneGenerator::run()
         if (!m_generationEnabled) {
             if (generationStarted == true) {
                 qDebug() << "Stop tone generation";
+                m_audioOutput->reset();
                 m_audioOutput->disconnect();
                 m_audioOutput->stop();
                 m_audioOutput->deleteLater();
@@ -331,6 +334,7 @@ void ToneGenerator::run()
         if (generationStarted == false) {
             qDebug() << "Start tone generation";
             m_audioOutput = new QAudioOutput(m_curAudioDeviceInfo, m_audioFormat);
+            m_audioOutput->reset();
             connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), SLOT(stateChanged(QAudio::State)));
             m_outputBuffer->configure(m_audioFormat, m_toneFrequency, m_waveForm, m_activeChannels, m_relativeAmplitude);
             m_audioOutput->start(m_outputBuffer);
