@@ -3,6 +3,7 @@
 #include "ui_formcalibration.h"
 #include "devices/tonegenerator.h"
 #include "devices/audioinputdevice.h"
+#include "widgets/oscilloscopeengine.h"
 
 FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent) :
     QWidget(parent),
@@ -57,7 +58,11 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
             SLOT(captureDeviceInitiated(int)), Qt::QueuedConnection);   // wait while main window initiated
     connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList, SamplesList)),
             this, SLOT(processOscilloscopeData(SamplesList, SamplesList)));
-            
+
+    m_oscEngine = new OscilloscopeEngine(ui->oscilloscope);
+    m_oscEngine->setTriggerMode(TRIG_AUTO);
+    m_oscEngine->setDisplayedChannels(CHANNEL_BOTH);
+
     qreal magnitude = m_gen->getMaxVoltageAmplitude();
     connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
     connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
@@ -80,6 +85,7 @@ void FormCalibration::leaveForm()
     ui->buttonLeftOutputChannel->setChecked(false);
     ui->buttonRightOutputChannel->setChecked(false);
     ui->buttonCalibrate->setChecked(false);
+    m_oscEngine->stop();
 }
 
 void FormCalibration::switchOutputAudioDevice(int index)
@@ -140,6 +146,7 @@ void FormCalibration::captureDeviceInitiated(int samplingRate)
     // Audio device ready to capture - display this
     ui->viewLeftChannelLevel->setSamplingRate(samplingRate);
     ui->viewRightChannelLevel->setSamplingRate(samplingRate);
+    m_oscEngine->prepareToStart(samplingRate);
     Q_ASSERT(m_capture);
     m_capture->setCapturedChannels(CHANNEL_BOTH);
 }
@@ -151,11 +158,7 @@ void FormCalibration::processOscilloscopeData(SamplesList leftChannelData, Sampl
     }
     ui->viewLeftChannelLevel->processSamples(leftChannelData);
     ui->viewRightChannelLevel->processSamples(rightChannelData);
-    QVector<double> voltage;
-    voltage = QVector<double>::fromList(leftChannelData);
-    QVector<double> current;
-    current = QVector<double>::fromList(rightChannelData);
-    ui->viewSignature->draw(voltage, current);
+    m_oscEngine->processOscilloscopeData(leftChannelData, rightChannelData);
 }
 
 void FormCalibration::runCalibration(bool start)
@@ -171,6 +174,9 @@ void FormCalibration::runCalibration(bool start)
     }
     m_capture->startCapturing(start);
     m_gen->runGenerator(start);
+    if (start == false) {
+        m_oscEngine->stop();
+    }
 }
 
 void FormCalibration::setGeneratorMagnitude(double voltage)
@@ -199,7 +205,7 @@ void FormCalibration::setGeneratorMagnitude(double voltage)
     m_gen->setMaxVoltageAmplitude(peak);
     m_gen->setCurVoltageAmplitude(peak);
     m_capture->setSensivity(peak);
-    ui->viewSignature->setMaximumAmplitude(peak);
+    m_oscEngine->setMaximumAmplitude(peak);
     ui->viewLeftChannelLevel->setMaximumAmplitude(peak);
     ui->viewRightChannelLevel->setMaximumAmplitude(peak);
 

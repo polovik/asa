@@ -128,6 +128,11 @@ void OscilloscopeEngine::setTriggerSlope(OscTriggerSlope slope)
     }
 }
 
+void OscilloscopeEngine::setMaximumAmplitude(qreal voltage)
+{
+    m_view->setYaxisRange(-voltage * 1.1, voltage * 1.1);
+}
+
 void OscilloscopeEngine::draw(AudioChannels channel, const QVector<double> &values)
 {
     QVector<double> keys;

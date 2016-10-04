@@ -19,6 +19,7 @@ public:
     void setTriggerChannel(AudioChannels channel);
     void setTriggerMode(OscTriggerMode mode);
     void setTriggerSlope(OscTriggerSlope slope);
+    void setMaximumAmplitude(qreal voltage);
 
 public slots:
     void processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData);

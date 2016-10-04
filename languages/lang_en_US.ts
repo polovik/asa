@@ -167,13 +167,13 @@
     </message>
     <message>
         <location filename="../formcalibration.ui" line="110"/>
-        <location filename="../formcalibration.ui" line="398"/>
+        <location filename="../formcalibration.ui" line="381"/>
         <source>Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="120"/>
-        <location filename="../formcalibration.ui" line="408"/>
+        <location filename="../formcalibration.ui" line="391"/>
         <source>Right</source>
         <translation type="unfinished"></translation>
     </message>
@@ -205,12 +205,12 @@ Vpk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="215"/>
+        <location filename="../formcalibration.cpp" line="227"/>
         <source>Perform calibration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="216"/>
+        <location filename="../formcalibration.cpp" line="228"/>
         <source>This area helps to adjust maximal voltage on audio input pins.
 Button pressing leads to play tone on left and right channel simultaneously.
 Tone is Sine 50Hz with maximal amplitude.
@@ -221,12 +221,12 @@ For correct signature displaying, it needs to specify range of axes.Measured vol
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="226"/>
+        <location filename="../formcalibration.cpp" line="238"/>
         <source>Play tone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="227"/>
+        <location filename="../formcalibration.cpp" line="239"/>
         <source>This buttons help to distinguish audio output pins.
 Button pressing leads to play tone on specific channel.
 Tone is Sine 50Hz with maximal amplitude.</source>

@@ -229,7 +229,9 @@ void OscilloscopeView::setTriggerLevel(double voltage)
 
 void OscilloscopeView::showTriggerLine(bool visible)
 {
+    m_triggerLevelLine->setSelectable(visible);
     m_triggerLevelLine->setVisible(visible);
+    m_triggerLevelText->setVisible(visible);
     replot();
 }
 

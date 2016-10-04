@@ -11,6 +11,7 @@ class FormCalibration;
 
 class ToneGenerator;
 class AudioInputThread;
+class OscilloscopeEngine;
 
 class FormCalibration : public QWidget
 {
@@ -37,6 +38,7 @@ private:
     Ui::FormCalibration *ui;
     ToneGenerator *m_gen;
     AudioInputThread *m_capture;
+    OscilloscopeEngine *m_oscEngine;
 };
 
 #endif // FORMCALIBRATION_H

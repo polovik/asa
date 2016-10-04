@@ -62,6 +62,8 @@ void FormRaw::enterForm()
     QString outputName = m_gen->getDeviceName();
     ui->labelAudioInputDevice->setText(inputName);
     ui->labelAudioOutputDevice->setText(outputName);
+    qreal max = m_gen->getMaxVoltageAmplitude();
+    m_oscEngine->setMaximumAmplitude(max);
 }
 
 void FormRaw::leaveForm()
