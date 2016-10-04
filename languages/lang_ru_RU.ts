@@ -255,12 +255,12 @@ Potentiometers on the board have to be adjusted for making the same voltage on b
 Переменные резисторы на плате должны быть подстроены для получения одинакового напряжения на обоих пинах входного аудио устройства.</translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="227"/>
+        <location filename="../formcalibration.cpp" line="229"/>
         <source>Perform calibration</source>
         <translation>Выполнение калибровки</translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="228"/>
+        <location filename="../formcalibration.cpp" line="230"/>
         <source>This area helps to adjust maximal voltage on audio input pins.
 Button pressing leads to play tone on left and right channel simultaneously.
 Tone is Sine 50Hz with maximal amplitude.
@@ -277,12 +277,12 @@ For correct signature displaying, it needs to specify range of axes.Measured vol
 - RMS - когда используется обычный вольтметр в режиме измерения ~U</translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="238"/>
+        <location filename="../formcalibration.cpp" line="240"/>
         <source>Play tone</source>
         <translation>Проиграть тоновый сигнал</translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="239"/>
+        <location filename="../formcalibration.cpp" line="241"/>
         <source>This buttons help to distinguish audio output pins.
 Button pressing leads to play tone on specific channel.
 Tone is Sine 50Hz with maximal amplitude.</source>
@@ -595,14 +595,14 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../widgets/oscilloscopeview.cpp" line="50"/>
         <location filename="../widgets/oscilloscopeview.cpp" line="156"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="283"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="326"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="285"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="328"/>
         <source>%1ms, %2V</source>
         <translation>%1мс, %2В</translation>
     </message>
     <message>
         <location filename="../widgets/oscilloscopeview.cpp" line="87"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="332"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="334"/>
         <source> ms</source>
         <translation> мс</translation>
     </message>
@@ -610,8 +610,8 @@ p, li { white-space: pre-wrap; }
         <location filename="../widgets/oscilloscopeview.cpp" line="109"/>
         <location filename="../widgets/oscilloscopeview.cpp" line="209"/>
         <location filename="../widgets/oscilloscopeview.cpp" line="214"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="277"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="312"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="279"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="314"/>
         <source> V</source>
         <translation> В</translation>
     </message>

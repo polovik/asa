@@ -104,7 +104,7 @@ unix {
     system(desktop-file-validate asa.desktop)
 }
 
-QMAKE_CXXFLAGS += -std=c++0x
+QMAKE_CXXFLAGS += -std=c++0x -Wall -Wpedantic -Wextra -Werror -pedantic-errors
 
 win32 {
     RC_ICONS += icons/app_icon.ico

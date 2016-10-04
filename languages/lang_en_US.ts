@@ -205,12 +205,12 @@ Vpk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="227"/>
+        <location filename="../formcalibration.cpp" line="229"/>
         <source>Perform calibration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="228"/>
+        <location filename="../formcalibration.cpp" line="230"/>
         <source>This area helps to adjust maximal voltage on audio input pins.
 Button pressing leads to play tone on left and right channel simultaneously.
 Tone is Sine 50Hz with maximal amplitude.
@@ -221,12 +221,12 @@ For correct signature displaying, it needs to specify range of axes.Measured vol
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="238"/>
+        <location filename="../formcalibration.cpp" line="240"/>
         <source>Play tone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="239"/>
+        <location filename="../formcalibration.cpp" line="241"/>
         <source>This buttons help to distinguish audio output pins.
 Button pressing leads to play tone on specific channel.
 Tone is Sine 50Hz with maximal amplitude.</source>
@@ -532,14 +532,14 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../widgets/oscilloscopeview.cpp" line="50"/>
         <location filename="../widgets/oscilloscopeview.cpp" line="156"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="283"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="326"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="285"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="328"/>
         <source>%1ms, %2V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../widgets/oscilloscopeview.cpp" line="87"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="332"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="334"/>
         <source> ms</source>
         <translation type="unfinished"></translation>
     </message>
@@ -547,8 +547,8 @@ p, li { white-space: pre-wrap; }
         <location filename="../widgets/oscilloscopeview.cpp" line="109"/>
         <location filename="../widgets/oscilloscopeview.cpp" line="209"/>
         <location filename="../widgets/oscilloscopeview.cpp" line="214"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="277"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="312"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="279"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="314"/>
         <source> V</source>
         <translation type="unfinished"></translation>
     </message>

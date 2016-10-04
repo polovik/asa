@@ -31,10 +31,13 @@ private slots:
     void captureDeviceInitiated(int samplingRate);
     void processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData);
     void runCalibration(bool start);
-    void setGeneratorMagnitude(double voltage);
     void showHint();
-    
+    void setGeneratorMagnitudePeak(double voltage);
+    void setGeneratorMagnitudeRMS(double voltage);
+
 private:
+    void setGeneratorMagnitude(qreal peak);
+
     Ui::FormCalibration *ui;
     ToneGenerator *m_gen;
     AudioInputThread *m_capture;

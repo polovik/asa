@@ -64,8 +64,12 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     m_oscEngine->setDisplayedChannels(CHANNEL_BOTH);
 
     qreal magnitude = m_gen->getMaxVoltageAmplitude();
-    connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
-    connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
+    double rms = magnitude / qSqrt(2);
+    ui->boxGeneratorPeak->setValue(magnitude);
+    ui->boxGeneratorRMS->setValue(rms);
+    qDebug() << "Load max generator voltage: Vpk" << magnitude << "Vrms" << rms;
+    connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitudePeak(double)));
+    connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitudeRMS(double)));
     setGeneratorMagnitude(magnitude);
 
     connect(ui->buttonHintCalibrate, SIGNAL(clicked()), this, SLOT(showHint()));
@@ -179,38 +183,42 @@ void FormCalibration::runCalibration(bool start)
     }
 }
 
-void FormCalibration::setGeneratorMagnitude(double voltage)
+void FormCalibration::setGeneratorMagnitudePeak(double voltage)
 {
     // for avoid recursion, stop processing signal "valueChanged" until UI boxes are updated
-    disconnect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
-    disconnect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
+    disconnect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitudeRMS(double)));
 
-    double peak = -1.;
-    double rms = -1.;
-    if (sender() == ui->boxGeneratorPeak) {
-        peak = voltage;
-        rms = peak / qSqrt(2);
-        ui->boxGeneratorRMS->setValue(rms);
-    } else if (sender() == ui->boxGeneratorRMS) {
-        rms = voltage;
-        peak = rms * qSqrt(2);
-        ui->boxGeneratorPeak->setValue(peak);
-    } else {
-        peak = voltage;
-        rms = peak / qSqrt(2);
-        ui->boxGeneratorPeak->setValue(peak);
-        ui->boxGeneratorRMS->setValue(rms);
-    }
+    double peak = voltage;
+    double rms = peak / qSqrt(2);
     qDebug() << "Set max generator voltage: Vpk" << peak << "Vrms" << rms;
+    ui->boxGeneratorRMS->setValue(rms);
+    setGeneratorMagnitude(peak);
+
+    connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitudeRMS(double)));
+}
+
+void FormCalibration::setGeneratorMagnitudeRMS(double voltage)
+{
+    // for avoid recursion, stop processing signal "valueChanged" until UI boxes are updated
+    disconnect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitudePeak(double)));
+
+    double rms = voltage;
+    double peak = rms * qSqrt(2);
+    qDebug() << "Set max generator voltage: Vpk" << peak << "Vrms" << rms;
+    ui->boxGeneratorPeak->setValue(peak);
+    setGeneratorMagnitude(peak);
+
+    connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitudePeak(double)));
+}
+
+void FormCalibration::setGeneratorMagnitude(qreal peak)
+{
     m_gen->setMaxVoltageAmplitude(peak);
     m_gen->setCurVoltageAmplitude(peak);
     m_capture->setSensivity(peak);
     m_oscEngine->setMaximumAmplitude(peak);
     ui->viewLeftChannelLevel->setMaximumAmplitude(peak);
     ui->viewRightChannelLevel->setMaximumAmplitude(peak);
-
-    connect(ui->boxGeneratorPeak, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
-    connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitude(double)));
 }
 
 void FormCalibration::showHint()
