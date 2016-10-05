@@ -144,7 +144,7 @@ void FormRaw::changeTriggerSettings()
         slope = TRIG_FALLING;
     m_oscEngine->setTriggerSlope(slope);
     
-    AudioChannels channel;
+    AudioChannels channel = CHANNEL_NONE;
     if (ui->boxTriggerChannel->currentIndex() == 0) {
         channel = CHANNEL_LEFT;
     } else if (ui->boxTriggerChannel->currentIndex() == 1) {

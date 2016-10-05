@@ -53,7 +53,7 @@ public:
     AudioInputThread();
     void run();
     void startCapturing(bool start);
-    QStringList enumerateDevices();
+    QList<QPair<QString, QString> > enumerateDevices();
     void setCapturedChannels(AudioChannels channels);
     QString getDeviceName();
     void setSensivity(qreal maxInputVoltage);

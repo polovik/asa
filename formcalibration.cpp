@@ -33,19 +33,20 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     connect(ui->boxAudioOutputDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputAudioDevice(int)));
     
     // Audio capture
-    QStringList inputDeviceNames = m_capture->enumerateDevices();
+    QList<QPair<QString, QString>> inputDeviceNames = m_capture->enumerateDevices();
     QString inputDeviceName;
     ui->boxAudioInputDevice->clear();
     index = 0;
-    foreach(QString name, inputDeviceNames) {
-        if (name.startsWith("* ")) {
+    for (int i = 0; i < inputDeviceNames.count(); i++) {
+        QString name = inputDeviceNames.at(i).first;
+        QString description = inputDeviceNames.at(i).second;
+        if (description.startsWith("* ")) {
             inputDeviceName = name;
-            inputDeviceName.remove(0, 2);
-            ui->boxAudioInputDevice->addItem(name, QVariant(inputDeviceName));
+            ui->boxAudioInputDevice->addItem(description, QVariant(inputDeviceName));
             ui->boxAudioInputDevice->setCurrentIndex(index);
             switchInputAudioDevice(index);
         } else {
-            ui->boxAudioInputDevice->addItem(name, QVariant(name));
+            ui->boxAudioInputDevice->addItem(description, QVariant(name));
         }
         index++;
     }
@@ -116,9 +117,11 @@ void FormCalibration::switchInputAudioDevice(int index)
             ui->boxAudioInputDevice->setItemText(i, text);
         }
     }
+    QString curText = ui->boxAudioInputDevice->itemText(index);
+    ui->boxAudioInputDevice->setItemText(index, "* " + curText);
+
     QVariant cleanName = ui->boxAudioInputDevice->itemData(index);
     QString name = cleanName.toString();
-    ui->boxAudioInputDevice->setItemText(index, "* " + name);
     m_capture->switchInputDevice(name);
 }
 

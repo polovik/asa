@@ -3,6 +3,7 @@
 #include <QTime>
 #include <QEventLoop>
 #include <QtCore/qendian.h>
+#include <QProcess>
 #include "audioinputdevice.h"
 #include "settings.h"
 
@@ -159,10 +160,10 @@ void AudioInputThread::startCapturing(bool start)
     m_captureEnabled = start;
 }
 
-QStringList AudioInputThread::enumerateDevices()
+QList<QPair<QString, QString>> AudioInputThread::enumerateDevices()
 {
     extern bool g_verboseOutput;
-    QStringList devices;
+    QList<QPair<QString, QString>> devices;
     if (m_captureEnabled) {
         qWarning() << "Devices can't be enumerated' - some of them is already in use";
         return devices;
@@ -175,11 +176,27 @@ QStringList AudioInputThread::enumerateDevices()
     }
     bool highlighted = false;
     m_audioDeviceInfos.clear();
+#if !defined(_WIN32)
+    QProcess pacmd;
+    pacmd.start("pacmd", QStringList() << "list-sources", QIODevice::ReadOnly);
+    QString pacmdOutput = "";
+    if (!pacmd.waitForFinished()) {
+        qWarning() << "Command \"pacmd list-sources\" is invalid";
+        Q_ASSERT(false);
+    } else {
+        if ((pacmd.exitStatus() != QProcess::NormalExit) || (pacmd.exitCode() != 0)) {
+            qWarning() << "Command \"pacmd list-sources\" was interrupted";
+            Q_ASSERT(false);
+        }
+        pacmdOutput = pacmd.readAll();
+    }
+#endif
     foreach(const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
         if (info.isNull()) {
             continue;
         }
         QString name = info.deviceName();
+        QString description = name;
         if (g_verboseOutput) {
             qDebug() << "Device input name:" << name << info.supportedSampleRates()
                      << info.supportedCodecs() << info.supportedSampleTypes()
@@ -196,19 +213,34 @@ QStringList AudioInputThread::enumerateDevices()
             }
             continue;
         }
+        /*
+          index: 3
+                name: <alsa_input.pci-0000_00_1b.0.analog-stereo>
+                properties:
+                    device.description = "Built-in Audio Analog Stereo"
+        */
+        QString pattern = QRegExp::escape(name) + QString(".*device.description\\s*=\\s*\\\"([^\\\"]*)\\\"");
+        QRegExp pulseAudioRegExp(pattern, Qt::CaseSensitive, QRegExp::RegExp2);
+        pulseAudioRegExp.setMinimal(true);
+        int pos = pulseAudioRegExp.indexIn(pacmdOutput);
+        if (pos > -1) {
+            description = pulseAudioRegExp.cap(1);
+            qDebug() << name << "--" << description;
+        }
 #endif
         if (name == prevDeviceName) {
             highlighted = true;
-            name.prepend("* ");
+            description.prepend("* ");
         }
-        devices.append(name);
+        devices.append(qMakePair<QString, QString>(name, description));
         m_audioDeviceInfos.append(info);
     }
     if (!highlighted) {
         qWarning() << "Previous selected input device" << prevDeviceName << "is missed. Select default:" << defaultDevice.deviceName();
         for (int i = 0; i < devices.count(); i++) {
-            if (devices.at(i) == defaultDevice.deviceName()) {
-                devices[i] = "* " + devices.at(i);
+            QPair<QString, QString> &deviceInfo = devices[i];
+            if (deviceInfo.first == defaultDevice.deviceName()) {
+                deviceInfo.second = "* " + deviceInfo.second;
                 break;
             }
         }
