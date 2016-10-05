@@ -44,7 +44,7 @@ class ToneGenerator : public QThread
 public:
     explicit ToneGenerator(QObject *parent = 0);
     ~ToneGenerator();
-    QStringList enumerateDevices();
+    QList<QPair<QString, QString> > enumerateDevices();
     QString getDeviceName();
     qreal getCurVoltageAmplitude();
     qreal getMaxVoltageAmplitude();

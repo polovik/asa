@@ -5,6 +5,7 @@
 #include <QBuffer>
 #include <QEventLoop>
 #include <QtMath>
+#include <QProcess>
 #include "tonegenerator.h"
 #include "settings.h"
 
@@ -147,10 +148,10 @@ ToneGenerator::~ToneGenerator()
 
 }
 
-QStringList ToneGenerator::enumerateDevices()
+QList<QPair<QString, QString>> ToneGenerator::enumerateDevices()
 {
     extern bool g_verboseOutput;
-    QStringList devices;
+    QList<QPair<QString, QString>> devices;
     if (m_generationEnabled) {
         qWarning() << "Devices can't be enumerated' - some of them is already in use";
         return devices;
@@ -163,17 +164,47 @@ QStringList ToneGenerator::enumerateDevices()
     }
     bool highlighted = false;
     m_audioDeviceInfos.clear();
+#if !defined(_WIN32)
+    QProcess pacmd;
+    pacmd.start("pacmd", QStringList() << "list-sinks", QIODevice::ReadOnly);
+    QString pacmdOutput = "";
+    if (!pacmd.waitForFinished()) {
+        qWarning() << "Command \"pacmd list-sinks\" is invalid";
+        Q_ASSERT(false);
+    } else {
+        if ((pacmd.exitStatus() != QProcess::NormalExit) || (pacmd.exitCode() != 0)) {
+            qWarning() << "Command \"pacmd list-sinks\" was interrupted";
+            Q_ASSERT(false);
+        }
+        pacmdOutput = pacmd.readAll();
+    }
+#endif
     foreach(const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
         if (info.isNull()) {
             continue;
         }
         QString name = info.deviceName();
+        QString description = name;
 #if !defined(_WIN32)
         if (!name.contains("alsa", Qt::CaseInsensitive)) {
             if (g_verboseOutput) {
                 qDebug() << "Skip non-ALSA device:" << name;
             }
             continue;
+        }
+        /*
+          index: 2
+                name: <alsa_output.pci-0000_00_03.0.hdmi-stereo-extra1>
+                properties:
+                    device.description = "Built-in Audio Digital Stereo (HDMI)"
+        */
+        QString pattern = QRegExp::escape(name) + QString(".*device.description\\s*=\\s*\\\"([^\\\"]*)\\\"");
+        QRegExp pulseAudioRegExp(pattern, Qt::CaseSensitive, QRegExp::RegExp2);
+        pulseAudioRegExp.setMinimal(true);
+        int pos = pulseAudioRegExp.indexIn(pacmdOutput);
+        if (pos > -1) {
+            description = pulseAudioRegExp.cap(1);
+            qDebug() << name << "--" << description;
         }
 #endif
         if (g_verboseOutput) {
@@ -191,16 +222,17 @@ QStringList ToneGenerator::enumerateDevices()
 //        }
         if (name == prevDeviceName) {
             highlighted = true;
-            name.prepend("* ");
+            description.prepend("* ");
         }
-        devices.append(name);
+        devices.append(qMakePair<QString, QString>(name, description));
         m_audioDeviceInfos.append(info);
     }
     if (!highlighted) {
         qWarning() << "Previous selected output device" << prevDeviceName << "is missed. Select default:" << defaultDevice.deviceName();
         for (int i = 0; i < devices.count(); i++) {
-            if (devices.at(i) == defaultDevice.deviceName()) {
-                devices[i] = "* " + devices.at(i);
+            QPair<QString, QString> &deviceInfo = devices[i];
+            if (deviceInfo.first == defaultDevice.deviceName()) {
+                deviceInfo.second = "* " + deviceInfo.second;
                 break;
             }
         }
