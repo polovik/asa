@@ -6,6 +6,7 @@
 #include <QEventLoop>
 #include <QtMath>
 #include <QProcess>
+#include <DSound.h>
 #include "tonegenerator.h"
 #include "settings.h"
 
@@ -148,6 +149,19 @@ ToneGenerator::~ToneGenerator()
 
 }
 
+#if defined(_WIN32)
+static BOOL CALLBACK enumerateCallbackDS(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTSTR lpszDrvName, LPVOID lpContext)
+{
+    Q_UNUSED(lpGUID);
+    Q_UNUSED(lpszDrvName);
+
+    QStringList *devicesList = (QStringList *)lpContext;
+    QString description = QString::fromWCharArray(lpszDesc);
+    devicesList->append(description);
+    return TRUE;
+}
+#endif
+
 QList<QPair<QString, QString>> ToneGenerator::enumerateDevices()
 {
     extern bool g_verboseOutput;
@@ -164,7 +178,13 @@ QList<QPair<QString, QString>> ToneGenerator::enumerateDevices()
     }
     bool highlighted = false;
     m_audioDeviceInfos.clear();
-#if !defined(_WIN32)
+#if defined(_WIN32)
+    QStringList devicesFullNames;
+    if (FAILED(DirectSoundEnumerate((LPDSENUMCALLBACK)enumerateCallbackDS, (VOID *)&devicesFullNames))) {
+        qWarning() << "The list of devices full names couldn't be retrieved";
+    }
+    qDebug() << "Devices full names:" << devicesFullNames;
+#else
     QProcess pacmd;
     pacmd.start("pacmd", QStringList() << "list-sinks", QIODevice::ReadOnly);
     QString pacmdOutput = "";
@@ -185,7 +205,15 @@ QList<QPair<QString, QString>> ToneGenerator::enumerateDevices()
         }
         QString name = info.deviceName();
         QString description = name;
-#if !defined(_WIN32)
+#if defined(_WIN32)
+        foreach (QString fullName, devicesFullNames) {
+            if (fullName.startsWith(name)) {
+                description = fullName;
+                qDebug() << name << "--" << description;
+                break;
+            }
+        }
+#else
         if (!name.contains("alsa", Qt::CaseInsensitive)) {
             if (g_verboseOutput) {
                 qDebug() << "Skip non-ALSA device:" << name;

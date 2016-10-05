@@ -92,7 +92,8 @@ win32 {
         message("Seems like \"3rd-party\" folder is missed.")
         message("Check if https://github.com/polovik/3rd-party is cloned and built.")
         error("Some required libraries are missed.")
-}
+    }
+    LIBS += -ldsound
 }
 unix {
     LIBS += -lz -ltiff

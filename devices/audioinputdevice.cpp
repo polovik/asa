@@ -4,6 +4,7 @@
 #include <QEventLoop>
 #include <QtCore/qendian.h>
 #include <QProcess>
+#include <DSound.h>
 #include "audioinputdevice.h"
 #include "settings.h"
 
@@ -160,6 +161,19 @@ void AudioInputThread::startCapturing(bool start)
     m_captureEnabled = start;
 }
 
+#if defined(_WIN32)
+static BOOL CALLBACK enumerateCallbackDS(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTSTR lpszDrvName, LPVOID lpContext)
+{
+    Q_UNUSED(lpGUID);
+    Q_UNUSED(lpszDrvName);
+
+    QStringList *devicesList = (QStringList *)lpContext;
+    QString description = QString::fromWCharArray(lpszDesc);
+    devicesList->append(description);
+    return TRUE;
+}
+#endif
+
 QList<QPair<QString, QString>> AudioInputThread::enumerateDevices()
 {
     extern bool g_verboseOutput;
@@ -176,7 +190,13 @@ QList<QPair<QString, QString>> AudioInputThread::enumerateDevices()
     }
     bool highlighted = false;
     m_audioDeviceInfos.clear();
-#if !defined(_WIN32)
+#if defined(_WIN32)
+    QStringList devicesFullNames;
+    if (FAILED(DirectSoundCaptureEnumerate((LPDSENUMCALLBACK)enumerateCallbackDS, (VOID *)&devicesFullNames))) {
+        qWarning() << "The list of devices full names couldn't be retrieved";
+    }
+    qDebug() << "Devices full names:" << devicesFullNames;
+#else
     QProcess pacmd;
     pacmd.start("pacmd", QStringList() << "list-sources", QIODevice::ReadOnly);
     QString pacmdOutput = "";
@@ -206,7 +226,15 @@ QList<QPair<QString, QString>> AudioInputThread::enumerateDevices()
         if (!info.isFormatSupported(m_audioFormat)) {
             continue;
         }
-#if !defined(_WIN32)
+#if defined(_WIN32)
+        foreach (QString fullName, devicesFullNames) {
+            if (fullName.startsWith(name)) {
+                description = fullName;
+                qDebug() << name << "--" << description;
+                break;
+            }
+        }
+#else
         if (!name.contains("alsa_input", Qt::CaseInsensitive)) {
             if (g_verboseOutput) {
                 qDebug() << "Skip non-ALSA device:" << name;
