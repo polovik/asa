@@ -27,6 +27,7 @@ public slots:
 private slots:
     void switchOutputAudioDevice(int index);
     void switchInputAudioDevice(int index);
+    void switchInputAudioDevicePort(int index);
     void playTestTone();
     void captureDeviceInitiated(int samplingRate);
     void processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData);

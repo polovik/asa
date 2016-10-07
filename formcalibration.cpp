@@ -52,6 +52,7 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
         index++;
     }
     connect(ui->boxAudioInputDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(switchInputAudioDevice(int)));
+    connect(ui->boxAudioInputDevicePort, SIGNAL(currentIndexChanged(int)), this, SLOT(switchInputAudioDevicePort(int)));
     
     connect(ui->buttonLeftOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
     connect(ui->buttonRightOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
@@ -126,6 +127,44 @@ void FormCalibration::switchInputAudioDevice(int index)
     QVariant cleanName = ui->boxAudioInputDevice->itemData(index);
     QString name = cleanName.toString();
     m_capture->switchInputDevice(name);
+
+    ui->boxAudioInputDevicePort->clear();
+    QStringList devicePorts = m_capture->getPortsList();
+    if (devicePorts.isEmpty()) {
+        ui->boxAudioInputDevicePort->setVisible(false);
+    } else {
+        ui->boxAudioInputDevicePort->setVisible(true);
+        int index = 0;
+        for (int i = 0; i < devicePorts.count(); i++) {
+            QString port = devicePorts.at(i);
+            if (port.startsWith("* ")) {
+                QString cleanPortName = port.remove("* ");
+                ui->boxAudioInputDevicePort->addItem(port, QVariant(cleanPortName));
+                ui->boxAudioInputDevicePort->setCurrentIndex(index);
+                switchInputAudioDevicePort(index);
+            } else {
+                ui->boxAudioInputDevicePort->addItem(port, QVariant(port));
+            }
+            index++;
+        }
+    }
+}
+
+void FormCalibration::switchInputAudioDevicePort(int index)
+{
+    for (int i = 0; i < ui->boxAudioInputDevicePort->count(); i++) {
+        QString text = ui->boxAudioInputDevicePort->itemText(i);
+        if (text.startsWith("* ")) {
+            text.remove(0, 2);
+            ui->boxAudioInputDevicePort->setItemText(i, text);
+        }
+    }
+    QString curText = ui->boxAudioInputDevicePort->itemText(index);
+    ui->boxAudioInputDevicePort->setItemText(index, "* " + curText);
+
+    QVariant cleanPort = ui->boxAudioInputDevicePort->itemData(index);
+    QString port = cleanPort.toString();
+    m_capture->switchPort(port);
 }
 
 void FormCalibration::playTestTone()

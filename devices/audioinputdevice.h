@@ -5,6 +5,7 @@
 #include <QAudioInput>
 #include <QThread>
 #include <QTime>
+#include <QMap>
 #include "common_types.h"
 
 class AudioInputDevice : public QIODevice
@@ -56,10 +57,12 @@ public:
     QList<QPair<QString, QString> > enumerateDevices();
     void setCapturedChannels(AudioChannels channels);
     QString getDeviceName();
+    QStringList getPortsList();
     void setSensivity(qreal maxInputVoltage);
     
 public slots:
     void switchInputDevice(QString name);
+    void switchPort(QString alsaPort);
     
 signals:
     void initiated(int);
@@ -79,6 +82,7 @@ private:
     QList<QAudioDeviceInfo> m_audioDeviceInfos;
     AudioChannels m_capturedChannels;
     qreal m_maxInputVoltage;
+    QMap<QString, QString> m_portsMap;
 };
 
 #endif // AUDIOINPUTDEVICE_H

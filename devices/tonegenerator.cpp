@@ -6,7 +6,9 @@
 #include <QEventLoop>
 #include <QtMath>
 #include <QProcess>
+#if defined(_WIN32)
 #include <DSound.h>
+#endif
 #include "tonegenerator.h"
 #include "settings.h"
 
@@ -195,8 +197,9 @@ QList<QPair<QString, QString>> ToneGenerator::enumerateDevices()
         if ((pacmd.exitStatus() != QProcess::NormalExit) || (pacmd.exitCode() != 0)) {
             qWarning() << "Command \"pacmd list-sinks\" was interrupted";
             Q_ASSERT(false);
+        } else {
+            pacmdOutput = pacmd.readAll();
         }
-        pacmdOutput = pacmd.readAll();
     }
 #endif
     foreach(const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {

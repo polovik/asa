@@ -4,7 +4,9 @@
 #include <QEventLoop>
 #include <QtCore/qendian.h>
 #include <QProcess>
+#if defined(_WIN32)
 #include <DSound.h>
+#endif
 #include "audioinputdevice.h"
 #include "settings.h"
 
@@ -207,8 +209,9 @@ QList<QPair<QString, QString>> AudioInputThread::enumerateDevices()
         if ((pacmd.exitStatus() != QProcess::NormalExit) || (pacmd.exitCode() != 0)) {
             qWarning() << "Command \"pacmd list-sources\" was interrupted";
             Q_ASSERT(false);
+        } else {
+            pacmdOutput = pacmd.readAll();
         }
-        pacmdOutput = pacmd.readAll();
     }
 #endif
     foreach(const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
@@ -289,6 +292,206 @@ QString AudioInputThread::getDeviceName()
     return m_curAudioDeviceInfo.deviceName();
 }
 
+#if !defined(_WIN32)
+QString getAlsaPort(QString pulseAudioDeviceName)
+{
+    QString alsaCardIndex;
+    QProcess pacmd;
+    pacmd.start("pacmd", QStringList() << "list-sources", QIODevice::ReadOnly);
+    QString pacmdOutput = "";
+    if (!pacmd.waitForFinished()) {
+        qWarning() << "Command \"pacmd list-sources\" is invalid";
+        Q_ASSERT(false);
+        return alsaCardIndex;
+    } else {
+        if ((pacmd.exitStatus() != QProcess::NormalExit) || (pacmd.exitCode() != 0)) {
+            qWarning() << "Command \"pacmd list-sources\" was interrupted";
+            Q_ASSERT(false);
+            return alsaCardIndex;
+        } else {
+            pacmdOutput = pacmd.readAll();
+        }
+    }
+    /*
+      index: 3
+            name: <alsa_input.pci-0000_00_1b.0.analog-stereo>
+            properties:
+                alsa.card = "3"
+                alsa.card_name = "USB Sound Device"
+    */
+    QString pattern = QRegExp::escape(pulseAudioDeviceName) + QString(".*alsa\\.card\\s*=\\s*\\\"([^\\\"]*)\\\"");
+    QRegExp pulseAudioRegExp(pattern, Qt::CaseSensitive, QRegExp::RegExp2);
+    pulseAudioRegExp.setMinimal(true);
+    int pos = pulseAudioRegExp.indexIn(pacmdOutput);
+    if (pos > -1) {
+        alsaCardIndex = pulseAudioRegExp.cap(1);
+        qDebug() << "Audio device" << pulseAudioDeviceName << "is linked with alsa card -" << alsaCardIndex;
+    } else {
+        qWarning() << "Couldn't find linked alsa card for audio device" << pulseAudioDeviceName;
+        Q_ASSERT(false);
+        return alsaCardIndex;
+    }
+
+    return alsaCardIndex;
+}
+#endif
+
+QStringList AudioInputThread::getPortsList()
+{
+    QStringList ports;
+    m_portsMap.clear();
+#if defined(_WIN32)
+    return ports;
+#else
+    if (getDeviceName().isEmpty()) {
+        qWarning() << "Name of audio device is empty.";
+        return ports;
+    }
+    QString alsaCardIndex = getAlsaPort(getDeviceName());
+    if (alsaCardIndex.isEmpty()) {
+        qWarning() << "Alsa ports couldn't be determinied"
+                   << "because of undefined Alsa card index for device" << getDeviceName();
+        return ports;
+    }
+    QProcess pacmd;
+    pacmd.start("pacmd", QStringList() << "list-sources", QIODevice::ReadOnly);
+    QString pacmdOutput = "";
+    if (!pacmd.waitForFinished()) {
+        qWarning() << "Command \"pacmd list-sources\" is invalid";
+        Q_ASSERT(false);
+    } else {
+        if ((pacmd.exitStatus() != QProcess::NormalExit) || (pacmd.exitCode() != 0)) {
+            qWarning() << "Command \"pacmd list-sources\" was interrupted";
+            Q_ASSERT(false);
+        } else {
+            pacmdOutput = pacmd.readAll();
+        }
+    }
+    /*
+      index: 3
+            name: <alsa_input.pci-0000_00_1b.0.analog-stereo>
+            properties:
+            ports:
+                analog-input-microphone: Microphone (priority 8700, latency offset 0 usec, available: unknown)
+                    properties:
+                        device.icon_name = "audio-input-microphone"
+                analog-input-linein: Line In (priority 8100, latency offset 0 usec, available: unknown)
+                    properties:
+
+            active port: <analog-input-linein>
+    */
+    QStringList paPorts;
+    int linePos = pacmdOutput.indexOf("\tname: <" + getDeviceName() + ">");
+    QString paPortsOutput = pacmdOutput.mid(linePos);
+    int nextCardPos = paPortsOutput.indexOf("\tindex: ");
+    int portsPos = paPortsOutput.indexOf("\tports:\n");
+    if (portsPos == -1) {
+        qDebug() << "Audio device" << getDeviceName() << "doesn't have ports (PulseAudio)";
+        return ports;
+    }
+    if ((nextCardPos > -1) && (nextCardPos < portsPos)) {
+        qDebug() << "Audio device" << getDeviceName() << "doesn't have ports (PulseAudio)";
+        return ports;
+    }
+    paPortsOutput = paPortsOutput.mid(portsPos);
+    int activePortPos = paPortsOutput.indexOf("\tactive port: ");
+    paPortsOutput = paPortsOutput.left(activePortPos);
+    QString pattern = QString("\\sanalog-input-([^:]+):");
+    QRegExp portsRe(pattern, Qt::CaseSensitive, QRegExp::RegExp);
+    portsRe.setMinimal(true);
+    linePos = 0;
+    while (linePos >= 0) {
+        linePos = portsRe.indexIn(paPortsOutput, linePos);
+        if (linePos > 0) {
+            paPorts.append(portsRe.cap(1));
+            linePos += portsRe.matchedLength();
+        }
+    }
+    qDebug() << "Audio device" << getDeviceName() << "has ports (PulseAudio):" << paPorts;
+
+    QProcess amixerCmd;
+    amixerCmd.start("amixer", QStringList() << "-c" << alsaCardIndex << "sget" << "\"PCM Capture Source\"", QIODevice::ReadOnly);
+    QString amixerOutput = "";
+    if (!amixerCmd.waitForFinished(5000)) {
+        qWarning() << "Command \"amixer sget PCM \"Capture Source\"\" is invalid";
+        Q_ASSERT(false);
+    } else {
+        if ((amixerCmd.exitStatus() != QProcess::NormalExit) || (amixerCmd.exitCode() != 0)) {
+            amixerOutput = amixerCmd.readAllStandardError();
+            if (amixerOutput.contains("Unable to find simple control")) {
+                qDebug() << "Audio device" << getDeviceName() << "doesn't have control field \"PCM Capture Source\"";
+            } else {
+                qWarning() << "Command \"amixer sget PCM \"Capture Source\"\" was interrupted";
+                qDebug() << amixerOutput;
+                Q_ASSERT(false);
+            }
+            return ports;
+        } else {
+            amixerOutput = amixerCmd.readAll();
+        }
+    }
+    /*
+      Simple mixer control 'PCM Capture Source',0
+        Capabilities: enum
+        Items: 'Mic' 'Line' 'IEC958 In' 'Mixer'
+        Item0: 'Mic'
+    */
+    QStringList alsaPorts;
+    linePos = amixerOutput.indexOf("Items:");
+    amixerOutput = amixerOutput.mid(linePos);
+    amixerOutput = amixerOutput.left(amixerOutput.indexOf("\n"));
+    pattern = QString("\\s\\'([^\\']+)\\'");
+    QRegExp itemsRe(pattern, Qt::CaseSensitive, QRegExp::RegExp);
+    itemsRe.setMinimal(true);
+    linePos = 0;
+    while (linePos >= 0) {
+        linePos = itemsRe.indexIn(amixerOutput, linePos);
+        if (linePos > 0) {
+            alsaPorts.append(itemsRe.cap(1));
+            linePos += itemsRe.matchedLength();
+        }
+    }
+    qDebug() << "Audio device" << getDeviceName() << "has ports (Alsa):" << alsaPorts;
+
+    foreach (QString alsaPort, alsaPorts) {
+        foreach (QString paPort, paPorts) {
+            if (paPort.startsWith(alsaPort, Qt::CaseInsensitive)) {
+                m_portsMap.insert(alsaPort, QString("analog-input-%1").arg(paPort));
+                break;
+            }
+        }
+    }
+    qDebug() << "Audio device" << getDeviceName() << "has ports (Total):" << m_portsMap;
+
+    Settings *settings = Settings::getSettings();
+    QString prevPort = settings->value("Capture/AudioInputDevicePort", "").toString();
+    ports = m_portsMap.keys();
+    bool highlighted = false;
+    for (int i = 0; i < ports.count(); i++) {
+        QString &alsaPort = ports[i];
+        if (highlighted) {
+            break;
+        }
+        if (prevPort.isEmpty()) {
+            alsaPort.prepend("* ");
+            highlighted = true;
+            continue;
+        }
+        if (alsaPort == prevPort) {
+            alsaPort.prepend("* ");
+            highlighted = true;
+            continue;
+        }
+        if (i == (ports.count() - 1)) {
+            alsaPort.prepend("* ");
+        }
+    }
+    qDebug() << "Audio device" << getDeviceName() << "has ports for choosing:" << ports;
+
+    return ports;
+#endif
+}
+
 void AudioInputThread::setSensivity(qreal maxInputVoltage)
 {
     m_maxInputVoltage = maxInputVoltage;
@@ -312,4 +515,81 @@ void AudioInputThread::switchInputDevice(QString name)
     }
     Settings *settings = Settings::getSettings();
     settings->setValue("Capture/AudioInputDevice", name);
+}
+
+void AudioInputThread::switchPort(QString alsaPort)
+{
+    if (m_captureEnabled) {
+        qWarning() << "Input audio device's port can't be changed - it is already in use";
+        return;
+    }
+    qDebug() << "Switch audio input device's port to" << alsaPort;
+    QString pulseAudioPort = m_portsMap.value(alsaPort, "");
+    if (pulseAudioPort.isEmpty()) {
+        qWarning() << "PulseAudio port isn't defined for device" << getDeviceName()
+                   << "Alsa port:" << alsaPort << "Map:" << m_portsMap;
+        return;
+    }
+
+#if !defined(_WIN32)
+    QProcess pacmd;
+    pacmd.start("pacmd", QStringList() << "set-source-port" << getDeviceName() << pulseAudioPort, QIODevice::ReadOnly);
+//    QString pacmdOutput = "";
+    if (!pacmd.waitForFinished(5000)) {
+        qWarning() << "Command \"pacmd set-source-port\" is invalid";
+        Q_ASSERT(false);
+        return;
+    } else {
+        if ((pacmd.exitStatus() != QProcess::NormalExit) || (pacmd.exitCode() != 0)) {
+            qWarning() << "Command \"pacmd set-source-port\" was interrupted";
+            Q_ASSERT(false);
+            return;
+        } else {
+            qDebug() << "Audio source device's PulseAudio port has been changed to" << pulseAudioPort;
+        }
+    }
+
+    QString alsaCardIndex = getAlsaPort(getDeviceName());
+    if (alsaCardIndex.isEmpty()) {
+        qWarning() << "Alsa port couldn't be switched to" << alsaPort
+                   << "because of undefined Alsa card index for device" << getDeviceName();
+        return;
+    }
+    QProcess amixerCmd;
+    amixerCmd.start("amixer", QStringList() << "-c" << alsaCardIndex << "sset"
+                    << "\"PCM Capture Source\"" << alsaPort, QIODevice::ReadOnly);
+//    QString amixerOutput = "";
+    if (!amixerCmd.waitForFinished(5000)) {
+        qWarning() << "Command \"amixer sset PCM \"Capture Source\"\" is invalid";
+        Q_ASSERT(false);
+        return;
+    } else {
+        if ((amixerCmd.exitStatus() != QProcess::NormalExit) || (amixerCmd.exitCode() != 0)) {
+            qWarning() << "Command \"amixer sset PCM \"Capture Source\"\" was interrupted";
+            Q_ASSERT(false);
+            return;
+        } else {
+            qDebug() << "Audio source device's Alsa port has been changed to" << alsaPort;
+        }
+    }
+
+    pacmd.start("pacmd", QStringList() << "set-source-mute" << getDeviceName() << "0", QIODevice::ReadOnly);
+//    QString pacmdOutput = "";
+    if (!pacmd.waitForFinished(5000)) {
+        qWarning() << "Command \"pacmd set-source-mute\" is invalid";
+        Q_ASSERT(false);
+        return;
+    } else {
+        if ((pacmd.exitStatus() != QProcess::NormalExit) || (pacmd.exitCode() != 0)) {
+            qWarning() << "Command \"pacmd set-source-mute\" was interrupted";
+            Q_ASSERT(false);
+            return;
+        } else {
+            qDebug() << "Audio source device" << getDeviceName() << "has been unmuted";
+        }
+    }
+#endif
+
+    Settings *settings = Settings::getSettings();
+    settings->setValue("Capture/AudioInputDevicePort", alsaPort);
 }
