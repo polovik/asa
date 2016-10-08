@@ -117,6 +117,7 @@ void MainWindow::showForm(int formId)
     m_currentForm = newForm;
     if (m_currentForm == m_formCalibration) {
         qDebug() << "Open form \"Calibration\"";
+        m_formCalibration->enterForm();
     } else if (m_currentForm == m_formRaw) {
         qDebug() << "Open form \"Raw\"";
         m_formRaw->enterForm();

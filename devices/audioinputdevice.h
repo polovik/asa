@@ -58,13 +58,15 @@ public:
     void setCapturedChannels(AudioChannels channels);
     QString getDeviceName();
     QStringList getPortsList();
-    void setSensivity(qreal maxInputVoltage);
+    void setMaxInputVoltage(qreal maxInputVoltage);
+    void setAmplifyFactor(qreal amplifyFactor);
     
 public slots:
     void switchInputDevice(QString name);
     void switchPort(QString alsaPort);
     
 signals:
+    void prepared();
     void initiated(int);
     void dataForOscilloscope(AudioChannels channel, SamplesList data);
     void dataForOscilloscope(SamplesList leftChannelData, SamplesList rightChannelData);
@@ -82,6 +84,7 @@ private:
     QList<QAudioDeviceInfo> m_audioDeviceInfos;
     AudioChannels m_capturedChannels;
     qreal m_maxInputVoltage;
+    qreal m_amplifyFactor;
     QMap<QString, QString> m_portsMap;
 };
 

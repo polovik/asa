@@ -93,6 +93,8 @@ AudioInputThread::AudioInputThread()
     m_capturedChannels = CHANNEL_NONE;
     m_captureEnabled = false;
     m_maxInputVoltage = 0.01;
+    Settings *settings = Settings::getSettings();
+    m_amplifyFactor = settings->value("Capture/VoltageAmplifyFactor", 1.0).toDouble();
     // set up the format you want, eg.
     m_sampleRate = 44100;
     m_audioFormat.setSampleRate(m_sampleRate);
@@ -109,11 +111,11 @@ void AudioInputThread::run()
 {
     m_inputBuffer = new AudioInputDevice();
     m_inputBuffer->open(QIODevice::ReadWrite | QIODevice::Truncate);
-    m_inputBuffer->setVoltageScaleFactor(m_maxInputVoltage);
 //    connect(m_inputBuffer, SIGNAL(samplesReceived(AudioChannels,SamplesList)), SLOT (updateBuffers(AudioChannels,SamplesList)), Qt::QueuedConnection);
 //    connect(m_inputBuffer, SIGNAL(samplesReceived(AudioChannels,SamplesList)), SIGNAL(dataForOscilloscope(AudioChannels,SamplesList)), Qt::QueuedConnection);
     connect(m_inputBuffer, SIGNAL(samplesReceived(SamplesList, SamplesList)), SIGNAL(dataForOscilloscope(SamplesList, SamplesList)), Qt::QueuedConnection);
-    
+    emit prepared();
+
     bool captureStarted = false;
     QEventLoop loop;
     forever {
@@ -492,12 +494,28 @@ QStringList AudioInputThread::getPortsList()
 #endif
 }
 
-void AudioInputThread::setSensivity(qreal maxInputVoltage)
+void AudioInputThread::setMaxInputVoltage(qreal maxInputVoltage)
 {
-    m_maxInputVoltage = maxInputVoltage;
-    if (m_inputBuffer != NULL) {
-        m_inputBuffer->setVoltageScaleFactor(m_maxInputVoltage);
+    Q_ASSERT(m_inputBuffer);
+    if (m_inputBuffer == NULL) {
+        qCritical() << "Couldn't set capture max input voltage. m_inputBuffer is NULL";
+        return;
     }
+    m_maxInputVoltage = maxInputVoltage;
+    m_inputBuffer->setVoltageScaleFactor(m_maxInputVoltage * m_amplifyFactor);
+}
+
+void AudioInputThread::setAmplifyFactor(qreal amplifyFactor)
+{
+    Q_ASSERT(m_inputBuffer);
+    if (m_inputBuffer == NULL) {
+        qCritical() << "Couldn't set capture amplify factor. m_inputBuffer is NULL";
+        return;
+    }
+    m_amplifyFactor = amplifyFactor;
+    m_inputBuffer->setVoltageScaleFactor(m_maxInputVoltage * m_amplifyFactor);
+    Settings *settings = Settings::getSettings();
+    settings->setValue("Capture/VoltageAmplifyFactor", m_amplifyFactor);
 }
 
 void AudioInputThread::switchInputDevice(QString name)

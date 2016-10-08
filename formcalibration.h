@@ -22,6 +22,7 @@ public:
     ~FormCalibration();
     
 public slots:
+    void enterForm();
     void leaveForm();
     
 private slots:

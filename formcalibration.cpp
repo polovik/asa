@@ -57,6 +57,7 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     connect(ui->buttonLeftOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
     connect(ui->buttonRightOutputChannel, SIGNAL(clicked()), this, SLOT(playTestTone()));
     connect(ui->buttonCalibrate, SIGNAL(clicked(bool)), this, SLOT(runCalibration(bool)));
+    connect(m_capture, SIGNAL(prepared()), this, SLOT(enterForm()));
     connect(m_capture, SIGNAL(initiated(int)),
             SLOT(captureDeviceInitiated(int)), Qt::QueuedConnection);   // wait while main window initiated
     connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList, SamplesList)),
@@ -77,11 +78,20 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
 
     connect(ui->buttonHintCalibrate, SIGNAL(clicked()), this, SLOT(showHint()));
     connect(ui->buttonHintPlayTone, SIGNAL(clicked()), this, SLOT(showHint()));
+
+    m_oscEngine->setMaximumAmplitude(1.0);
+    ui->viewLeftChannelLevel->setMaximumAmplitude(1.0);
+    ui->viewRightChannelLevel->setMaximumAmplitude(1.0);
 }
 
 FormCalibration::~FormCalibration()
 {
     delete ui;
+}
+
+void FormCalibration::enterForm()
+{
+    m_capture->setMaxInputVoltage(1.0);
 }
 
 void FormCalibration::leaveForm()
@@ -93,6 +103,7 @@ void FormCalibration::leaveForm()
     ui->buttonRightOutputChannel->setChecked(false);
     ui->buttonCalibrate->setChecked(false);
     m_oscEngine->stop();
+    m_capture->setMaxInputVoltage(m_gen->getMaxVoltageAmplitude());
 }
 
 void FormCalibration::switchOutputAudioDevice(int index)
@@ -260,10 +271,6 @@ void FormCalibration::setGeneratorMagnitude(qreal peak)
 {
     m_gen->setMaxVoltageAmplitude(peak);
     m_gen->setCurVoltageAmplitude(peak);
-    m_capture->setSensivity(peak);
-    m_oscEngine->setMaximumAmplitude(peak);
-    ui->viewLeftChannelLevel->setMaximumAmplitude(peak);
-    ui->viewRightChannelLevel->setMaximumAmplitude(peak);
 }
 
 void FormCalibration::showHint()
