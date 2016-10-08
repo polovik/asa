@@ -161,56 +161,79 @@
     </message>
     <message>
         <location filename="../formcalibration.ui" line="89"/>
-        <location filename="../formcalibration.ui" line="215"/>
+        <location filename="../formcalibration.ui" line="225"/>
         <source>?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="110"/>
-        <location filename="../formcalibration.ui" line="381"/>
+        <location filename="../formcalibration.ui" line="486"/>
+        <location filename="../formcalibration.ui" line="582"/>
         <source>Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="120"/>
-        <location filename="../formcalibration.ui" line="391"/>
+        <location filename="../formcalibration.ui" line="496"/>
+        <location filename="../formcalibration.ui" line="592"/>
         <source>Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="239"/>
+        <location filename="../formcalibration.ui" line="249"/>
         <source>Calibrate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="264"/>
+        <location filename="../formcalibration.ui" line="274"/>
         <source>Generator&apos;s tone volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="292"/>
-        <location filename="../formcalibration.ui" line="320"/>
+        <location filename="../formcalibration.ui" line="302"/>
+        <location filename="../formcalibration.ui" line="330"/>
         <source>V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="336"/>
+        <location filename="../formcalibration.ui" line="346"/>
         <source>Amplitude
 Vpk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="347"/>
+        <location filename="../formcalibration.ui" line="357"/>
         <source>RMS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="235"/>
+        <location filename="../formcalibration.ui" line="384"/>
+        <source>Input amplify factor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formcalibration.ui" line="429"/>
+        <source>factor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formcalibration.ui" line="470"/>
+        <source>Input channels offsets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formcalibration.ui" line="524"/>
+        <location filename="../formcalibration.ui" line="551"/>
+        <source>offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formcalibration.cpp" line="315"/>
         <source>Perform calibration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="236"/>
+        <location filename="../formcalibration.cpp" line="316"/>
         <source>This area helps to adjust maximal voltage on audio input pins.
 Button pressing leads to play tone on left and right channel simultaneously.
 Tone is Sine 50Hz with maximal amplitude.
@@ -221,12 +244,12 @@ For correct signature displaying, it needs to specify range of axes.Measured vol
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="246"/>
+        <location filename="../formcalibration.cpp" line="326"/>
         <source>Play tone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="247"/>
+        <location filename="../formcalibration.cpp" line="327"/>
         <source>This buttons help to distinguish audio output pins.
 Button pressing leads to play tone on specific channel.
 Tone is Sine 50Hz with maximal amplitude.</source>

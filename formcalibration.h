@@ -36,6 +36,8 @@ private slots:
     void showHint();
     void setGeneratorMagnitudePeak(double voltage);
     void setGeneratorMagnitudeRMS(double voltage);
+    void changeInputAmplifyFactor(int percents);
+    void changeInputOffset(int percents);
 
 private:
     void setGeneratorMagnitude(qreal peak);

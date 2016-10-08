@@ -66,6 +66,7 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     m_oscEngine = new OscilloscopeEngine(ui->oscilloscope);
     m_oscEngine->setTriggerMode(TRIG_AUTO);
     m_oscEngine->setDisplayedChannels(CHANNEL_BOTH);
+    m_oscEngine->setMaximumAmplitude(1.0);
 
     qreal magnitude = m_gen->getMaxVoltageAmplitude();
     double rms = magnitude / qSqrt(2);
@@ -76,10 +77,22 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitudeRMS(double)));
     setGeneratorMagnitude(magnitude);
 
+    int factor = m_capture->getAmplifyFactor() * 100;
+    ui->sliderAmplifyInput->setValue(factor);
+    ui->labelAmplifyInput->setText(QString::number(m_capture->getAmplifyFactor(), 'f', 2));
+    int leftOffset = m_capture->getChannelOffset(CHANNEL_LEFT) * 100;
+    ui->sliderLeftInputOffset->setValue(leftOffset);
+    ui->labelLeftInputOffset->setText(QString::number(m_capture->getChannelOffset(CHANNEL_LEFT), 'f', 2));
+    int rightOffset = m_capture->getChannelOffset(CHANNEL_RIGHT) * 100;
+    ui->sliderRightInputOffset->setValue(rightOffset);
+    ui->labelRightInputOffset->setText(QString::number(m_capture->getChannelOffset(CHANNEL_RIGHT), 'f', 2));
+    connect(ui->sliderAmplifyInput, SIGNAL(valueChanged(int)), this, SLOT(changeInputAmplifyFactor(int)));
+    connect(ui->sliderLeftInputOffset, SIGNAL(valueChanged(int)), this, SLOT(changeInputOffset(int)));
+    connect(ui->sliderRightInputOffset, SIGNAL(valueChanged(int)), this, SLOT(changeInputOffset(int)));
+
     connect(ui->buttonHintCalibrate, SIGNAL(clicked()), this, SLOT(showHint()));
     connect(ui->buttonHintPlayTone, SIGNAL(clicked()), this, SLOT(showHint()));
 
-    m_oscEngine->setMaximumAmplitude(1.0);
     ui->viewLeftChannelLevel->setMaximumAmplitude(1.0);
     ui->viewRightChannelLevel->setMaximumAmplitude(1.0);
 }
@@ -271,6 +284,27 @@ void FormCalibration::setGeneratorMagnitude(qreal peak)
 {
     m_gen->setMaxVoltageAmplitude(peak);
     m_gen->setCurVoltageAmplitude(peak);
+}
+
+void FormCalibration::changeInputAmplifyFactor(int percents)
+{
+    qreal factor = percents / 100.;
+    m_capture->setAmplifyFactor(factor);
+    ui->labelAmplifyInput->setText(QString::number(factor, 'f', 2));
+}
+
+void FormCalibration::changeInputOffset(int percents)
+{
+    qreal offset = percents / 100.;
+    AudioChannels channel = CHANNEL_NONE;
+    if (sender() == ui->sliderLeftInputOffset) {
+        channel = CHANNEL_LEFT;
+        ui->labelLeftInputOffset->setText(QString::number(offset, 'f', 2));
+    } else if (sender() == ui->sliderRightInputOffset) {
+        channel = CHANNEL_RIGHT;
+        ui->labelRightInputOffset->setText(QString::number(offset, 'f', 2));
+    }
+    m_capture->setChannelOffset(channel, offset);
 }
 
 void FormCalibration::showHint()

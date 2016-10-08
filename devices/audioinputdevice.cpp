@@ -15,6 +15,8 @@ AudioInputDevice::AudioInputDevice(QObject *parent) :
 {
     m_channels = CHANNEL_NONE;
     m_scaleFactor = 100.;
+    m_leftChannelOffset = 1.;
+    m_rightChannelOffset = 1.;
 }
 
 AudioInputDevice::~AudioInputDevice()
@@ -33,6 +35,14 @@ void AudioInputDevice::setVoltageScaleFactor(qreal maxVoltage)
 {
     m_scaleFactor = maxVoltage;
     qDebug() << "Set voltage scale factor to" << m_scaleFactor << "V";
+}
+
+void AudioInputDevice::setOffsets(qreal leftChannelOffset, qreal rightChannelOffset)
+{
+    m_leftChannelOffset = leftChannelOffset;
+    m_rightChannelOffset = rightChannelOffset;
+    qDebug() << "Set offsets for audio input data: left -" << leftChannelOffset
+             << "right -" << rightChannelOffset;
 }
 
 qint64 AudioInputDevice::readData(char *data, qint64 maxSize)
@@ -67,11 +77,13 @@ qint64 AudioInputDevice::writeData(const char *data, qint64 maxSize)
         // convert from char* to real
         if (m_channels & CHANNEL_LEFT) {
             qreal sample = charToReal(&data[i], true);
+            sample = sample + m_leftChannelOffset;
             sample = sample * m_scaleFactor;
             samplesLeft.append(sample);
         }
         if (m_channels & CHANNEL_RIGHT) {
             qreal sample = charToReal(&data[i + 2], true);
+            sample = sample + m_rightChannelOffset;
             sample = sample * m_scaleFactor;
             samplesRight.append(sample);
         }
@@ -95,6 +107,9 @@ AudioInputThread::AudioInputThread()
     m_maxInputVoltage = 0.01;
     Settings *settings = Settings::getSettings();
     m_amplifyFactor = settings->value("Capture/VoltageAmplifyFactor", 1.0).toDouble();
+    m_leftChannelOffset = settings->value("Capture/LeftChannelOffset", 0.0).toDouble();
+    m_rightChannelOffset = settings->value("Capture/RightChannelOffset", 0.0).toDouble();
+
     // set up the format you want, eg.
     m_sampleRate = 44100;
     m_audioFormat.setSampleRate(m_sampleRate);
@@ -113,6 +128,7 @@ void AudioInputThread::run()
     m_inputBuffer->open(QIODevice::ReadWrite | QIODevice::Truncate);
 //    connect(m_inputBuffer, SIGNAL(samplesReceived(AudioChannels,SamplesList)), SLOT (updateBuffers(AudioChannels,SamplesList)), Qt::QueuedConnection);
 //    connect(m_inputBuffer, SIGNAL(samplesReceived(AudioChannels,SamplesList)), SIGNAL(dataForOscilloscope(AudioChannels,SamplesList)), Qt::QueuedConnection);
+    m_inputBuffer->setOffsets(m_leftChannelOffset, m_rightChannelOffset);
     connect(m_inputBuffer, SIGNAL(samplesReceived(SamplesList, SamplesList)), SIGNAL(dataForOscilloscope(SamplesList, SamplesList)), Qt::QueuedConnection);
     emit prepared();
 
@@ -516,6 +532,48 @@ void AudioInputThread::setAmplifyFactor(qreal amplifyFactor)
     m_inputBuffer->setVoltageScaleFactor(m_maxInputVoltage * m_amplifyFactor);
     Settings *settings = Settings::getSettings();
     settings->setValue("Capture/VoltageAmplifyFactor", m_amplifyFactor);
+}
+
+qreal AudioInputThread::getAmplifyFactor()
+{
+    return m_amplifyFactor;
+}
+
+void AudioInputThread::setChannelOffset(AudioChannels channel, qreal offset)
+{
+    Q_ASSERT(m_inputBuffer);
+    if (m_inputBuffer == NULL) {
+        qCritical() << "Couldn't set capture channel offset. m_inputBuffer is NULL";
+        return;
+    }
+    QString settingsItem;
+    if (channel == CHANNEL_LEFT) {
+        m_leftChannelOffset = offset;
+        settingsItem = "Capture/LeftChannelOffset";
+    } else if (channel == CHANNEL_RIGHT) {
+        m_rightChannelOffset = offset;
+        settingsItem = "Capture/RightChannelOffset";
+    } else {
+        qWarning() << "Couldn't set offset" << offset << "for incorrect input channel:" << channel;
+        Q_ASSERT(false);
+        return;
+    }
+    m_inputBuffer->setOffsets(m_leftChannelOffset, m_rightChannelOffset);
+    Settings *settings = Settings::getSettings();
+    settings->setValue(settingsItem, offset);
+}
+
+qreal AudioInputThread::getChannelOffset(AudioChannels channel)
+{
+    if (channel == CHANNEL_LEFT) {
+        return m_leftChannelOffset;
+    } else if (channel == CHANNEL_RIGHT) {
+        return m_rightChannelOffset;
+    } else {
+        qWarning() << "Couldn't get offset for incorrect input channel:" << channel;
+        Q_ASSERT(false);
+        return 0.0;
+    }
 }
 
 void AudioInputThread::switchInputDevice(QString name)

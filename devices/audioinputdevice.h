@@ -18,6 +18,7 @@ public:
 public slots:
     void setChannels(AudioChannels channels);
     void setVoltageScaleFactor(qreal maxVoltage);
+    void setOffsets(qreal leftChannelOffset, qreal rightChannelOffset);
     
 protected:
     qint64 readData(char * /*data*/, qint64 /*maxSize*/);
@@ -27,7 +28,12 @@ private:
     QTime timer;
     qreal samplesReaded;    // use for determinate time of current frame from start
     AudioChannels m_channels;
+    // audio samples have to be scaled for reflect signal's amplitude which applied to testpoint on PCB
     qreal m_scaleFactor;
+    // some sound cards have channels with incorrect offsets in data:
+    // if signal isn't applied to input port, data displays some voltage on the port.
+    qreal m_leftChannelOffset;
+    qreal m_rightChannelOffset;
     
 signals:
     void samplesReceived(AudioChannels channel, SamplesList data);
@@ -60,6 +66,9 @@ public:
     QStringList getPortsList();
     void setMaxInputVoltage(qreal maxInputVoltage);
     void setAmplifyFactor(qreal amplifyFactor);
+    qreal getAmplifyFactor();
+    void setChannelOffset(AudioChannels channel, qreal offset);
+    qreal getChannelOffset(AudioChannels channel);
     
 public slots:
     void switchInputDevice(QString name);
@@ -85,6 +94,8 @@ private:
     AudioChannels m_capturedChannels;
     qreal m_maxInputVoltage;
     qreal m_amplifyFactor;
+    qreal m_leftChannelOffset;
+    qreal m_rightChannelOffset;
     QMap<QString, QString> m_portsMap;
 };
 
