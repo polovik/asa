@@ -5,7 +5,7 @@
 
 VolumeIndicator::VolumeIndicator(QWidget *parent) :
     QGraphicsView(parent), smoothFilter(0), volumeItem(0), global_counter(-1),
-    maxVolume(0.0), m_maxInputVoltage(0.01)
+    maxVolume(0.0), m_maxInputVoltage(0.01), m_curVolumeLevel(0.0)
 {
     // Do not show scroll bars for correct calculate and display of volume level
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -66,14 +66,22 @@ void VolumeIndicator::processSamples(SamplesList samples)
  */
 void VolumeIndicator::drawVolumeLevel(double level)
 {
+    m_curVolumeLevel = level;
     if (!volumeItem)
         return;
     double heightVolume = viewport()->geometry().height();
     double widthVolume = viewport()->geometry().width() - 1;
     QPointF downRigth(mapToScene(widthVolume, heightVolume - 1));
-    heightVolume *= level;
+    heightVolume *= m_curVolumeLevel;
     heightVolume = viewport()->geometry().height() - heightVolume;  // draw from down to up jumps
     QPointF upLeft(mapToScene(0, heightVolume));
     QRectF rectVolume(upLeft, downRigth);
     volumeItem->setRect(rectVolume);
+}
+
+void VolumeIndicator::resizeEvent(QResizeEvent *event)
+{
+    QGraphicsView::resizeEvent(event);
+
+    drawVolumeLevel(m_curVolumeLevel);
 }
