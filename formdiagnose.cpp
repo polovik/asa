@@ -18,6 +18,8 @@
 #include "devices/tonegenerator.h"
 #include "devices/audioinputdevice.h"
 
+extern bool g_verboseOutput;
+
 FormDiagnose::FormDiagnose(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FormDiagnose)
@@ -30,15 +32,19 @@ FormDiagnose::FormDiagnose(ToneGenerator *gen, AudioInputThread *capture, QWidge
 #if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     m_camerasList = QCameraInfo::availableCameras();
     foreach(const QCameraInfo &cameraInfo, m_camerasList) {
-        qDebug() << "Found camera:" << cameraInfo.deviceName() << cameraInfo.description()
-                 << cameraInfo.orientation() << cameraInfo.position();
+        if (g_verboseOutput) {
+            qDebug() << "Found camera:" << cameraInfo.deviceName() << cameraInfo.description()
+                     << cameraInfo.orientation() << cameraInfo.position();
+        }
         ui->boxCameras->addItem(cameraInfo.description(), QVariant(cameraInfo.deviceName()));
     }
 #else
     m_camerasList = QCamera::availableDevices();
     foreach(const QByteArray &cameraDevice, m_camerasList) {
         QString description = QCamera::deviceDescription(cameraDevice);
-        qDebug() << "Found camera:" << cameraDevice << description;
+        if (g_verboseOutput) {
+            qDebug() << "Found camera:" << cameraDevice << description;
+        }
         ui->boxCameras->addItem(description, QVariant(cameraDevice));
     }
 #endif

@@ -13,6 +13,14 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     yAxis->setLabel(tr("Volts"));
     xAxis->setRange(0.0, 1024. * 0.016);
     yAxis->setRange(0.0, 50.0);
+    QVector<double> dataKeys(2);
+    QVector<double> dataLeft(2), dataRight(2);
+    dataKeys[0] = -1.;
+    dataKeys[1] = 1.;
+    dataLeft[0] = dataRight[1] = -1.;
+    dataLeft[1] = dataRight[0] = 1.;
+    m_graphChannelLeft->setData(dataKeys, dataLeft);
+    m_graphChannelRight->setData(dataKeys, dataRight);
     QPen zeroLinePen;
     zeroLinePen.setColor("lightsalmon");
     zeroLinePen.setStyle(Qt::SolidLine);

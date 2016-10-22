@@ -10,6 +10,8 @@
 #include "audioinputdevice.h"
 #include "settings.h"
 
+extern bool g_verboseOutput;
+
 AudioInputDevice::AudioInputDevice(QObject *parent) :
     QIODevice(parent)
 {
@@ -118,8 +120,10 @@ AudioInputThread::AudioInputThread()
     m_audioFormat.setCodec("audio/pcm");
     m_audioFormat.setByteOrder(QAudioFormat::LittleEndian);
     m_audioFormat.setSampleType(QAudioFormat::SignedInt);
-    qDebug() << "AudioInputThread::AudioInputThread " << m_audioFormat.byteOrder() << m_audioFormat.channelCount() << m_audioFormat.codec()
-             << m_audioFormat.sampleRate() << m_audioFormat.sampleSize() << m_audioFormat.sampleType();
+    if (g_verboseOutput) {
+        qDebug() << "AudioInputThread::AudioInputThread " << m_audioFormat.byteOrder() << m_audioFormat.channelCount() << m_audioFormat.codec()
+                 << m_audioFormat.sampleRate() << m_audioFormat.sampleSize() << m_audioFormat.sampleType();
+    }
 }
 
 void AudioInputThread::run()
@@ -196,7 +200,6 @@ static BOOL CALLBACK enumerateCallbackDS(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTST
 
 QList<QPair<QString, QString>> AudioInputThread::enumerateDevices()
 {
-    extern bool g_verboseOutput;
     QList<QPair<QString, QString>> devices;
     if (m_captureEnabled) {
         qWarning() << "Devices can't be enumerated' - some of them is already in use";
@@ -274,7 +277,9 @@ QList<QPair<QString, QString>> AudioInputThread::enumerateDevices()
         int pos = pulseAudioRegExp.indexIn(pacmdOutput);
         if (pos > -1) {
             description = pulseAudioRegExp.cap(1);
-            qDebug() << name << "--" << description;
+            if (g_verboseOutput) {
+                qDebug() << name << "--" << description;
+            }
         }
 #endif
         if (name == prevDeviceName) {
@@ -295,7 +300,9 @@ QList<QPair<QString, QString>> AudioInputThread::enumerateDevices()
         }
     }
     
-    qDebug() << "Detected audio input devices:" << devices;
+    if (g_verboseOutput) {
+        qDebug() << "Detected audio input devices:" << devices;
+    }
     return devices;
 }
 
@@ -343,7 +350,9 @@ QString getAlsaPort(QString pulseAudioDeviceName)
     int pos = pulseAudioRegExp.indexIn(pacmdOutput);
     if (pos > -1) {
         alsaCardIndex = pulseAudioRegExp.cap(1);
-        qDebug() << "Audio device" << pulseAudioDeviceName << "is linked with alsa card -" << alsaCardIndex;
+        if (g_verboseOutput) {
+            qDebug() << "Audio device" << pulseAudioDeviceName << "is linked with alsa card -" << alsaCardIndex;
+        }
     } else {
         qWarning() << "Couldn't find linked alsa card for audio device" << pulseAudioDeviceName;
         Q_ASSERT(false);
@@ -404,11 +413,15 @@ QStringList AudioInputThread::getPortsList()
     int nextCardPos = paPortsOutput.indexOf("\tindex: ");
     int portsPos = paPortsOutput.indexOf("\tports:\n");
     if (portsPos == -1) {
-        qDebug() << "Audio device" << getDeviceName() << "doesn't have ports (PulseAudio)";
+        if (g_verboseOutput) {
+            qDebug() << "Audio device" << getDeviceName() << "doesn't have ports (PulseAudio)";
+        }
         return ports;
     }
     if ((nextCardPos > -1) && (nextCardPos < portsPos)) {
-        qDebug() << "Audio device" << getDeviceName() << "doesn't have ports (PulseAudio)";
+        if (g_verboseOutput) {
+            qDebug() << "Audio device" << getDeviceName() << "doesn't have ports (PulseAudio)";
+        }
         return ports;
     }
     paPortsOutput = paPortsOutput.mid(portsPos);
@@ -425,7 +438,9 @@ QStringList AudioInputThread::getPortsList()
             linePos += portsRe.matchedLength();
         }
     }
-    qDebug() << "Audio device" << getDeviceName() << "has ports (PulseAudio):" << paPorts;
+    if (g_verboseOutput) {
+        qDebug() << "Audio device" << getDeviceName() << "has ports (PulseAudio):" << paPorts;
+    }
 
     QProcess amixerCmd;
     amixerCmd.start("amixer", QStringList() << "-c" << alsaCardIndex << "sget" << "\"PCM Capture Source\"", QIODevice::ReadOnly);
@@ -437,7 +452,9 @@ QStringList AudioInputThread::getPortsList()
         if ((amixerCmd.exitStatus() != QProcess::NormalExit) || (amixerCmd.exitCode() != 0)) {
             amixerOutput = amixerCmd.readAllStandardError();
             if (amixerOutput.contains("Unable to find simple control")) {
-                qDebug() << "Audio device" << getDeviceName() << "doesn't have control field \"PCM Capture Source\"";
+                if (g_verboseOutput) {
+                    qDebug() << "Audio device" << getDeviceName() << "doesn't have control field \"PCM Capture Source\"";
+                }
             } else {
                 qWarning() << "Command \"amixer sget PCM \"Capture Source\"\" was interrupted";
                 qDebug() << amixerOutput;
@@ -469,7 +486,9 @@ QStringList AudioInputThread::getPortsList()
             linePos += itemsRe.matchedLength();
         }
     }
-    qDebug() << "Audio device" << getDeviceName() << "has ports (Alsa):" << alsaPorts;
+    if (g_verboseOutput) {
+        qDebug() << "Audio device" << getDeviceName() << "has ports (Alsa):" << alsaPorts;
+    }
 
     foreach (QString alsaPort, alsaPorts) {
         foreach (QString paPort, paPorts) {
@@ -479,7 +498,9 @@ QStringList AudioInputThread::getPortsList()
             }
         }
     }
-    qDebug() << "Audio device" << getDeviceName() << "has ports (Total):" << m_portsMap;
+    if (g_verboseOutput) {
+        qDebug() << "Audio device" << getDeviceName() << "has ports (Total):" << m_portsMap;
+    }
 
     Settings *settings = Settings::getSettings();
     QString prevPort = settings->value("Capture/AudioInputDevicePort", "").toString();
@@ -504,7 +525,9 @@ QStringList AudioInputThread::getPortsList()
             alsaPort.prepend("* ");
         }
     }
-    qDebug() << "Audio device" << getDeviceName() << "has ports for choosing:" << ports;
+    if (g_verboseOutput) {
+        qDebug() << "Audio device" << getDeviceName() << "has ports for choosing:" << ports;
+    }
 
     return ports;
 #endif

@@ -12,6 +12,8 @@
 #include "tonegenerator.h"
 #include "settings.h"
 
+extern bool g_verboseOutput;
+
 AudioOutputDevice::AudioOutputDevice(QObject *parent) : QIODevice(parent)
 {
     m_frequency = 0;
@@ -141,9 +143,11 @@ ToneGenerator::ToneGenerator(QObject *parent) : QThread(parent)
     m_audioFormat.setCodec("audio/pcm");
     m_audioFormat.setByteOrder(QAudioFormat::LittleEndian);
     m_audioFormat.setSampleType(QAudioFormat::SignedInt);
-    qDebug() << "ToneGenerator::ToneGenerator " << m_audioFormat.sampleRate() << m_audioFormat.byteOrder()
-             << " " << m_audioFormat.channelCount() << " " << m_audioFormat.codec()
-             << " " << m_audioFormat.sampleSize() << " " << m_audioFormat.sampleType();
+    if (g_verboseOutput) {
+        qDebug() << "ToneGenerator::ToneGenerator " << m_audioFormat.sampleRate() << m_audioFormat.byteOrder()
+                 << " " << m_audioFormat.channelCount() << " " << m_audioFormat.codec()
+                 << " " << m_audioFormat.sampleSize() << " " << m_audioFormat.sampleType();
+    }
 }
 
 ToneGenerator::~ToneGenerator()
@@ -166,7 +170,6 @@ static BOOL CALLBACK enumerateCallbackDS(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTST
 
 QList<QPair<QString, QString>> ToneGenerator::enumerateDevices()
 {
-    extern bool g_verboseOutput;
     QList<QPair<QString, QString>> devices;
     if (m_generationEnabled) {
         qWarning() << "Devices can't be enumerated' - some of them is already in use";
@@ -235,7 +238,9 @@ QList<QPair<QString, QString>> ToneGenerator::enumerateDevices()
         int pos = pulseAudioRegExp.indexIn(pacmdOutput);
         if (pos > -1) {
             description = pulseAudioRegExp.cap(1);
-            qDebug() << name << "--" << description;
+            if (g_verboseOutput) {
+                qDebug() << name << "--" << description;
+            }
         }
 #endif
         if (g_verboseOutput) {
@@ -269,7 +274,9 @@ QList<QPair<QString, QString>> ToneGenerator::enumerateDevices()
         }
     }
     
-    qDebug() << "Detected audio output devices:" << devices;
+    if (g_verboseOutput) {
+        qDebug() << "Detected audio output devices:" << devices;
+    }
     return devices;
 }
 

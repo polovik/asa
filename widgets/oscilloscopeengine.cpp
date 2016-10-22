@@ -14,31 +14,10 @@ OscilloscopeEngine::OscilloscopeEngine(OscilloscopeView *view, QObject *parent) 
     m_dataForSingleCaptureAcqured = true;
     stop();
 
-    // create plot (from quadratic plot example):
-    QVector<double> x(1024), y(1024);
-    for (int i = 0; i < 100; ++i) {
-        x[i] = i * 0.016;
-        y[i] = 400 / 1024. * 50.;
-    }
-    for (int i = 100; i < 150; ++i) {
-        x[i] = i * 0.016;
-        y[i] = 100 / 1024. * 50.;
-    }
-    for (int i = 150; i < 151; ++i) {
-        x[i] = i * 0.016;
-        y[i] = 300 / 1024. * 50.;
-    }
-    for (int i = 151; i < 1024; ++i) {
-        x[i] = i * 0.016;
-        y[i] = (i) / 1024. * 50.;
-    }
-//    QVector<double> dataX = x;
-    QVector<double> dataY = y;
     m_triggerLevel = 0.;
     m_view->setTriggerLevel(m_triggerLevel);
     m_view->setYaxisRange(-1.0, 1.0);
     m_view->setXaxisRange(0, 1000 * 8000. / 44100);
-    draw(CHANNEL_LEFT, dataY);
     connect(m_view, SIGNAL(triggerLevelChanged(double)), this, SLOT(updateTriggerLevel(double)));
 }
 

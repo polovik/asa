@@ -79,7 +79,6 @@ int main(int argc, char *argv[])
     QString filename = QString(":/languages%1lang_%2").arg(QDir::separator()).arg(locale);
     if (translator.load(filename) ){
         QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8"));
-        qDebug() << "Translation file loaded" << filename;
         if (!QCoreApplication::installTranslator(&translator)) {
             qWarning() << "Translator couldn't be installed";
             Q_ASSERT(false);
