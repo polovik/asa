@@ -29,7 +29,11 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     yAxis->grid()->setZeroLinePen(zeroLinePen);
     
     setInteraction(QCP::iRangeZoom, true);
+    xAxis->axisRect()->setRangeZoom(Qt::Horizontal);
+    yAxis->axisRect()->setRangeZoom(Qt::Horizontal);
     setInteraction(QCP::iRangeDrag, true);
+    xAxis->axisRect()->setRangeDrag(Qt::Horizontal);
+    yAxis->axisRect()->setRangeDrag(Qt::Horizontal);
     setInteraction(QCP::iSelectItems, true);
     setInteraction(QCP::iMultiSelect, false);
 //    graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssTriangle, 10));
@@ -254,14 +258,18 @@ void OscilloscopeView::showGraph(DisplayedGraphId id, bool visible)
 
 void OscilloscopeView::mousePressEvent(QMouseEvent *event)
 {
+    if (event->button() != Qt::LeftButton) {
+        QCustomPlot::mousePressEvent(event);
+        return;
+    }
+
     QCPAbstractItem *selectedItem = itemAt(event->localPos(), true);
-    
-    qDebug() << "Selected item:" << selectedItem;
-    
     if (selectedItem == NULL) {
         QCustomPlot::mousePressEvent(event);
         return;
     }
+    qDebug() << "Selected item:" << selectedItem;
+
     QCPItemStraightLine *straightLine = qobject_cast<QCPItemStraightLine *>(selectedItem);
     if (straightLine == NULL) {
         QCustomPlot::mousePressEvent(event);
@@ -295,6 +303,18 @@ void OscilloscopeView::mousePressEvent(QMouseEvent *event)
     
     QWidget::mousePressEvent(event);
     replot();
+}
+
+void OscilloscopeView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (event->button() != Qt::MiddleButton) {
+        QCustomPlot::mouseDoubleClickEvent(event);
+        return;
+    }
+    xAxis->setRange(m_axisXminValue, m_axisXmaxValue);
+    yAxis->setRange(m_axisYminValue, m_axisYmaxValue);
+    replot();
+    event->accept();
 }
 
 void OscilloscopeView::mouseMoveEvent(QMouseEvent *event)
@@ -358,4 +378,22 @@ void OscilloscopeView::mouseReleaseEvent(QMouseEvent *event)
     
     QCustomPlot::mouseReleaseEvent(event);
     replot();
+}
+
+void OscilloscopeView::wheelEvent(QWheelEvent *event)
+{
+    Qt::KeyboardModifiers keys = event->modifiers();
+    if ((keys & Qt::ShiftModifier) || (keys & Qt::ControlModifier) || (keys & Qt::AltModifier)) {
+        xAxis->axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
+        yAxis->axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
+        xAxis->axisRect()->setRangeDrag(Qt::Horizontal | Qt::Vertical);
+        yAxis->axisRect()->setRangeDrag(Qt::Horizontal | Qt::Vertical);
+    }
+
+    QCustomPlot::wheelEvent(event);
+
+    xAxis->axisRect()->setRangeZoom(Qt::Horizontal);
+    yAxis->axisRect()->setRangeZoom(Qt::Horizontal);
+    xAxis->axisRect()->setRangeDrag(Qt::Horizontal);
+    yAxis->axisRect()->setRangeDrag(Qt::Horizontal);
 }
