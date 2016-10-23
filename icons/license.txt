@@ -37,5 +37,23 @@ Thanks to webdesignerdepot.com
 File "potentiometer.ico" was obtained from http://findicons.com/icon/567870/potentiometer
 Thanks to VisualPharm
 
-File "Lissajous_curve_1by2.svg.pngwas obtained from https://commons.wikimedia.org/wiki/File%3ALissajous_curve_1by2.svg
+File "Lissajous_curve_1by2.svg.png" was obtained from https://commons.wikimedia.org/wiki/File%3ALissajous_curve_1by2.svg
 Thanks to By Alessio Damato
+
+File "open.ico" was obtained from http://findicons.com/icon/209806/open_folder_yellow
+Thanks to FOOOD
+
+File "save.ico" was obtained from http://findicons.com/icon/226973/3floppy_unmount
+Thanks to David Vignoni
+
+File "calibrate.ico" was obtained from http://findicons.com/icon/208375/screwdriver
+Thanks to Yahir Vite
+
+Files "sound_right.png" and "sound_left.png" were obtained from http://findicons.com/icon/464637/sound_1
+Thanks to icojam
+
+File "analyze.ico" was obtained from http://findicons.com/icon/24687/nero_smart_start
+Thanks to Deleket (Jojo Mendoza)
+
+Files "locked.ico" and "unlocked.ico" were obtained from http://findicons.com/icon/25023/lock_lock_01 and http://findicons.com/icon/24948/lock_unlock_01
+Thanks to Deleket (Jojo Mendoza)

@@ -110,18 +110,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formanalyze.ui" line="201"/>
+        <location filename="../formanalyze.ui" line="211"/>
         <location filename="../formanalyze.cpp" line="238"/>
         <source>Open signature</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formanalyze.ui" line="227"/>
+        <location filename="../formanalyze.ui" line="241"/>
         <source>Lock signature</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formanalyze.ui" line="256"/>
+        <location filename="../formanalyze.ui" line="275"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
@@ -145,7 +145,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="139"/>
+        <location filename="../formcalibration.ui" line="147"/>
         <source>Input audio device</source>
         <translation type="unfinished"></translation>
     </message>
@@ -161,69 +161,69 @@
     </message>
     <message>
         <location filename="../formcalibration.ui" line="89"/>
-        <location filename="../formcalibration.ui" line="225"/>
+        <location filename="../formcalibration.ui" line="233"/>
         <source>?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="110"/>
-        <location filename="../formcalibration.ui" line="486"/>
-        <location filename="../formcalibration.ui" line="582"/>
+        <location filename="../formcalibration.ui" line="504"/>
+        <location filename="../formcalibration.ui" line="589"/>
         <source>Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="120"/>
-        <location filename="../formcalibration.ui" line="496"/>
-        <location filename="../formcalibration.ui" line="592"/>
+        <location filename="../formcalibration.ui" line="124"/>
+        <location filename="../formcalibration.ui" line="514"/>
+        <location filename="../formcalibration.ui" line="599"/>
         <source>Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="249"/>
+        <location filename="../formcalibration.ui" line="257"/>
         <source>Calibrate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="274"/>
+        <location filename="../formcalibration.ui" line="292"/>
         <source>Generator&apos;s tone volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="302"/>
-        <location filename="../formcalibration.ui" line="330"/>
+        <location filename="../formcalibration.ui" line="320"/>
+        <location filename="../formcalibration.ui" line="348"/>
         <source>V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="346"/>
+        <location filename="../formcalibration.ui" line="364"/>
         <source>Amplitude
 Vpk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="357"/>
+        <location filename="../formcalibration.ui" line="375"/>
         <source>RMS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="384"/>
+        <location filename="../formcalibration.ui" line="402"/>
         <source>Input amplify factor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="429"/>
+        <location filename="../formcalibration.ui" line="447"/>
         <source>factor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="470"/>
+        <location filename="../formcalibration.ui" line="488"/>
         <source>Input channels offsets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="524"/>
-        <location filename="../formcalibration.ui" line="551"/>
+        <location filename="../formcalibration.ui" line="542"/>
+        <location filename="../formcalibration.ui" line="569"/>
         <source>offset</source>
         <translation type="unfinished"></translation>
     </message>
@@ -289,24 +289,24 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="166"/>
+        <location filename="../formdiagnose.cpp" line="172"/>
         <source>Save Photo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="168"/>
-        <location filename="../formdiagnose.cpp" line="202"/>
-        <location filename="../formdiagnose.cpp" line="387"/>
+        <location filename="../formdiagnose.cpp" line="174"/>
+        <location filename="../formdiagnose.cpp" line="208"/>
+        <location filename="../formdiagnose.cpp" line="393"/>
         <source>Images (*.tif *.tiff)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="200"/>
+        <location filename="../formdiagnose.cpp" line="206"/>
         <source>Open board by photo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="385"/>
+        <location filename="../formdiagnose.cpp" line="391"/>
         <source>Save Diagnostic Results</source>
         <translation type="unfinished"></translation>
     </message>
@@ -553,25 +553,25 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/oscilloscopeview.cpp" line="50"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="156"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="285"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="328"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="62"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="168"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="301"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="356"/>
         <source>%1ms, %2V</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/oscilloscopeview.cpp" line="87"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="334"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="99"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="362"/>
         <source> ms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/oscilloscopeview.cpp" line="109"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="209"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="214"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="279"/>
-        <location filename="../widgets/oscilloscopeview.cpp" line="314"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="121"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="221"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="226"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="295"/>
+        <location filename="../widgets/oscilloscopeview.cpp" line="342"/>
         <source> V</source>
         <translation type="unfinished"></translation>
     </message>
