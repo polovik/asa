@@ -523,10 +523,10 @@ Vpk</string>
               <item>
                <widget class="QSlider" name="sliderLeftInputOffset">
                 <property name="minimum">
-                 <number>-100</number>
+                 <number>-200</number>
                 </property>
                 <property name="maximum">
-                 <number>100</number>
+                 <number>200</number>
                 </property>
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
@@ -550,10 +550,10 @@ Vpk</string>
               <item>
                <widget class="QSlider" name="sliderRightInputOffset">
                 <property name="minimum">
-                 <number>-100</number>
+                 <number>-200</number>
                 </property>
                 <property name="maximum">
-                 <number>100</number>
+                 <number>200</number>
                 </property>
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>

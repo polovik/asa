@@ -41,6 +41,7 @@ private slots:
 
 private:
     void setGeneratorMagnitude(qreal peak);
+    void lockWidgets(bool locked);
 
     Ui::FormCalibration *ui;
     ToneGenerator *m_gen;

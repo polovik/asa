@@ -80,12 +80,12 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     int factor = m_capture->getAmplifyFactor() * 100;
     ui->sliderAmplifyInput->setValue(factor);
     ui->labelAmplifyInput->setText(QString::number(m_capture->getAmplifyFactor(), 'f', 2));
-    int leftOffset = m_capture->getChannelOffset(CHANNEL_LEFT) * 100;
+    int leftOffset = m_capture->getChannelOffset(CHANNEL_LEFT) * 1000;
     ui->sliderLeftInputOffset->setValue(leftOffset);
-    ui->labelLeftInputOffset->setText(QString::number(m_capture->getChannelOffset(CHANNEL_LEFT), 'f', 2));
-    int rightOffset = m_capture->getChannelOffset(CHANNEL_RIGHT) * 100;
+    ui->labelLeftInputOffset->setText(QString::number(m_capture->getChannelOffset(CHANNEL_LEFT), 'f', 3));
+    int rightOffset = m_capture->getChannelOffset(CHANNEL_RIGHT) * 1000;
     ui->sliderRightInputOffset->setValue(rightOffset);
-    ui->labelRightInputOffset->setText(QString::number(m_capture->getChannelOffset(CHANNEL_RIGHT), 'f', 2));
+    ui->labelRightInputOffset->setText(QString::number(m_capture->getChannelOffset(CHANNEL_RIGHT), 'f', 3));
     connect(ui->sliderAmplifyInput, SIGNAL(valueChanged(int)), this, SLOT(changeInputAmplifyFactor(int)));
     connect(ui->sliderLeftInputOffset, SIGNAL(valueChanged(int)), this, SLOT(changeInputOffset(int)));
     connect(ui->sliderRightInputOffset, SIGNAL(valueChanged(int)), this, SLOT(changeInputOffset(int)));
@@ -95,6 +95,8 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
 
     ui->viewLeftChannelLevel->setMaximumAmplitude(1.0);
     ui->viewRightChannelLevel->setMaximumAmplitude(1.0);
+
+    lockWidgets(true);
 }
 
 FormCalibration::~FormCalibration()
@@ -117,6 +119,7 @@ void FormCalibration::leaveForm()
     ui->buttonCalibrate->setChecked(false);
     m_oscEngine->stop();
     m_capture->setMaxInputVoltage(m_gen->getMaxVoltageAmplitude());
+    lockWidgets(true);
 }
 
 void FormCalibration::switchOutputAudioDevice(int index)
@@ -250,6 +253,7 @@ void FormCalibration::runCalibration(bool start)
     if (start == false) {
         m_oscEngine->stop();
     }
+    lockWidgets(!start);
 }
 
 void FormCalibration::setGeneratorMagnitudePeak(double voltage)
@@ -286,6 +290,21 @@ void FormCalibration::setGeneratorMagnitude(qreal peak)
     m_gen->setCurVoltageAmplitude(peak);
 }
 
+void FormCalibration::lockWidgets(bool locked)
+{
+    ui->sliderAmplifyInput->setEnabled(!locked);
+    ui->sliderLeftInputOffset->setEnabled(!locked);
+    ui->sliderRightInputOffset->setEnabled(!locked);
+    ui->boxGeneratorPeak->setEnabled(!locked);
+    ui->boxGeneratorRMS->setEnabled(!locked);
+
+    ui->buttonLeftOutputChannel->setEnabled(locked);
+    ui->buttonRightOutputChannel->setEnabled(locked);
+    ui->boxAudioInputDevice->setEnabled(locked);
+    ui->boxAudioInputDevicePort->setEnabled(locked);
+    ui->boxAudioOutputDevice->setEnabled(locked);
+}
+
 void FormCalibration::changeInputAmplifyFactor(int percents)
 {
     qreal factor = percents / 100.;
@@ -295,14 +314,14 @@ void FormCalibration::changeInputAmplifyFactor(int percents)
 
 void FormCalibration::changeInputOffset(int percents)
 {
-    qreal offset = percents / 100.;
+    qreal offset = percents / 1000.;
     AudioChannels channel = CHANNEL_NONE;
     if (sender() == ui->sliderLeftInputOffset) {
         channel = CHANNEL_LEFT;
-        ui->labelLeftInputOffset->setText(QString::number(offset, 'f', 2));
+        ui->labelLeftInputOffset->setText(QString::number(offset, 'f', 3));
     } else if (sender() == ui->sliderRightInputOffset) {
         channel = CHANNEL_RIGHT;
-        ui->labelRightInputOffset->setText(QString::number(offset, 'f', 2));
+        ui->labelRightInputOffset->setText(QString::number(offset, 'f', 3));
     }
     m_capture->setChannelOffset(channel, offset);
 }
