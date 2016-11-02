@@ -77,16 +77,13 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     connect(ui->boxGeneratorRMS, SIGNAL(valueChanged(double)), this, SLOT(setGeneratorMagnitudeRMS(double)));
     setGeneratorMagnitude(magnitude);
 
-    int factor = m_capture->getAmplifyFactor() * 100;
-    ui->sliderAmplifyInput->setValue(factor);
-    ui->labelAmplifyInput->setText(QString::number(m_capture->getAmplifyFactor(), 'f', 2));
     int leftOffset = m_capture->getChannelOffset(CHANNEL_LEFT) * 1000;
     ui->sliderLeftInputOffset->setValue(leftOffset);
     ui->labelLeftInputOffset->setText(QString::number(m_capture->getChannelOffset(CHANNEL_LEFT), 'f', 3));
     int rightOffset = m_capture->getChannelOffset(CHANNEL_RIGHT) * 1000;
     ui->sliderRightInputOffset->setValue(rightOffset);
     ui->labelRightInputOffset->setText(QString::number(m_capture->getChannelOffset(CHANNEL_RIGHT), 'f', 3));
-    connect(ui->sliderAmplifyInput, SIGNAL(valueChanged(int)), this, SLOT(changeInputAmplifyFactor(int)));
+    connect(ui->sliderCaptureVolume, SIGNAL(valueChanged(int)), this, SLOT(changeCaptureVolume(int)));
     connect(ui->sliderLeftInputOffset, SIGNAL(valueChanged(int)), this, SLOT(changeInputOffset(int)));
     connect(ui->sliderRightInputOffset, SIGNAL(valueChanged(int)), this, SLOT(changeInputOffset(int)));
 
@@ -175,6 +172,13 @@ void FormCalibration::switchInputAudioDevice(int index)
             index++;
         }
     }
+
+    int maxCaptureVolume, curCaptureVolume;
+    m_capture->getVolume(m_baseCaptureVolume, curCaptureVolume, maxCaptureVolume);
+    ui->sliderCaptureVolume->setMaximum(maxCaptureVolume);
+    ui->sliderCaptureVolume->setTickInterval(maxCaptureVolume / 20);
+    ui->sliderCaptureVolume->setValue(curCaptureVolume);
+    ui->labelCaptureVolume->setText(QString::number(1.0 * curCaptureVolume / m_baseCaptureVolume, 'f', 2));
 }
 
 void FormCalibration::switchInputAudioDevicePort(int index)
@@ -292,7 +296,7 @@ void FormCalibration::setGeneratorMagnitude(qreal peak)
 
 void FormCalibration::lockWidgets(bool locked)
 {
-    ui->sliderAmplifyInput->setEnabled(!locked);
+    ui->sliderCaptureVolume->setEnabled(!locked);
     ui->sliderLeftInputOffset->setEnabled(!locked);
     ui->sliderRightInputOffset->setEnabled(!locked);
     ui->boxGeneratorPeak->setEnabled(!locked);
@@ -305,11 +309,10 @@ void FormCalibration::lockWidgets(bool locked)
     ui->boxAudioOutputDevice->setEnabled(locked);
 }
 
-void FormCalibration::changeInputAmplifyFactor(int percents)
+void FormCalibration::changeCaptureVolume(int volume)
 {
-    qreal factor = percents / 100.;
-    m_capture->setAmplifyFactor(factor);
-    ui->labelAmplifyInput->setText(QString::number(factor, 'f', 2));
+    m_capture->setVolume(volume);
+    ui->labelCaptureVolume->setText(QString::number(1.0 * volume / m_baseCaptureVolume, 'f', 2));
 }
 
 void FormCalibration::changeInputOffset(int percents)

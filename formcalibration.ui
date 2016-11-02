@@ -399,7 +399,7 @@ Vpk</string>
             <item>
              <widget class="QLabel" name="label_8">
               <property name="text">
-               <string>Input amplify factor</string>
+               <string>Capture device volume</string>
               </property>
              </widget>
             </item>
@@ -426,7 +426,7 @@ Vpk</string>
                </spacer>
               </item>
               <item>
-               <widget class="QSlider" name="sliderAmplifyInput">
+               <widget class="QSlider" name="sliderCaptureVolume">
                 <property name="minimum">
                  <number>100</number>
                 </property>
@@ -442,9 +442,9 @@ Vpk</string>
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="labelAmplifyInput">
+               <widget class="QLabel" name="labelCaptureVolume">
                 <property name="text">
-                 <string>factor</string>
+                 <string>volume</string>
                 </property>
                </widget>
               </item>

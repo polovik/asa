@@ -69,6 +69,8 @@ public:
     qreal getAmplifyFactor();
     void setChannelOffset(AudioChannels channel, qreal offset);
     qreal getChannelOffset(AudioChannels channel);
+    void getVolume(int &baseVolume, int &curVolume, int &maxVolume);
+    void setVolume(int volume);
     
 public slots:
     void switchInputDevice(QString name);
@@ -97,6 +99,7 @@ private:
     qreal m_leftChannelOffset;
     qreal m_rightChannelOffset;
     QMap<QString, QString> m_portsMap;
+    int m_systemVolume;
 };
 
 #endif // AUDIOINPUTDEVICE_H

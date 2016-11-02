@@ -111,6 +111,7 @@ AudioInputThread::AudioInputThread()
     m_amplifyFactor = settings->value("Capture/VoltageAmplifyFactor", 1.0).toDouble();
     m_leftChannelOffset = settings->value("Capture/LeftChannelOffset", 0.0).toDouble();
     m_rightChannelOffset = settings->value("Capture/RightChannelOffset", 0.0).toDouble();
+    m_systemVolume = settings->value("Capture/SystemVolume", 0).toInt();
 
     // set up the format you want, eg.
     m_sampleRate = 44100;
@@ -174,6 +175,9 @@ void AudioInputThread::stateChanged(QAudio::State newState)
     if (m_audioInput->error() != QAudio::NoError) {
         qDebug() << "QAudio error" << m_audioInput->error();
         Q_ASSERT(false);
+    }
+    if (newState == QAudio::ActiveState) {
+        setVolume(m_systemVolume);
     }
 }
 
@@ -597,6 +601,144 @@ qreal AudioInputThread::getChannelOffset(AudioChannels channel)
         Q_ASSERT(false);
         return 0.0;
     }
+}
+
+void AudioInputThread::getVolume(int &baseVolume, int &curVolume, int &maxVolume)
+{
+    baseVolume = -1;
+    curVolume = -1;
+    maxVolume = -1;
+#if !defined(_WIN32)
+    QProcess pacmd;
+    pacmd.start("pacmd", QStringList() << "list-sources", QIODevice::ReadOnly);
+    QString pacmdOutput = "";
+    if (!pacmd.waitForFinished()) {
+        qWarning() << "Command \"pacmd list-sources\" is invalid";
+        Q_ASSERT(false);
+        return;
+    } else {
+        if ((pacmd.exitStatus() != QProcess::NormalExit) || (pacmd.exitCode() != 0)) {
+            qWarning() << "Command \"pacmd list-sources\" was interrupted";
+            Q_ASSERT(false);
+            return;
+        } else {
+            pacmdOutput = pacmd.readAll();
+        }
+    }
+    /*
+      index: 3
+            name: <alsa_input.pci-0000_00_1b.0.analog-stereo>
+            volume: front-left: 65222 / 100% / -0.13 dB,   front-right: 65222 / 100% / -0.13 dB
+                    balance 0.00
+            base volume: 42869 /  65% / -11.06 dB
+            volume steps: 65537
+      or
+    * index: 1
+            name: <alsa_input.usb-046d_0825_36D88820-02.analog-mono>
+            volume: mono: 42703 /  65% / -11.16 dB
+                    balance 0.00
+            base volume: 20724 /  32% / -30.00 dB
+            volume steps: 65537
+    */
+    QString pattern = QRegExp::escape(getDeviceName()) + QString(".*base\\svolume:\\s*(\\d+)\\s");
+    QRegExp rx(pattern, Qt::CaseSensitive, QRegExp::RegExp2);
+    rx.setMinimal(true);
+    int pos = rx.indexIn(pacmdOutput);
+    if (pos > -1) {
+        QString volume = rx.cap(1);
+        bool ok = false;
+        baseVolume = volume.toInt(&ok);
+        if (!ok) {
+            qWarning() << "Couldn't get integer value from base volume" << volume << "for audio device" << getDeviceName();
+            Q_ASSERT(false);
+            return;
+        } else {
+            if (g_verboseOutput) {
+                qDebug() << "Audio device" << getDeviceName() << "has base volume -" << baseVolume;
+            }
+        }
+    } else {
+        qWarning() << "Couldn't find base volume for audio device" << getDeviceName();
+        Q_ASSERT(false);
+        return;
+    }
+    pattern = QRegExp::escape(getDeviceName()) + QString(".*\\tvolume:\\s*(front-left|mono):\\s*(\\d+)\\s");
+    rx.setPattern(pattern);
+    pos = rx.indexIn(pacmdOutput);
+    if (pos > -1) {
+        QString volume = rx.cap(2);
+        bool ok = false;
+        curVolume = volume.toInt(&ok);
+        if (!ok) {
+            qWarning() << "Couldn't get integer value from current volume" << volume << "for audio device" << getDeviceName();
+            Q_ASSERT(false);
+            return;
+        } else {
+            if (g_verboseOutput) {
+                qDebug() << "Audio device" << getDeviceName() << "has current volume -" << curVolume;
+            }
+        }
+    } else {
+        qWarning() << "Couldn't find current volume for audio device" << getDeviceName();
+        Q_ASSERT(false);
+        return;
+    }
+    pattern = QRegExp::escape(getDeviceName()) + QString(".*\\svolume\\ssteps:\\s*(\\d+)\\b");
+    rx.setPattern(pattern);
+    pos = rx.indexIn(pacmdOutput);
+    if (pos > -1) {
+        QString volume = rx.cap(1);
+        bool ok = false;
+        maxVolume = volume.toInt(&ok);
+        if (!ok) {
+            qWarning() << "Couldn't get integer value from max volume" << volume << "for audio device" << getDeviceName();
+            Q_ASSERT(false);
+            return;
+        } else {
+            if (g_verboseOutput) {
+                qDebug() << "Audio device" << getDeviceName() << "has max volume -" << maxVolume;
+            }
+        }
+        maxVolume = maxVolume * 2;
+    } else {
+        qWarning() << "Couldn't find max volume for audio device" << getDeviceName();
+        Q_ASSERT(false);
+        return;
+    }
+#endif
+    if (baseVolume <= 0) {
+        m_systemVolume = 0;
+    } else {
+        Settings *settings = Settings::getSettings();
+        m_systemVolume = settings->value("Capture/SystemVolume", baseVolume).toInt();
+    }
+}
+
+void AudioInputThread::setVolume(int volume)
+{
+    qDebug() << "Set volume for audio input device to" << volume;
+
+#if !defined(_WIN32)
+    QProcess pacmd;
+    pacmd.start("pacmd", QStringList() << "set-source-volume" << getDeviceName() << QString::number(volume), QIODevice::ReadOnly);
+    if (!pacmd.waitForFinished(5000)) {
+        qWarning() << "Command \"pacmd set-source-volume\" is invalid";
+        Q_ASSERT(false);
+        return;
+    } else {
+        if ((pacmd.exitStatus() != QProcess::NormalExit) || (pacmd.exitCode() != 0)) {
+            qWarning() << "Command \"pacmd set-source-volume\" was interrupted";
+            Q_ASSERT(false);
+            return;
+        } else {
+            qDebug() << "Audio source device's volume has been changed to" << volume;
+        }
+    }
+#endif
+
+    Settings *settings = Settings::getSettings();
+    settings->setValue("Capture/SystemVolume", volume);
+    m_systemVolume = volume;
 }
 
 void AudioInputThread::switchInputDevice(QString name)

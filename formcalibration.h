@@ -36,7 +36,7 @@ private slots:
     void showHint();
     void setGeneratorMagnitudePeak(double voltage);
     void setGeneratorMagnitudeRMS(double voltage);
-    void changeInputAmplifyFactor(int percents);
+    void changeCaptureVolume(int volume);
     void changeInputOffset(int percents);
 
 private:
@@ -47,6 +47,7 @@ private:
     ToneGenerator *m_gen;
     AudioInputThread *m_capture;
     OscilloscopeEngine *m_oscEngine;
+    int m_baseCaptureVolume;
 };
 
 #endif // FORMCALIBRATION_H
