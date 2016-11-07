@@ -175,6 +175,7 @@ void FormCalibration::switchInputAudioDevice(int index)
 
     int maxCaptureVolume, curCaptureVolume;
     m_capture->getVolume(m_baseCaptureVolume, curCaptureVolume, maxCaptureVolume);
+    ui->sliderCaptureVolume->setMinimum(0);
     ui->sliderCaptureVolume->setMaximum(maxCaptureVolume);
     ui->sliderCaptureVolume->setTickInterval(maxCaptureVolume / 20);
     ui->sliderCaptureVolume->setValue(curCaptureVolume);

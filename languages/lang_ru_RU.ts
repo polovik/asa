@@ -198,12 +198,12 @@
     </message>
     <message>
         <location filename="../formcalibration.ui" line="402"/>
-        <source>Input amplify factor</source>
+        <source>Capture device volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="447"/>
-        <source>factor</source>
+        <source>volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -278,12 +278,12 @@ Potentiometers on the board have to be adjusted for making the same voltage on b
 Переменные резисторы на плате должны быть подстроены для получения одинакового напряжения на обоих пинах входного аудио устройства.</translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="315"/>
+        <location filename="../formcalibration.cpp" line="338"/>
         <source>Perform calibration</source>
         <translation>Выполнение калибровки</translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="316"/>
+        <location filename="../formcalibration.cpp" line="339"/>
         <source>This area helps to adjust maximal voltage on audio input pins.
 Button pressing leads to play tone on left and right channel simultaneously.
 Tone is Sine 50Hz with maximal amplitude.
@@ -300,12 +300,12 @@ For correct signature displaying, it needs to specify range of axes.Measured vol
 - RMS - когда используется обычный вольтметр в режиме измерения ~U</translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="326"/>
+        <location filename="../formcalibration.cpp" line="349"/>
         <source>Play tone</source>
         <translation>Проиграть тоновый сигнал</translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="327"/>
+        <location filename="../formcalibration.cpp" line="350"/>
         <source>This buttons help to distinguish audio output pins.
 Button pressing leads to play tone on specific channel.
 Tone is Sine 50Hz with maximal amplitude.</source>

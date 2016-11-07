@@ -215,7 +215,9 @@ QList<QPair<QString, QString>> ToneGenerator::enumerateDevices()
         foreach (QString fullName, devicesFullNames) {
             if (fullName.startsWith(name)) {
                 description = fullName;
-                qDebug() << name << "--" << description;
+                if (g_verboseOutput) {
+                    qDebug() << name << "--" << description;
+                }
                 break;
             }
         }

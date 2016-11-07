@@ -208,12 +208,12 @@ Vpk</source>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="402"/>
-        <source>Input amplify factor</source>
+        <source>Capture device volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="447"/>
-        <source>factor</source>
+        <source>volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -228,12 +228,12 @@ Vpk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="315"/>
+        <location filename="../formcalibration.cpp" line="338"/>
         <source>Perform calibration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="316"/>
+        <location filename="../formcalibration.cpp" line="339"/>
         <source>This area helps to adjust maximal voltage on audio input pins.
 Button pressing leads to play tone on left and right channel simultaneously.
 Tone is Sine 50Hz with maximal amplitude.
@@ -244,12 +244,12 @@ For correct signature displaying, it needs to specify range of axes.Measured vol
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="326"/>
+        <location filename="../formcalibration.cpp" line="349"/>
         <source>Play tone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="327"/>
+        <location filename="../formcalibration.cpp" line="350"/>
         <source>This buttons help to distinguish audio output pins.
 Button pressing leads to play tone on specific channel.
 Tone is Sine 50Hz with maximal amplitude.</source>

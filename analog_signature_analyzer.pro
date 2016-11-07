@@ -94,6 +94,8 @@ win32 {
         error("Some required libraries are missed.")
     }
     LIBS += -ldsound
+    # Set/Get global audio capture volume level
+    LIBS += -lOle32
 }
 unix {
     LIBS += -lz -ltiff

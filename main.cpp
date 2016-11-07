@@ -35,6 +35,11 @@ void logging(QtMsgType type, const QMessageLogContext &context, const QString &m
     fprintf(logStream, "%s ", qPrintable(formatedTime));
     
     switch (type) {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
+    case QtInfoMsg:
+        fprintf(logStream, "Info: %s (`%s:%u, %s`)\n", localMsg.constData(), file.constData(), context.line, context.function);
+        break;
+#endif
     case QtDebugMsg:
         fprintf(logStream, "Debug: %s (`%s:%u, %s`)\n", localMsg.constData(), file.constData(), context.line, context.function);
         break;

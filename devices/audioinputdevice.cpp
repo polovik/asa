@@ -6,6 +6,10 @@
 #include <QProcess>
 #if defined(_WIN32)
 #include <DSound.h>
+#include <mmdeviceapi.h>
+#include <endpointvolume.h>
+#include <initguid.h>
+#include <Functiondiscoverykeys_devpkey.h>
 #endif
 #include "audioinputdevice.h"
 #include "settings.h"
@@ -258,7 +262,9 @@ QList<QPair<QString, QString>> AudioInputThread::enumerateDevices()
         foreach (QString fullName, devicesFullNames) {
             if (fullName.startsWith(name)) {
                 description = fullName;
-                qDebug() << name << "--" << description;
+                if (g_verboseOutput) {
+                    qDebug() << name << "--" << description;
+                }
                 break;
             }
         }
@@ -603,12 +609,129 @@ qreal AudioInputThread::getChannelOffset(AudioChannels channel)
     }
 }
 
+#if defined(_WIN32)
+IAudioEndpointVolume *getAudioEndpointVolume(QString deviceName)
+{
+    IMMDeviceEnumerator *deviceEnumerator = NULL;
+    IMMDeviceCollection *pCollection = NULL;
+    HRESULT hr;
+    IAudioEndpointVolume *endpointVolume = NULL;
+    bool foundEndpoint = false;
+    hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (LPVOID *)&deviceEnumerator);
+    if (FAILED(hr)) {
+        qWarning() << "Couldn't create instance of MMDeviceEnumerator";
+        goto clear_res;
+    }
+    hr = deviceEnumerator->EnumAudioEndpoints(eCapture, DEVICE_STATE_ACTIVE | DEVICE_STATE_DISABLED, &pCollection);
+    if (FAILED(hr)) {
+        qWarning() << "Couldn't enumerate Capture AudioEndpoints";
+        goto clear_res;
+    }
+    UINT count;
+    hr = pCollection->GetCount(&count);
+    if (FAILED(hr)) {
+        qWarning() << "Couldn't get count of Capture AudioEndpoints";
+        goto clear_res;
+    }
+    for (ULONG i = 0; i < count; i++) {
+        IMMDevice *pEndpoint = NULL;
+        IPropertyStore *pProps = NULL;
+        endpointVolume = NULL;
+        LPWSTR pwszID = NULL;
+        PROPVARIANT varName;
+        QString pointName;
+        // Initialize container for property value.
+        PropVariantInit(&varName);
+        // Get pointer to endpoint number i.
+        hr = pCollection->Item(i, &pEndpoint);
+        if (FAILED(hr)) {
+            qWarning() << "Couldn't get AudioEndpoint at" << i;
+            goto endpoint_clear;
+        }
+        // Get the endpoint ID string.
+        hr = pEndpoint->GetId(&pwszID);
+        if (FAILED(hr)) {
+            qWarning() << "Couldn't get AudioEndpoint's ID string at" << i;
+            goto endpoint_clear;
+        }
+        hr = pEndpoint->OpenPropertyStore(STGM_READ, &pProps);
+        if (FAILED(hr)) {
+            qWarning() << "Couldn't read properties for AudioEndpoint at" << i;
+            goto endpoint_clear;
+        }
+        hr = pProps->GetValue(PKEY_Device_FriendlyName, &varName);
+        if (FAILED(hr)) {
+            qWarning() << "Couldn't get friendly name of AudioEndpoint at" << i;
+            goto endpoint_clear;
+        }
+        pointName = QString::fromWCharArray(varName.pwszVal);
+        if (pointName.startsWith(deviceName)) {
+            hr = pEndpoint->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID *)&endpointVolume);
+            if (FAILED(hr)) {
+                qWarning() << "Couldn't get access to AudioEndpoint at" << i << "name:" << pointName;
+                goto endpoint_clear;
+            }
+            foundEndpoint = true;
+        }
+
+endpoint_clear:
+        if (pwszID != NULL) {
+            CoTaskMemFree(pwszID);
+        }
+        PropVariantClear(&varName);
+        if (pProps != NULL) {
+            pProps->Release();
+        }
+        if (pEndpoint != NULL) {
+            pEndpoint->Release();
+        }
+        if (foundEndpoint) {
+            break;
+        } else {
+            if (endpointVolume != NULL) {
+                endpointVolume->Release();
+            }
+        }
+    }
+clear_res:
+    if (deviceEnumerator != NULL) {
+        deviceEnumerator->Release();
+    }
+    if (pCollection != NULL) {
+        pCollection->Release();
+    }
+    return endpointVolume;
+}
+
+#endif
+
 void AudioInputThread::getVolume(int &baseVolume, int &curVolume, int &maxVolume)
 {
     baseVolume = -1;
     curVolume = -1;
     maxVolume = -1;
-#if !defined(_WIN32)
+#if defined(_WIN32)
+    IAudioEndpointVolume *endpointVolume = getAudioEndpointVolume(getDeviceName());
+    if (endpointVolume != NULL) {
+        float currentVolume = 0;
+        HRESULT hr = endpointVolume->GetMasterVolumeLevelScalar(&currentVolume);
+        endpointVolume->Release();
+        if (FAILED(hr)) {
+            qWarning() << "Couldn't get master volume level of AudioEndpoint" << getDeviceName();
+            Q_ASSERT(false);
+            return;
+        } else {
+            qDebug() << "Endpoint" << getDeviceName() << "- current volume as a scalar is:" << currentVolume;
+            baseVolume = 1;
+            curVolume = currentVolume * 100;
+            maxVolume = 100;
+        }
+    } else {
+        qWarning() << "Couldn't find AudioEndpoint for device" << getDeviceName();
+        Q_ASSERT(false);
+        return;
+    }
+#else
     QProcess pacmd;
     pacmd.start("pacmd", QStringList() << "list-sources", QIODevice::ReadOnly);
     QString pacmdOutput = "";
@@ -711,6 +834,7 @@ void AudioInputThread::getVolume(int &baseVolume, int &curVolume, int &maxVolume
     } else {
         Settings *settings = Settings::getSettings();
         m_systemVolume = settings->value("Capture/SystemVolume", baseVolume).toInt();
+        curVolume = m_systemVolume;
     }
 }
 
@@ -718,7 +842,27 @@ void AudioInputThread::setVolume(int volume)
 {
     qDebug() << "Set volume for audio input device to" << volume;
 
-#if !defined(_WIN32)
+#if defined(_WIN32)
+    IAudioEndpointVolume *endpointVolume = getAudioEndpointVolume(getDeviceName());
+    if (endpointVolume != NULL) {
+        float newVolume = volume / 100.;
+        HRESULT hr = endpointVolume->SetMasterVolumeLevelScalar((float)newVolume, NULL);
+        endpointVolume->Release();
+        if (FAILED(hr)) {
+            qWarning() << "Couldn't get master volume level of AudioEndpoint" << getDeviceName();
+            Q_ASSERT(false);
+            return;
+        } else {
+            if (g_verboseOutput) {
+                qDebug() << "Audio source device's volume has been changed to" << volume;
+            }
+        }
+    } else {
+        qWarning() << "Couldn't find AudioEndpoint for device" << getDeviceName();
+        Q_ASSERT(false);
+        return;
+    }
+#else
     QProcess pacmd;
     pacmd.start("pacmd", QStringList() << "set-source-volume" << getDeviceName() << QString::number(volume), QIODevice::ReadOnly);
     if (!pacmd.waitForFinished(5000)) {
@@ -731,7 +875,9 @@ void AudioInputThread::setVolume(int volume)
             Q_ASSERT(false);
             return;
         } else {
-            qDebug() << "Audio source device's volume has been changed to" << volume;
+            if (g_verboseOutput) {
+                qDebug() << "Audio source device's volume has been changed to" << volume;
+            }
         }
     }
 #endif
