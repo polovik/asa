@@ -9,7 +9,8 @@
 #include <mmdeviceapi.h>
 #include <endpointvolume.h>
 #include <initguid.h>
-#include <Functiondiscoverykeys_devpkey.h>
+// #include <Functiondiscoverykeys_devpkey.h>
+#include <propkeydef.h>
 #endif
 #include "audioinputdevice.h"
 #include "settings.h"
@@ -610,6 +611,8 @@ qreal AudioInputThread::getChannelOffset(AudioChannels channel)
 }
 
 #if defined(_WIN32)
+DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 14);
+
 IAudioEndpointVolume *getAudioEndpointVolume(QString deviceName)
 {
     IMMDeviceEnumerator *deviceEnumerator = NULL;

@@ -71,7 +71,6 @@ void FormAnalyze::enterForm()
         qWarning() << "Invalid format of signal form:" << waveForm << ". Select \"sine\"";
         ui->boxWaveForm->setCurrentIndex(0);
     }
-    ui->viewSignature->setMaximumAmplitude(maxVV);
 }
 
 void FormAnalyze::leaveForm()
@@ -123,6 +122,8 @@ void FormAnalyze::setVoltage(double voltage)
     }
     Settings *settings = Settings::getSettings();
     settings->setValue("Analyzer/SignalAmplitude", curV);
+
+    ui->viewSignature->setMaximumAmplitude(curV);
 
     connect(ui->boxVoltage, SIGNAL(valueChanged(double)), this, SLOT(setVoltage(double)));
     connect(ui->sliderVoltage, SIGNAL(valueChanged(int)), this, SLOT(setVoltage(int)));
