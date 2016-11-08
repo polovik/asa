@@ -30,6 +30,9 @@ FormRaw::FormRaw(ToneGenerator *gen, AudioInputThread *capture, QWidget *parent)
             SLOT(captureDeviceInitiated(int)), Qt::QueuedConnection);   // wait while main window initiated
             
     // Oscilloscope
+    ui->oscilloscope->showTimeMeasureGuides(true);
+    ui->oscilloscope->showVoltageMeasureGuides(false, true);
+    ui->oscilloscope->showSampleValueUnderMouse(true);
     m_oscEngine = new OscilloscopeEngine(ui->oscilloscope);
     connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList, SamplesList)),
             m_oscEngine, SLOT(processOscilloscopeData(SamplesList, SamplesList)));

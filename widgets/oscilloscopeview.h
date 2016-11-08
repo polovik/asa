@@ -22,6 +22,9 @@ public:
     void setTriggerLevel(double voltage);
     void showTriggerLine(bool visible);
     void showGraph(DisplayedGraphId id, bool visible);
+    void showTimeMeasureGuides(bool visible);
+    void showVoltageMeasureGuides(bool visible, bool freezed);
+    void showSampleValueUnderMouse(bool visible);
     
 signals:
     void triggerLevelChanged(double voltage);
@@ -44,7 +47,12 @@ private:
     QCPItemStraightLine *m_timeMeasurementLine2;
     QCPItemBracket *m_timeMeasurementBracket;
     QCPItemText *m_timeMeasurementText;
-    
+
+    QCPItemStraightLine *m_voltageMeasurementLine1;
+    QCPItemStraightLine *m_voltageMeasurementLine2;
+    QCPItemText *m_voltageMeasurementText1;
+    QCPItemText *m_voltageMeasurementText2;
+
     QCPItemStraightLine *m_triggerLevelLine;
     QCPItemText *m_triggerLevelText;
     

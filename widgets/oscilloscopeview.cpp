@@ -48,7 +48,6 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_pointUnderMouse->setPen(QPen(Qt::red));
     m_pointUnderMouse->setBrush(Qt::red);
     m_pointUnderMouse->setSize(7);
-    m_pointUnderMouse->setSelectable(false);
     
     m_pointUnderMouseText = new QCPItemText(this);
     addItem(m_pointUnderMouseText);
@@ -61,7 +60,6 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_pointUnderMouseText->position->setCoords(data.key, data.value);
     m_pointUnderMouseText->setText(tr("%1ms, %2V").arg(data.key, 0, 'f', 2).arg(data.value, 0, 'f', 1));
 //    m_pointUnderMouseText->setBrush(Qt::white);
-    m_pointUnderMouseText->setSelectable(false);
     
     //  Measure time between two points
     QPen measurementPen;
@@ -87,7 +85,6 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_timeMeasurementBracket->right->setCoords(10.0, 48.0);
     m_timeMeasurementBracket->setLength(10);
     m_timeMeasurementBracket->setStyle(QCPItemBracket::bsSquare);
-    m_timeMeasurementBracket->setSelectable(false);
     
     m_timeMeasurementText = new QCPItemText(this);
     addItem(m_timeMeasurementText);
@@ -100,8 +97,41 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_timeMeasurementText->setText(measuredTime);
     m_timeMeasurementText->setFont(QFont(font().family(), 10));
     m_timeMeasurementText->setBrush(Qt::white);
-    m_timeMeasurementText->setSelectable(false);
     
+    // Measure time between two points
+    m_voltageMeasurementLine1 = new QCPItemStraightLine(this);
+    addItem(m_voltageMeasurementLine1);
+    m_voltageMeasurementLine1->setPen(measurementPen);
+    m_voltageMeasurementLine1->point1->setCoords(-100.0, 1.0);
+    m_voltageMeasurementLine1->point2->setCoords(100.0,  1.0);
+
+    m_voltageMeasurementLine2 = new QCPItemStraightLine(this);
+    addItem(m_voltageMeasurementLine2);
+    m_voltageMeasurementLine2->setPen(measurementPen);
+    m_voltageMeasurementLine2->point1->setCoords(-100.0, -1.0);
+    m_voltageMeasurementLine2->point2->setCoords(100.0,  -1.0);
+
+    m_voltageMeasurementText1 = new QCPItemText(this);
+    addItem(m_voltageMeasurementText1);
+    m_voltageMeasurementText1->position->setType(QCPItemPosition::ptPlotCoords);
+    m_voltageMeasurementText1->position->setCoords(0, 1.0);
+    m_voltageMeasurementText1->setPositionAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+    mes1 = m_voltageMeasurementLine1->point1->value();
+    m_voltageMeasurementText1->setText(QString::number(mes1, 'f', 2));
+    m_voltageMeasurementText1->setFont(QFont(font().family(), 10));
+    m_voltageMeasurementText1->setBrush(Qt::white);
+
+    m_voltageMeasurementText2 = new QCPItemText(this);
+    addItem(m_voltageMeasurementText2);
+    m_voltageMeasurementText2->position->setType(QCPItemPosition::ptPlotCoords);
+    m_voltageMeasurementText2->position->setCoords(0, -1.0);
+    m_voltageMeasurementText2->setPositionAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+    mes2 = m_voltageMeasurementLine2->point1->value();
+    m_voltageMeasurementText2->setText(QString::number(mes2, 'f', 2));
+    m_voltageMeasurementText2->setFont(QFont(font().family(), 10));
+    m_voltageMeasurementText2->setBrush(Qt::white);
+
+    // Adjust trigger level
     QPen triggerPen;
     triggerPen.setWidth(2);
     triggerPen.setColor("green");
@@ -123,6 +153,10 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_triggerLevelText->setFont(QFont(font().family(), 10));
     m_triggerLevelText->setBrush(Qt::white);
     m_triggerLevelText->setSelectable(false);
+
+    showTimeMeasureGuides(true);
+    showVoltageMeasureGuides(false, true);
+    showSampleValueUnderMouse(true);
 }
 
 OscilloscopeView::~OscilloscopeView()
@@ -254,6 +288,39 @@ void OscilloscopeView::showGraph(DisplayedGraphId id, bool visible)
     if (id == GRAPH_CHANNEL_RIGHT)
         m_graphChannelRight->setVisible(visible);
     replot();
+}
+
+void OscilloscopeView::showTimeMeasureGuides(bool visible)
+{
+    m_timeMeasurementLine1->setVisible(visible);
+    m_timeMeasurementLine1->setSelectable(visible);
+    m_timeMeasurementLine2->setVisible(visible);
+    m_timeMeasurementLine2->setSelectable(visible);
+    m_timeMeasurementBracket->setVisible(visible);
+    m_timeMeasurementBracket->setSelectable(false);
+    m_timeMeasurementText->setVisible(visible);
+    m_timeMeasurementText->setSelectable(false);
+    replot();
+}
+
+void OscilloscopeView::showVoltageMeasureGuides(bool visible, bool freezed)
+{
+    m_voltageMeasurementLine1->setVisible(visible);
+    m_voltageMeasurementLine1->setSelectable(!freezed);
+    m_voltageMeasurementLine2->setVisible(visible);
+    m_voltageMeasurementLine2->setSelectable(!freezed);
+    m_voltageMeasurementText1->setVisible(visible);
+    m_voltageMeasurementText1->setSelectable(false);
+    m_voltageMeasurementText2->setVisible(visible);
+    m_voltageMeasurementText2->setSelectable(false);
+}
+
+void OscilloscopeView::showSampleValueUnderMouse(bool visible)
+{
+    m_pointUnderMouse->setVisible(visible);
+    m_pointUnderMouse->setSelectable(false);
+    m_pointUnderMouseText->setVisible(visible);
+    m_pointUnderMouseText->setSelectable(false);
 }
 
 void OscilloscopeView::mousePressEvent(QMouseEvent *event)

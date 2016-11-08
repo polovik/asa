@@ -63,6 +63,9 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList, SamplesList)),
             this, SLOT(processOscilloscopeData(SamplesList, SamplesList)));
 
+    ui->oscilloscope->showTimeMeasureGuides(false);
+    ui->oscilloscope->showVoltageMeasureGuides(true, true);
+    ui->oscilloscope->showSampleValueUnderMouse(false);
     m_oscEngine = new OscilloscopeEngine(ui->oscilloscope);
     m_oscEngine->setTriggerMode(TRIG_AUTO);
     m_oscEngine->setDisplayedChannels(CHANNEL_BOTH);
