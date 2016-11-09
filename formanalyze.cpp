@@ -226,9 +226,9 @@ void FormAnalyze::processOscilloscopeData(SamplesList leftChannelData, SamplesLi
         return;
     }
     QVector<double> voltage;
-    voltage = QVector<double>::fromList(leftChannelData);
+    voltage = QVector<double>::fromList(rightChannelData);
     QVector<double> current;
-    current = QVector<double>::fromList(rightChannelData);
+    current = QVector<double>::fromList(leftChannelData);
     ui->viewSignature->draw(voltage, current);
 }
 

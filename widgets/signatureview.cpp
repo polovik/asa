@@ -4,9 +4,17 @@
 SignatureView::SignatureView(QWidget *parent) : QCustomPlot(parent)
 {
     m_graphPrevSignature = addGraph();
-    m_graphCurSignature = addGraph();
     m_graphPrevSignature->setPen(QColor("black"));
+    m_graphPrevSignature->setLineStyle(QCPGraph::lsNone);
+    QCPScatterStyle dotStylePrev(QCPScatterStyle::ssCircle, QColor("black"), QColor("black"), 2);
+    m_graphPrevSignature->setScatterStyle(dotStylePrev);
+
+    m_graphCurSignature = addGraph();
     m_graphCurSignature->setPen(QColor("red"));
+    m_graphCurSignature->setLineStyle(QCPGraph::lsNone);
+    QCPScatterStyle dotStyleCur(QCPScatterStyle::ssCircle, QColor("red"), QColor("red"), 2);
+    m_graphCurSignature->setScatterStyle(dotStyleCur);
+
     xAxis->setLabel(tr("Ugenerator, Volts"));
     yAxis->setLabel(tr("Uprobe, Volts"));
     setMaximumAmplitude(30.);
