@@ -642,12 +642,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SignatureView</name>
     <message>
-        <location filename="../widgets/signatureview.cpp" line="10"/>
+        <location filename="../widgets/signatureview.cpp" line="18"/>
         <source>Ugenerator, Volts</source>
         <translation>Uгенератора, Вольт</translation>
     </message>
     <message>
-        <location filename="../widgets/signatureview.cpp" line="11"/>
+        <location filename="../widgets/signatureview.cpp" line="19"/>
         <source>Uprobe, Volts</source>
         <translation>Uисследуемой точки, Вольт</translation>
     </message>
