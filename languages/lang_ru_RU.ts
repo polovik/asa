@@ -199,23 +199,23 @@
     <message>
         <location filename="../formcalibration.ui" line="402"/>
         <source>Capture device volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Громкость входного сигнала</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="447"/>
         <source>volume</source>
-        <translation type="unfinished"></translation>
+        <translation>уровень</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="488"/>
         <source>Input channels offsets</source>
-        <translation type="unfinished"></translation>
+        <translation>Смещение входных каналов</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="542"/>
         <location filename="../formcalibration.ui" line="569"/>
         <source>offset</source>
-        <translation type="unfinished"></translation>
+        <translation>смещение</translation>
     </message>
     <message>
         <source>Adjust max generated voltage</source>
@@ -370,7 +370,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
     <message>
         <location filename="../formdiagnose.cpp" line="391"/>
         <source>Save Diagnostic Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить результаты диагностики</translation>
     </message>
 </context>
 <context>
