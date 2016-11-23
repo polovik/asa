@@ -162,9 +162,16 @@ void FormAnalyze::runAnalyze(bool start)
 
 void FormAnalyze::saveSignature()
 {
+    SignalParameters params;
+    int index = ui->boxWaveForm->currentIndex();
+    QVariant data = ui->boxWaveForm->itemData(index);
+    ToneWaveForm::Id signalType = (ToneWaveForm::Id)data.toInt();
+    params.type = ToneWaveForm::getName(signalType);
+    params.voltage = ui->boxVoltage->value();
+    params.frequency = ui->boxFrequency->value();
     QImage image;
     QList<QPointF> graphData;
-    ui->viewSignature->getView(image, graphData);
+    ui->viewSignature->getView(params, image, graphData);
     
     QFileDialog dialog(this);
     dialog.setWindowTitle(tr("Save Signature"));
@@ -191,9 +198,7 @@ void FormAnalyze::saveSignature()
     TestpointMeasure point;
     point.id = 0;
     point.pos = QPoint(0, 0);
-    int index = ui->boxWaveForm->currentIndex();
-    QVariant data = ui->boxWaveForm->itemData(index);
-    point.signalType.setId((ToneWaveForm::Id)data.toInt());
+    point.signalType.setId(signalType);
     point.signalFrequency = ui->boxFrequency->value();
     point.signalVoltage = ui->boxVoltage->value();
     point.isCurrent = false;
@@ -292,9 +297,10 @@ void FormAnalyze::lockSignature(bool lock)
 {
     qDebug() << "Lock signature view:" << lock;
     if (lock) {
+        SignalParameters params;
         QImage image;
         QList<QPointF> graphData;
-        ui->viewSignature->getView(image, graphData);
+        ui->viewSignature->getView(params, image, graphData);
         ui->viewSignature->loadPreviousSignature(graphData);
     } else {
         QList<QPointF> graphData;

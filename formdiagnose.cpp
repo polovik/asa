@@ -267,7 +267,8 @@ void FormDiagnose::captureSignature()
     foreach (int uid, m_testpoints.keys()) {
         TestpointMeasure &pt = m_testpoints[uid];
         if (pt.isCurrent) {
-            ui->viewSignature->getView(pt.signature, pt.data);
+            SignalParameters params;
+            ui->viewSignature->getView(params, pt.signature, pt.data);
             found = true;
             break;
         }

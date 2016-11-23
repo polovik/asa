@@ -46,7 +46,7 @@ typedef struct {
     QPoint pos;
     ToneWaveForm signalType;
     int signalFrequency;
-    int signalVoltage;
+    double signalVoltage;
     bool isCurrent;
     QImage signature;
     QList<QPointF> data;

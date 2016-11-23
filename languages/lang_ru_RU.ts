@@ -111,7 +111,7 @@
     </message>
     <message>
         <location filename="../formanalyze.ui" line="211"/>
-        <location filename="../formanalyze.cpp" line="239"/>
+        <location filename="../formanalyze.cpp" line="244"/>
         <source>Open signature</source>
         <translation>Открыть сигнатуру</translation>
     </message>
@@ -126,13 +126,13 @@
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../formanalyze.cpp" line="170"/>
+        <location filename="../formanalyze.cpp" line="177"/>
         <source>Save Signature</source>
         <translation>Сохранить сигнатуру</translation>
     </message>
     <message>
-        <location filename="../formanalyze.cpp" line="172"/>
-        <location filename="../formanalyze.cpp" line="241"/>
+        <location filename="../formanalyze.cpp" line="179"/>
+        <location filename="../formanalyze.cpp" line="246"/>
         <source>Images (*.tif *.tiff)</source>
         <translation>Изображения (*.tif *.tiff)</translation>
     </message>
@@ -358,7 +358,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
     <message>
         <location filename="../formdiagnose.cpp" line="174"/>
         <location filename="../formdiagnose.cpp" line="208"/>
-        <location filename="../formdiagnose.cpp" line="393"/>
+        <location filename="../formdiagnose.cpp" line="394"/>
         <source>Images (*.tif *.tiff)</source>
         <translation>Изображения (*.tif *.tiff)</translation>
     </message>
@@ -368,7 +368,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation>Открыть плату по фотографии</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="391"/>
+        <location filename="../formdiagnose.cpp" line="392"/>
         <source>Save Diagnostic Results</source>
         <translation>Сохранить результаты диагностики</translation>
     </message>
@@ -650,6 +650,16 @@ p, li { white-space: pre-wrap; }
         <location filename="../widgets/signatureview.cpp" line="19"/>
         <source>Uprobe, Volts</source>
         <translation>Uисследуемой точки, Вольт</translation>
+    </message>
+    <message>
+        <location filename="../widgets/signatureview.cpp" line="76"/>
+        <source>V</source>
+        <translation>В</translation>
+    </message>
+    <message>
+        <location filename="../widgets/signatureview.cpp" line="86"/>
+        <source>Hz</source>
+        <translation>Гц</translation>
     </message>
 </context>
 </TS>

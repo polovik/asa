@@ -56,15 +56,56 @@ void SignatureView::draw(const QVector<double> &keys, const QVector<double> &val
     replot();
 }
 
-void SignatureView::getView(QImage &renderedView, QList<QPointF> &graphData)
+void SignatureView::getView(SignalParameters params, QImage &renderedView, QList<QPointF> &graphData)
 {
+    // Add text labels about tested signal parameters
+    qreal textOffset = 0.01;
+    int fontSize = 9;
+    QColor textColor(Qt::darkGreen);
+    QCPItemText *signalType = new QCPItemText(this);
+    addItem(signalType);
+    signalType->setText(params.type);
+    signalType->position->setType(QCPItemPosition::ptAxisRectRatio);
+    signalType->setPositionAlignment(Qt::AlignLeft | Qt::AlignTop);
+    signalType->position->setCoords(0.02, textOffset);
+    signalType->setTextAlignment(Qt::AlignLeft);
+    signalType->setFont(QFont(font().family(), fontSize));
+    signalType->setColor(textColor);
+    QCPItemText *signalVolt = new QCPItemText(this);
+    addItem(signalVolt);
+    signalVolt->setText(QString::number(params.voltage, 'f', 1) + tr("V"));
+    signalVolt->position->setType(QCPItemPosition::ptAxisRectRatio);
+    signalVolt->setPositionAlignment(Qt::AlignLeft | Qt::AlignTop);
+    signalVolt->position->setParentAnchor(signalType->anchor("bottomLeft"));
+    signalVolt->position->setCoords(0.00, textOffset);
+    signalVolt->setTextAlignment(Qt::AlignLeft);
+    signalVolt->setFont(QFont(font().family(), fontSize));
+    signalVolt->setColor(textColor);
+    QCPItemText *signalFreq = new QCPItemText(this);
+    addItem(signalFreq);
+    signalFreq->setText(QString::number(params.frequency) + tr("Hz"));
+    signalFreq->position->setType(QCPItemPosition::ptAxisRectRatio);
+    signalFreq->setPositionAlignment(Qt::AlignLeft | Qt::AlignTop);
+    signalFreq->position->setParentAnchor(signalVolt->anchor("bottomLeft"));
+    signalFreq->position->setCoords(0.00, textOffset);
+    signalFreq->setTextAlignment(Qt::AlignLeft);
+    signalFreq->setFont(QFont(font().family(), fontSize));
+    signalFreq->setColor(textColor);
+
+    // Render current view for store in image file.
     m_graphPrevSignature->setVisible(false);
     replot(QCustomPlot::rpImmediate);
     QPixmap view = toPixmap();
+
+    // Remove temporaty text labels and unhide previous signature
     m_graphPrevSignature->setVisible(true);
+    removeItem(signalType);
+    removeItem(signalVolt);
+    removeItem(signalFreq);
     replot(QCustomPlot::rpImmediate);
     renderedView = view.toImage();
     
+    // Get data of current signature
     QCPDataMap *rawData = m_graphCurSignature->data();
     graphData.clear();
     foreach(const QCPData &point, rawData->values()) {
