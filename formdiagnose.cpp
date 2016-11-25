@@ -430,12 +430,10 @@ void FormDiagnose::freezeForm(bool changesNotStored)
         ui->buttonCamera->setEnabled(false);
         ui->buttonOpenBoard->setEnabled(false);
         ui->buttonSave->setEnabled(true);
-        ui->buttonDiscard->setEnabled(true);
     } else {
         ui->buttonCamera->setEnabled(true);
         ui->buttonOpenBoard->setEnabled(true);
         ui->buttonSave->setEnabled(false);
-        ui->buttonDiscard->setEnabled(false);
     }
     m_needSave = changesNotStored;
 }

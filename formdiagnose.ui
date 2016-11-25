@@ -13,124 +13,246 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QComboBox" name="boxCameras">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>20</y>
-     <width>151</width>
-     <height>23</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="buttonCamera">
-   <property name="geometry">
-    <rect>
-     <x>50</x>
-     <y>50</y>
-     <width>181</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Grab picture from camera</string>
-   </property>
-   <property name="icon">
-    <iconset resource="analog_signature_analyzer.qrc">
-     <normaloff>:/icons/photo.ico</normaloff>:/icons/photo.ico</iconset>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="buttonOpenBoard">
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>50</y>
-     <width>151</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Select picture from file</string>
-   </property>
-  </widget>
-  <widget class="BoardView" name="boardView">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>80</y>
-     <width>231</width>
-     <height>151</height>
-    </rect>
-   </property>
-   <property name="transformationAnchor">
-    <enum>QGraphicsView::NoAnchor</enum>
-   </property>
-   <property name="resizeAnchor">
-    <enum>QGraphicsView::NoAnchor</enum>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="buttonLockMeasure">
-   <property name="geometry">
-    <rect>
-     <x>460</x>
-     <y>310</y>
-     <width>131</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Lock measure</string>
-   </property>
-  </widget>
-  <widget class="QPlainTextEdit" name="textComments">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>240</y>
-     <width>91</width>
-     <height>91</height>
-    </rect>
-   </property>
-   <property name="plainText">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="buttonSave">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>150</y>
-     <width>151</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Save measures to file</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="buttonDiscard">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>180</y>
-     <width>151</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Discard changes</string>
-   </property>
-  </widget>
-  <widget class="SignatureView" name="viewSignature">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>250</y>
-     <width>300</width>
-     <height>300</height>
-    </rect>
-   </property>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="2,3">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+     <item>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="minimumSize">
+        <size>
+         <width>250</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>File control</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QComboBox" name="boxCameras"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="buttonCamera">
+          <property name="text">
+           <string>Grab picture from camera</string>
+          </property>
+          <property name="icon">
+           <iconset resource="analog_signature_analyzer.qrc">
+            <normaloff>:/icons/photo.ico</normaloff>:/icons/photo.ico</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="buttonOpenBoard">
+          <property name="text">
+           <string>Select picture from file</string>
+          </property>
+          <property name="icon">
+           <iconset resource="analog_signature_analyzer.qrc">
+            <normaloff>:/icons/open.ico</normaloff>:/icons/open.ico</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="buttonSave">
+          <property name="text">
+           <string>Save measures to file</string>
+          </property>
+          <property name="icon">
+           <iconset resource="analog_signature_analyzer.qrc">
+            <normaloff>:/icons/save.ico</normaloff>:/icons/save.ico</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="SquareWidgetHolder" name="widget" native="true">
+       <widget class="BoardView" name="boardView">
+        <property name="transformationAnchor">
+         <enum>QGraphicsView::NoAnchor</enum>
+        </property>
+        <property name="resizeAnchor">
+         <enum>QGraphicsView::NoAnchor</enum>
+        </property>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Run</string>
+         </property>
+         <property name="icon">
+          <iconset resource="analog_signature_analyzer.qrc">
+           <normaloff>:/icons/analyze.ico</normaloff>:/icons/analyze.ico</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonLockMeasure">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Lock measure</string>
+         </property>
+         <property name="icon">
+          <iconset resource="analog_signature_analyzer.qrc">
+           <normaloff>:/icons/locked.ico</normaloff>
+           <normalon>:/icons/unlocked.ico</normalon>:/icons/locked.ico</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Probing signal</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QComboBox" name="comboBox"/>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="doubleSpinBox">
+              <property name="suffix">
+               <string>V</string>
+              </property>
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <double>5.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>2.200000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QSpinBox" name="spinBox">
+              <property name="suffix">
+               <string>Hz</string>
+              </property>
+              <property name="minimum">
+               <number>50</number>
+              </property>
+              <property name="maximum">
+               <number>20000</number>
+              </property>
+              <property name="value">
+               <number>222</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QSlider" name="verticalSlider">
+              <property name="minimum">
+               <number>50</number>
+              </property>
+              <property name="maximum">
+               <number>20000</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::TicksBothSides</enum>
+              </property>
+              <property name="tickInterval">
+               <number>1000</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSlider" name="verticalSlider_2">
+              <property name="maximum">
+               <number>50</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="tickPosition">
+               <enum>QSlider::TicksBothSides</enum>
+              </property>
+              <property name="tickInterval">
+               <number>10</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="SquareWidgetHolder" name="widget_2" native="true">
+       <widget class="SignatureView" name="viewSignature">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>0</y>
+          <width>408</width>
+          <height>333</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>
@@ -142,6 +264,12 @@
    <class>SignatureView</class>
    <extends>QGraphicsView</extends>
    <header>widgets/signatureview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SquareWidgetHolder</class>
+   <extends>QWidget</extends>
+   <header location="global">widgets/squarewidgetholder.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
