@@ -134,7 +134,7 @@ void OscilloscopeEngine::draw(AudioChannels channel, const QVector<double> &valu
 void OscilloscopeEngine::displayOscilloscopeChannelData(int dislayFrom, int displayedLength, int removeFrom)
 {
     if (m_capturedChannels != CHANNEL_BOTH) {
-        SamplesList *buffer = NULL;
+        SamplesList *buffer = nullptr;
         if (m_capturedChannels == CHANNEL_LEFT) {
             buffer = &m_samplesInputBufferLeft;
         } else if (m_capturedChannels == CHANNEL_RIGHT) {
@@ -164,8 +164,8 @@ void OscilloscopeEngine::processOscilloscopeData(SamplesList leftChannelData, Sa
     if (m_capturedChannels == CHANNEL_NONE) {
         return;
     }
-    SamplesList *buffer = NULL;
-    SamplesList *samples = NULL;
+    SamplesList *buffer = nullptr;
+    SamplesList *samples = nullptr;
     // I.   Select primary channel
     if (m_capturedChannels != CHANNEL_BOTH) {
         // For single channel capture, process only one buffer.
@@ -230,7 +230,7 @@ void OscilloscopeEngine::processOscilloscopeData(SamplesList leftChannelData, Sa
         return;
     }
     // V.   Trigger mode: Normal or Single (when trigger hasn't fired yet)
-    if ((m_triggerMode == TRIG_NORMAL) or (m_triggerMode == TRIG_SINGLE)) {
+    if ((m_triggerMode == TRIG_NORMAL) || (m_triggerMode == TRIG_SINGLE)) {
         // Fill buffers with samples
         if (m_capturedChannels != CHANNEL_BOTH) {
             buffer->append(*samples);

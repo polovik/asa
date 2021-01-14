@@ -326,29 +326,53 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation>Форма</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="36"/>
+        <location filename="../formdiagnose.ui" line="28"/>
+        <source>File control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.ui" line="37"/>
         <source>Grab picture from camera</source>
         <translation>Получить картинку с камеры</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="53"/>
+        <location filename="../formdiagnose.ui" line="48"/>
         <source>Select picture from file</source>
         <translation>Выбрать картинку из файла</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="82"/>
+        <location filename="../formdiagnose.ui" line="116"/>
+        <source>Run</source>
+        <translation type="unfinished">Запуск</translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.ui" line="139"/>
         <source>Lock measure</source>
         <translation>Удержать сигнатуру</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="108"/>
+        <location filename="../formdiagnose.ui" line="154"/>
+        <source>Probing signal</source>
+        <translation type="unfinished">Тестирующий сигнал</translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.ui" line="165"/>
+        <source>V</source>
+        <translation type="unfinished">В</translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.ui" line="184"/>
+        <source>Hz</source>
+        <translation type="unfinished">Гц</translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.ui" line="72"/>
         <source>Save measures to file</source>
         <translation>Сохранить сигнатуру в файл</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="121"/>
         <source>Discard changes</source>
-        <translation>Отменить изменения</translation>
+        <translation type="vanished">Отменить изменения</translation>
     </message>
     <message>
         <location filename="../formdiagnose.cpp" line="172"/>

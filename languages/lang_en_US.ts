@@ -264,28 +264,48 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="36"/>
+        <location filename="../formdiagnose.ui" line="28"/>
+        <source>File control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.ui" line="37"/>
         <source>Grab picture from camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="53"/>
+        <location filename="../formdiagnose.ui" line="48"/>
         <source>Select picture from file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="82"/>
+        <location filename="../formdiagnose.ui" line="116"/>
+        <source>Run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.ui" line="139"/>
         <source>Lock measure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="108"/>
-        <source>Save measures to file</source>
+        <location filename="../formdiagnose.ui" line="154"/>
+        <source>Probing signal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="121"/>
-        <source>Discard changes</source>
+        <location filename="../formdiagnose.ui" line="165"/>
+        <source>V</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.ui" line="184"/>
+        <source>Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.ui" line="72"/>
+        <source>Save measures to file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

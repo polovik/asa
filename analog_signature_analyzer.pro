@@ -78,6 +78,10 @@ DISTFILES += \
     languages/lang_en_US.ts \
     prepare_deb_package.sh
 
+TRANSLATIONS += \
+    languages/lang_ru_RU.ts \
+    languages/lang_en_US.ts
+
 win32 {
     # zlib
     LIBS += -L$$PWD/../3rd-party/zlib/lib/ -lzdll
@@ -107,7 +111,13 @@ unix {
     system(desktop-file-validate asa.desktop)
 }
 
-QMAKE_CXXFLAGS += -std=c++0x -Wall -Wpedantic -Wextra -Werror -pedantic-errors
+win32-g++ {
+    QMAKE_CXXFLAGS += -Wall -std=c++0x -Wpedantic -Wextra -Werror -pedantic-errors
+}
+win32-msvc* {
+    # /W4 /Wall /WX
+    QMAKE_CXXFLAGS += /W3 /std:c11
+}
 
 win32 {
     RC_ICONS += icons/app_icon.ico
