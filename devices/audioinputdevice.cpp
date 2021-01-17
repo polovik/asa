@@ -302,11 +302,20 @@ QList<QPair<QString, QString>> AudioInputThread::enumerateDevices()
     }
     if (!highlighted) {
         qWarning() << "Previous selected input device" << prevDeviceName << "is missed. Select default:" << defaultDevice.deviceName();
+        bool found = false;
         for (int i = 0; i < devices.count(); i++) {
             QPair<QString, QString> &deviceInfo = devices[i];
             if (deviceInfo.first == defaultDevice.deviceName()) {
                 deviceInfo.second = "* " + deviceInfo.second;
+                found = true;
                 break;
+            }
+        }
+        if (!found) {
+            qWarning() << "Couldn't found default input device, use first available input device";
+            if (!devices.isEmpty()) {
+                QPair<QString, QString> &deviceInfo = devices.first();
+                deviceInfo.second = "* " + deviceInfo.second;
             }
         }
     }
@@ -720,7 +729,8 @@ void AudioInputThread::getVolume(int &baseVolume, int &curVolume, int &maxVolume
         HRESULT hr = endpointVolume->GetMasterVolumeLevelScalar(&currentVolume);
         endpointVolume->Release();
         if (FAILED(hr)) {
-            qWarning() << "Couldn't get master volume level of AudioEndpoint" << getDeviceName();
+            qWarning() << "Couldn't get master volume level of AudioEndpoint"
+                       << getDeviceName() << QString("hresult: 0x%1").arg(hr, 8, 16, QLatin1Char('0'));
             Q_ASSERT(false);
             return;
         } else {
@@ -852,7 +862,8 @@ void AudioInputThread::setVolume(int volume)
         HRESULT hr = endpointVolume->SetMasterVolumeLevelScalar((float)newVolume, NULL);
         endpointVolume->Release();
         if (FAILED(hr)) {
-            qWarning() << "Couldn't get master volume level of AudioEndpoint" << getDeviceName();
+            qWarning() << "Couldn't get master volume level of AudioEndpoint"
+                       << getDeviceName() << QString("hresult: 0x%1").arg(hr, 8, 16, QLatin1Char('0'));
             Q_ASSERT(false);
             return;
         } else {

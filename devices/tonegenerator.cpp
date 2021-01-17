@@ -267,11 +267,20 @@ QList<QPair<QString, QString>> ToneGenerator::enumerateDevices()
     }
     if (!highlighted) {
         qWarning() << "Previous selected output device" << prevDeviceName << "is missed. Select default:" << defaultDevice.deviceName();
+        bool found = false;
         for (int i = 0; i < devices.count(); i++) {
             QPair<QString, QString> &deviceInfo = devices[i];
             if (deviceInfo.first == defaultDevice.deviceName()) {
                 deviceInfo.second = "* " + deviceInfo.second;
+                found = true;
                 break;
+            }
+        }
+        if (!found) {
+            qWarning() << "Couldn't found default output device, use first available output device";
+            if (!devices.isEmpty()) {
+                QPair<QString, QString> &deviceInfo = devices.first();
+                deviceInfo.second = "* " + deviceInfo.second;
             }
         }
     }

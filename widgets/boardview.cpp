@@ -8,6 +8,7 @@
 #include <QGraphicsPixmapItem>
 #include <QTimer>
 #include <QFontMetrics>
+#include <QRandomGenerator>
 #include "boardview.h"
 
 BoardView::BoardView(QWidget *parent = 0) :
@@ -441,16 +442,7 @@ int BoardView::getUID()
 {
     int uid = 0;
     while (true) {
-        int i = qrand();
-        if (i < 100000) {
-            continue;
-        }
-        while (i > 999999) {
-            i = i / 11;
-        }
-        if (i < 100000) {
-            continue;
-        }
+        int i = QRandomGenerator::system()->bounded(100000, 1000000);
         if (m_uids.contains(i)) {
             qWarning() << "UID not unique:" << uid;
             continue;

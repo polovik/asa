@@ -13,9 +13,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="2,3">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+    <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,2,2">
      <item>
       <widget class="QGroupBox" name="groupBox_2">
        <property name="minimumSize">
@@ -42,112 +42,31 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QPushButton" name="buttonOpenBoard">
-          <property name="text">
-           <string>Select picture from file</string>
-          </property>
-          <property name="icon">
-           <iconset resource="analog_signature_analyzer.qrc">
-            <normaloff>:/icons/open.ico</normaloff>:/icons/open.ico</iconset>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="buttonSave">
-          <property name="text">
-           <string>Save measures to file</string>
-          </property>
-          <property name="icon">
-           <iconset resource="analog_signature_analyzer.qrc">
-            <normaloff>:/icons/save.ico</normaloff>:/icons/save.ico</iconset>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
      </item>
      <item>
-      <widget class="SquareWidgetHolder" name="widget" native="true">
-       <widget class="BoardView" name="boardView">
-        <property name="transformationAnchor">
-         <enum>QGraphicsView::NoAnchor</enum>
-        </property>
-        <property name="resizeAnchor">
-         <enum>QGraphicsView::NoAnchor</enum>
+      <widget class="SquareWidgetHolder" name="widget_2" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
+       <widget class="SignatureView" name="viewSignature">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>0</y>
+          <width>200</width>
+          <height>100</height>
+         </rect>
         </property>
        </widget>
       </widget>
      </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QPushButton" name="pushButton">
-         <property name="minimumSize">
-          <size>
-           <width>200</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>200</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Run</string>
-         </property>
-         <property name="icon">
-          <iconset resource="analog_signature_analyzer.qrc">
-           <normaloff>:/icons/analyze.ico</normaloff>:/icons/analyze.ico</iconset>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="buttonLockMeasure">
-         <property name="minimumSize">
-          <size>
-           <width>200</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>200</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Lock measure</string>
-         </property>
-         <property name="icon">
-          <iconset resource="analog_signature_analyzer.qrc">
-           <normaloff>:/icons/locked.ico</normaloff>
-           <normalon>:/icons/unlocked.ico</normalon>:/icons/locked.ico</iconset>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
@@ -236,19 +155,189 @@
        </item>
       </layout>
      </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
-      <widget class="SquareWidgetHolder" name="widget_2" native="true">
-       <widget class="SignatureView" name="viewSignature">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>0</y>
-          <width>408</width>
-          <height>333</height>
-         </rect>
-        </property>
-       </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Run</string>
+         </property>
+         <property name="icon">
+          <iconset resource="analog_signature_analyzer.qrc">
+           <normaloff>:/icons/analyze.ico</normaloff>:/icons/analyze.ico</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="BoardView" name="boardView">
+       <property name="transformationAnchor">
+        <enum>QGraphicsView::NoAnchor</enum>
+       </property>
+       <property name="resizeAnchor">
+        <enum>QGraphicsView::NoAnchor</enum>
+       </property>
       </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <spacer name="horizontalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonOpenBoard">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Select picture from file</string>
+         </property>
+         <property name="icon">
+          <iconset resource="analog_signature_analyzer.qrc">
+           <normaloff>:/icons/open.ico</normaloff>:/icons/open.ico</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonLockMeasure">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Lock measure</string>
+         </property>
+         <property name="icon">
+          <iconset resource="analog_signature_analyzer.qrc">
+           <normaloff>:/icons/locked.ico</normaloff>
+           <normalon>:/icons/unlocked.ico</normalon>:/icons/locked.ico</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonSave">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Save measures to file</string>
+         </property>
+         <property name="icon">
+          <iconset resource="analog_signature_analyzer.qrc">
+           <normaloff>:/icons/save.ico</normaloff>:/icons/save.ico</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

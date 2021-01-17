@@ -390,6 +390,7 @@ void FormDiagnose::saveMeasures()
 
     QFileDialog dialog(this);
     dialog.setWindowTitle(tr("Save Diagnostic Results"));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setNameFilter(tr("Images (*.tif *.tiff)"));
     if (dialog.exec() != QDialog::Accepted) {

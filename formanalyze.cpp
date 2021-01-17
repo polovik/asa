@@ -175,6 +175,7 @@ void FormAnalyze::saveSignature()
     
     QFileDialog dialog(this);
     dialog.setWindowTitle(tr("Save Signature"));
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setNameFilter(tr("Images (*.tif *.tiff)"));
     

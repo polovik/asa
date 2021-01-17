@@ -54,6 +54,7 @@ private:
     QGraphicsEllipseItem *m_currentTestpoint;
     QTimer *m_animationTimer;
 
+    // TODO add and remove uids to/from m_uids
     QSet<int> m_uids; // [100000...999999]
 };
 
