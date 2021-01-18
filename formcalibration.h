@@ -36,7 +36,8 @@ private slots:
     void showHint();
     void setGeneratorMagnitudePeak(double voltage);
     void setGeneratorMagnitudeRMS(double voltage);
-    void changeCaptureVolume(int volume);
+    void changeCaptureHardwareVolume(int volume);
+    void changeCaptureSoftwareVolume(int volume);
     void changeInputOffset(int percents);
 
 private:

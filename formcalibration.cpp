@@ -86,7 +86,8 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     int rightOffset = m_capture->getChannelOffset(CHANNEL_RIGHT) * 1000;
     ui->sliderRightInputOffset->setValue(rightOffset);
     ui->labelRightInputOffset->setText(QString::number(m_capture->getChannelOffset(CHANNEL_RIGHT), 'f', 3));
-    connect(ui->sliderCaptureHardwareVolume, SIGNAL(valueChanged(int)), this, SLOT(changeCaptureVolume(int)));
+    connect(ui->sliderCaptureHardwareVolume, SIGNAL(valueChanged(int)), this, SLOT(changeCaptureHardwareVolume(int)));
+    connect(ui->sliderCaptureSoftwareVolume, SIGNAL(valueChanged(int)), this, SLOT(changeCaptureSoftwareVolume(int)));
     connect(ui->sliderLeftInputOffset, SIGNAL(valueChanged(int)), this, SLOT(changeInputOffset(int)));
     connect(ui->sliderRightInputOffset, SIGNAL(valueChanged(int)), this, SLOT(changeInputOffset(int)));
 
@@ -183,6 +184,10 @@ void FormCalibration::switchInputAudioDevice(int index)
     ui->sliderCaptureHardwareVolume->setTickInterval(maxCaptureVolume / 20);
     ui->sliderCaptureHardwareVolume->setValue(curCaptureVolume);
     ui->labelCaptureHardwareVolume->setText(QString::number(1.0 * curCaptureVolume / m_baseCaptureVolume, 'f', 2));
+
+    qreal amplifyFactor = m_capture->getAmplifyFactor();
+    ui->sliderCaptureSoftwareVolume->setValue(qRound(amplifyFactor * 100.));
+    ui->labelCaptureSoftwareVolume->setText(QString("x%1").arg(amplifyFactor, 0, 'f', 2));
 }
 
 void FormCalibration::switchInputAudioDevicePort(int index)
@@ -301,6 +306,7 @@ void FormCalibration::setGeneratorMagnitude(qreal peak)
 void FormCalibration::lockWidgets(bool locked)
 {
     ui->sliderCaptureHardwareVolume->setEnabled(!locked);
+    ui->sliderCaptureSoftwareVolume->setEnabled(!locked);
     ui->sliderLeftInputOffset->setEnabled(!locked);
     ui->sliderRightInputOffset->setEnabled(!locked);
     ui->boxGeneratorPeak->setEnabled(!locked);
@@ -313,10 +319,17 @@ void FormCalibration::lockWidgets(bool locked)
     ui->boxAudioOutputDevice->setEnabled(locked);
 }
 
-void FormCalibration::changeCaptureVolume(int volume)
+void FormCalibration::changeCaptureHardwareVolume(int volume)
 {
     m_capture->setVolume(volume);
     ui->labelCaptureHardwareVolume->setText(QString::number(1.0 * volume / m_baseCaptureVolume, 'f', 2));
+}
+
+void FormCalibration::changeCaptureSoftwareVolume(int volume)
+{
+    qreal amplifyFactor = volume / 100.;
+    m_capture->setAmplifyFactor(amplifyFactor);
+    ui->labelCaptureSoftwareVolume->setText(QString("x%1").arg(amplifyFactor, 0, 'f', 2));
 }
 
 void FormCalibration::changeInputOffset(int percents)

@@ -463,6 +463,12 @@ Vpk</string>
                <layout class="QHBoxLayout" name="horizontalLayout_2">
                 <item>
                  <widget class="QSlider" name="sliderCaptureSoftwareVolume">
+                  <property name="minimum">
+                   <number>100</number>
+                  </property>
+                  <property name="maximum">
+                   <number>500</number>
+                  </property>
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
                   </property>
