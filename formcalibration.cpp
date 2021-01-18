@@ -86,7 +86,7 @@ FormCalibration::FormCalibration(ToneGenerator *gen, AudioInputThread *capture, 
     int rightOffset = m_capture->getChannelOffset(CHANNEL_RIGHT) * 1000;
     ui->sliderRightInputOffset->setValue(rightOffset);
     ui->labelRightInputOffset->setText(QString::number(m_capture->getChannelOffset(CHANNEL_RIGHT), 'f', 3));
-    connect(ui->sliderCaptureVolume, SIGNAL(valueChanged(int)), this, SLOT(changeCaptureVolume(int)));
+    connect(ui->sliderCaptureHardwareVolume, SIGNAL(valueChanged(int)), this, SLOT(changeCaptureVolume(int)));
     connect(ui->sliderLeftInputOffset, SIGNAL(valueChanged(int)), this, SLOT(changeInputOffset(int)));
     connect(ui->sliderRightInputOffset, SIGNAL(valueChanged(int)), this, SLOT(changeInputOffset(int)));
 
@@ -178,11 +178,11 @@ void FormCalibration::switchInputAudioDevice(int index)
 
     int maxCaptureVolume, curCaptureVolume;
     m_capture->getVolume(m_baseCaptureVolume, curCaptureVolume, maxCaptureVolume);
-    ui->sliderCaptureVolume->setMinimum(0);
-    ui->sliderCaptureVolume->setMaximum(maxCaptureVolume);
-    ui->sliderCaptureVolume->setTickInterval(maxCaptureVolume / 20);
-    ui->sliderCaptureVolume->setValue(curCaptureVolume);
-    ui->labelCaptureVolume->setText(QString::number(1.0 * curCaptureVolume / m_baseCaptureVolume, 'f', 2));
+    ui->sliderCaptureHardwareVolume->setMinimum(0);
+    ui->sliderCaptureHardwareVolume->setMaximum(maxCaptureVolume);
+    ui->sliderCaptureHardwareVolume->setTickInterval(maxCaptureVolume / 20);
+    ui->sliderCaptureHardwareVolume->setValue(curCaptureVolume);
+    ui->labelCaptureHardwareVolume->setText(QString::number(1.0 * curCaptureVolume / m_baseCaptureVolume, 'f', 2));
 }
 
 void FormCalibration::switchInputAudioDevicePort(int index)
@@ -300,7 +300,7 @@ void FormCalibration::setGeneratorMagnitude(qreal peak)
 
 void FormCalibration::lockWidgets(bool locked)
 {
-    ui->sliderCaptureVolume->setEnabled(!locked);
+    ui->sliderCaptureHardwareVolume->setEnabled(!locked);
     ui->sliderLeftInputOffset->setEnabled(!locked);
     ui->sliderRightInputOffset->setEnabled(!locked);
     ui->boxGeneratorPeak->setEnabled(!locked);
@@ -316,7 +316,7 @@ void FormCalibration::lockWidgets(bool locked)
 void FormCalibration::changeCaptureVolume(int volume)
 {
     m_capture->setVolume(volume);
-    ui->labelCaptureVolume->setText(QString::number(1.0 * volume / m_baseCaptureVolume, 'f', 2));
+    ui->labelCaptureHardwareVolume->setText(QString::number(1.0 * volume / m_baseCaptureVolume, 'f', 2));
 }
 
 void FormCalibration::changeInputOffset(int percents)

@@ -4,17 +4,17 @@
 <context>
     <name>BoardView</name>
     <message>
-        <location filename="../widgets/boardview.cpp" line="273"/>
+        <location filename="../widgets/boardview.cpp" line="274"/>
         <source>Add testpoint</source>
         <translation>Добавить тестовую точку</translation>
     </message>
     <message>
-        <location filename="../widgets/boardview.cpp" line="274"/>
+        <location filename="../widgets/boardview.cpp" line="275"/>
         <source>Remove testpoint</source>
         <translation>Удалить тестовую точку</translation>
     </message>
     <message>
-        <location filename="../widgets/boardview.cpp" line="275"/>
+        <location filename="../widgets/boardview.cpp" line="276"/>
         <source>Fit to window</source>
         <translation>Отмасштабировать по размеру окна</translation>
     </message>
@@ -111,7 +111,7 @@
     </message>
     <message>
         <location filename="../formanalyze.ui" line="211"/>
-        <location filename="../formanalyze.cpp" line="244"/>
+        <location filename="../formanalyze.cpp" line="245"/>
         <source>Open signature</source>
         <translation>Открыть сигнатуру</translation>
     </message>
@@ -131,8 +131,8 @@
         <translation>Сохранить сигнатуру</translation>
     </message>
     <message>
-        <location filename="../formanalyze.cpp" line="179"/>
-        <location filename="../formanalyze.cpp" line="246"/>
+        <location filename="../formanalyze.cpp" line="180"/>
+        <location filename="../formanalyze.cpp" line="247"/>
         <source>Images (*.tif *.tiff)</source>
         <translation>Изображения (*.tif *.tiff)</translation>
     </message>
@@ -174,15 +174,15 @@
     </message>
     <message>
         <location filename="../formcalibration.ui" line="110"/>
-        <location filename="../formcalibration.ui" line="504"/>
-        <location filename="../formcalibration.ui" line="589"/>
+        <location filename="../formcalibration.ui" line="523"/>
+        <location filename="../formcalibration.ui" line="608"/>
         <source>Left</source>
         <translation>Левый</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="124"/>
-        <location filename="../formcalibration.ui" line="514"/>
-        <location filename="../formcalibration.ui" line="599"/>
+        <location filename="../formcalibration.ui" line="533"/>
+        <location filename="../formcalibration.ui" line="618"/>
         <source>Right</source>
         <translation>Правый</translation>
     </message>
@@ -202,18 +202,29 @@
         <translation>Громкость входного сигнала</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="447"/>
+        <location filename="../formcalibration.ui" line="418"/>
+        <source>Hardware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formcalibration.ui" line="446"/>
+        <location filename="../formcalibration.ui" line="477"/>
         <source>volume</source>
         <translation>уровень</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="488"/>
+        <location filename="../formcalibration.ui" line="455"/>
+        <source>Software</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formcalibration.ui" line="507"/>
         <source>Input channels offsets</source>
         <translation>Смещение входных каналов</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="542"/>
-        <location filename="../formcalibration.ui" line="569"/>
+        <location filename="../formcalibration.ui" line="561"/>
+        <location filename="../formcalibration.ui" line="588"/>
         <source>offset</source>
         <translation>смещение</translation>
     </message>
@@ -336,37 +347,37 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation>Получить картинку с камеры</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="48"/>
+        <location filename="../formdiagnose.ui" line="249"/>
         <source>Select picture from file</source>
         <translation>Выбрать картинку из файла</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="116"/>
+        <location filename="../formdiagnose.ui" line="192"/>
         <source>Run</source>
         <translation type="unfinished">Запуск</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="139"/>
+        <location filename="../formdiagnose.ui" line="285"/>
         <source>Lock measure</source>
         <translation>Удержать сигнатуру</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="154"/>
+        <location filename="../formdiagnose.ui" line="73"/>
         <source>Probing signal</source>
         <translation type="unfinished">Тестирующий сигнал</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="165"/>
+        <location filename="../formdiagnose.ui" line="84"/>
         <source>V</source>
         <translation type="unfinished">В</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="184"/>
+        <location filename="../formdiagnose.ui" line="103"/>
         <source>Hz</source>
         <translation type="unfinished">Гц</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="72"/>
+        <location filename="../formdiagnose.ui" line="319"/>
         <source>Save measures to file</source>
         <translation>Сохранить сигнатуру в файл</translation>
     </message>
@@ -382,7 +393,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
     <message>
         <location filename="../formdiagnose.cpp" line="174"/>
         <location filename="../formdiagnose.cpp" line="208"/>
-        <location filename="../formdiagnose.cpp" line="394"/>
+        <location filename="../formdiagnose.cpp" line="395"/>
         <source>Images (*.tif *.tiff)</source>
         <translation>Изображения (*.tif *.tiff)</translation>
     </message>
