@@ -167,15 +167,15 @@
     </message>
     <message>
         <location filename="../formcalibration.ui" line="110"/>
-        <location filename="../formcalibration.ui" line="523"/>
-        <location filename="../formcalibration.ui" line="608"/>
+        <location filename="../formcalibration.ui" line="529"/>
+        <location filename="../formcalibration.ui" line="614"/>
         <source>Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="124"/>
-        <location filename="../formcalibration.ui" line="533"/>
-        <location filename="../formcalibration.ui" line="618"/>
+        <location filename="../formcalibration.ui" line="539"/>
+        <location filename="../formcalibration.ui" line="624"/>
         <source>Right</source>
         <translation type="unfinished"></translation>
     </message>
@@ -218,7 +218,7 @@ Vpk</source>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="446"/>
-        <location filename="../formcalibration.ui" line="477"/>
+        <location filename="../formcalibration.ui" line="483"/>
         <source>volume</source>
         <translation type="unfinished"></translation>
     </message>
@@ -228,23 +228,23 @@ Vpk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="507"/>
+        <location filename="../formcalibration.ui" line="513"/>
         <source>Input channels offsets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="561"/>
-        <location filename="../formcalibration.ui" line="588"/>
+        <location filename="../formcalibration.ui" line="567"/>
+        <location filename="../formcalibration.ui" line="594"/>
         <source>offset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="341"/>
+        <location filename="../formcalibration.cpp" line="354"/>
         <source>Perform calibration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="342"/>
+        <location filename="../formcalibration.cpp" line="355"/>
         <source>This area helps to adjust maximal voltage on audio input pins.
 Button pressing leads to play tone on left and right channel simultaneously.
 Tone is Sine 50Hz with maximal amplitude.
@@ -255,12 +255,12 @@ For correct signature displaying, it needs to specify range of axes.Measured vol
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="352"/>
+        <location filename="../formcalibration.cpp" line="365"/>
         <source>Play tone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="353"/>
+        <location filename="../formcalibration.cpp" line="366"/>
         <source>This buttons help to distinguish audio output pins.
 Button pressing leads to play tone on specific channel.
 Tone is Sine 50Hz with maximal amplitude.</source>
@@ -327,7 +327,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
     <message>
         <location filename="../formdiagnose.cpp" line="174"/>
         <location filename="../formdiagnose.cpp" line="208"/>
-        <location filename="../formdiagnose.cpp" line="395"/>
+        <location filename="../formdiagnose.cpp" line="396"/>
         <source>Images (*.tif *.tiff)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -337,7 +337,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="392"/>
+        <location filename="../formdiagnose.cpp" line="393"/>
         <source>Save Diagnostic Results</source>
         <translation type="unfinished"></translation>
     </message>

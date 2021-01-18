@@ -129,8 +129,8 @@ qint64 AudioOutputDevice::writeData(const char *data, qint64 maxSize)
 ToneGenerator::ToneGenerator(QObject *parent) : QThread(parent)
 {
     m_generationEnabled = false;
-    m_audioOutput = NULL;
-    m_outputBuffer = NULL;
+    m_audioOutput = nullptr;
+    m_outputBuffer = nullptr;
     m_activeChannels = CHANNEL_NONE;
     m_relativeAmplitude = -1;
     m_maxVoltageAmplitude = -10.;
@@ -205,14 +205,14 @@ QList<QPair<QString, QString>> ToneGenerator::enumerateDevices()
         }
     }
 #endif
-    foreach(const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
+    for (const QAudioDeviceInfo &info : QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
         if (info.isNull()) {
             continue;
         }
         QString name = info.deviceName();
         QString description = name;
 #if defined(_WIN32)
-        foreach (QString fullName, devicesFullNames) {
+        for (const QString &fullName : devicesFullNames) {
             if (fullName.startsWith(name)) {
                 description = fullName;
                 if (g_verboseOutput) {
@@ -305,7 +305,7 @@ void ToneGenerator::runGenerator(bool start)
 void ToneGenerator::changeFrequency(int freq)
 {
     m_toneFrequency = freq;
-    if (m_outputBuffer == NULL) {
+    if (m_outputBuffer == nullptr) {
         qWarning() << "Skip frequency applying for ToneGenerator because it hasn't been started yet";
         return;
     }
@@ -319,7 +319,7 @@ void ToneGenerator::switchOutputDevice(QString name)
         return;
     }
     qDebug() << "Switch audio output device to" << name;
-    foreach(const QAudioDeviceInfo &info, m_audioDeviceInfos) {
+    for (const QAudioDeviceInfo &info : m_audioDeviceInfos) {
         if (info.deviceName() == name) {
             m_curAudioDeviceInfo = info;
             break;
@@ -332,7 +332,7 @@ void ToneGenerator::switchOutputDevice(QString name)
 void ToneGenerator::switchWaveForm(ToneWaveForm form)
 {
     m_waveForm = form;
-    if (m_outputBuffer == NULL) {
+    if (m_outputBuffer == nullptr) {
         qWarning() << "Skip waveform applying for ToneGenerator because it hasn't been started yet";
         return;
     }
@@ -342,7 +342,7 @@ void ToneGenerator::switchWaveForm(ToneWaveForm form)
 void ToneGenerator::setActiveChannels(AudioChannels channels)
 {
     m_activeChannels = channels;
-    if (m_outputBuffer == NULL) {
+    if (m_outputBuffer == nullptr) {
         qWarning() << "Skip active channels applying for ToneGenerator because it hasn't been started yet";
         return;
     }
@@ -358,7 +358,7 @@ qreal ToneGenerator::getCurVoltageAmplitude()
 void ToneGenerator::setCurVoltageAmplitude(qreal voltage)
 {
     m_relativeAmplitude = voltage / getMaxVoltageAmplitude();
-    if (m_outputBuffer == NULL) {
+    if (m_outputBuffer == nullptr) {
         qWarning() << "Skip cur voltage amplitude applying for ToneGenerator because it hasn't been started yet";
         return;
     }
@@ -382,7 +382,7 @@ void ToneGenerator::setMaxVoltageAmplitude(qreal voltage)
     m_relativeAmplitude = absAmplitude / m_maxVoltageAmplitude;
     Settings *settings = Settings::getSettings();
     settings->setValue("Generator/MaxVoltageAmplitude", m_maxVoltageAmplitude);
-    if (m_outputBuffer == NULL) {
+    if (m_outputBuffer == nullptr) {
         qWarning() << "Skip cur voltage amplitude updating for ToneGenerator because it hasn't been started yet";
         return;
     }
@@ -407,7 +407,7 @@ void ToneGenerator::run()
                 m_audioOutput->disconnect();
                 m_audioOutput->stop();
                 m_audioOutput->deleteLater();
-                m_audioOutput = NULL;
+                m_audioOutput = nullptr;
                 generationStarted = false;
             }
             continue;
@@ -428,8 +428,8 @@ void ToneGenerator::run()
 
 void ToneGenerator::stateChanged(QAudio::State state)
 {
-    if (m_audioOutput == NULL) {
-        qWarning() << "Audio output is NULL";
+    if (m_audioOutput == nullptr) {
+        qWarning() << "Audio output is nullptr";
 //        Q_ASSERT(m_audioOutput);
         return;
     }

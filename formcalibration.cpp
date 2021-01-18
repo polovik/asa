@@ -162,18 +162,18 @@ void FormCalibration::switchInputAudioDevice(int index)
         ui->boxAudioInputDevicePort->setVisible(false);
     } else {
         ui->boxAudioInputDevicePort->setVisible(true);
-        int index = 0;
+        int portIndex = 0;
         for (int i = 0; i < devicePorts.count(); i++) {
             QString port = devicePorts.at(i);
             if (port.startsWith("* ")) {
                 QString cleanPortName = port.remove("* ");
                 ui->boxAudioInputDevicePort->addItem(port, QVariant(cleanPortName));
-                ui->boxAudioInputDevicePort->setCurrentIndex(index);
-                switchInputAudioDevicePort(index);
+                ui->boxAudioInputDevicePort->setCurrentIndex(portIndex);
+                switchInputAudioDevicePort(portIndex);
             } else {
                 ui->boxAudioInputDevicePort->addItem(port, QVariant(port));
             }
-            index++;
+            portIndex++;
         }
     }
 

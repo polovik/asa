@@ -174,15 +174,15 @@
     </message>
     <message>
         <location filename="../formcalibration.ui" line="110"/>
-        <location filename="../formcalibration.ui" line="523"/>
-        <location filename="../formcalibration.ui" line="608"/>
+        <location filename="../formcalibration.ui" line="529"/>
+        <location filename="../formcalibration.ui" line="614"/>
         <source>Left</source>
         <translation>Левый</translation>
     </message>
     <message>
         <location filename="../formcalibration.ui" line="124"/>
-        <location filename="../formcalibration.ui" line="533"/>
-        <location filename="../formcalibration.ui" line="618"/>
+        <location filename="../formcalibration.ui" line="539"/>
+        <location filename="../formcalibration.ui" line="624"/>
         <source>Right</source>
         <translation>Правый</translation>
     </message>
@@ -208,7 +208,7 @@
     </message>
     <message>
         <location filename="../formcalibration.ui" line="446"/>
-        <location filename="../formcalibration.ui" line="477"/>
+        <location filename="../formcalibration.ui" line="483"/>
         <source>volume</source>
         <translation>уровень</translation>
     </message>
@@ -218,13 +218,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="507"/>
+        <location filename="../formcalibration.ui" line="513"/>
         <source>Input channels offsets</source>
         <translation>Смещение входных каналов</translation>
     </message>
     <message>
-        <location filename="../formcalibration.ui" line="561"/>
-        <location filename="../formcalibration.ui" line="588"/>
+        <location filename="../formcalibration.ui" line="567"/>
+        <location filename="../formcalibration.ui" line="594"/>
         <source>offset</source>
         <translation>смещение</translation>
     </message>
@@ -289,12 +289,12 @@ Potentiometers on the board have to be adjusted for making the same voltage on b
 Переменные резисторы на плате должны быть подстроены для получения одинакового напряжения на обоих пинах входного аудио устройства.</translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="341"/>
+        <location filename="../formcalibration.cpp" line="354"/>
         <source>Perform calibration</source>
         <translation>Выполнение калибровки</translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="342"/>
+        <location filename="../formcalibration.cpp" line="355"/>
         <source>This area helps to adjust maximal voltage on audio input pins.
 Button pressing leads to play tone on left and right channel simultaneously.
 Tone is Sine 50Hz with maximal amplitude.
@@ -311,12 +311,12 @@ For correct signature displaying, it needs to specify range of axes.Measured vol
 - RMS - когда используется обычный вольтметр в режиме измерения ~U</translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="352"/>
+        <location filename="../formcalibration.cpp" line="365"/>
         <source>Play tone</source>
         <translation>Проиграть тоновый сигнал</translation>
     </message>
     <message>
-        <location filename="../formcalibration.cpp" line="353"/>
+        <location filename="../formcalibration.cpp" line="366"/>
         <source>This buttons help to distinguish audio output pins.
 Button pressing leads to play tone on specific channel.
 Tone is Sine 50Hz with maximal amplitude.</source>
@@ -393,7 +393,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
     <message>
         <location filename="../formdiagnose.cpp" line="174"/>
         <location filename="../formdiagnose.cpp" line="208"/>
-        <location filename="../formdiagnose.cpp" line="395"/>
+        <location filename="../formdiagnose.cpp" line="396"/>
         <source>Images (*.tif *.tiff)</source>
         <translation>Изображения (*.tif *.tiff)</translation>
     </message>
@@ -403,7 +403,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation>Открыть плату по фотографии</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="392"/>
+        <location filename="../formdiagnose.cpp" line="393"/>
         <source>Save Diagnostic Results</source>
         <translation>Сохранить результаты диагностики</translation>
     </message>

@@ -15,8 +15,8 @@ Settings::Settings(QObject *parent) : QObject(parent)
 
 Settings *Settings::getSettings()
 {
-    static Settings *settings = NULL;
-    if (settings != NULL) {
+    static Settings *settings = nullptr;
+    if (settings != nullptr) {
         return settings;
     }
     settings = new Settings();

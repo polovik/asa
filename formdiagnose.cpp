@@ -27,11 +27,11 @@ FormDiagnose::FormDiagnose(ToneGenerator *gen, AudioInputThread *capture, QWidge
     ui->setupUi(this);
     m_gen = gen;
     m_capture = capture;
-    m_dialogCamera = NULL;
+    m_dialogCamera = nullptr;
     
 #if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
     m_camerasList = QCameraInfo::availableCameras();
-    foreach(const QCameraInfo &cameraInfo, m_camerasList) {
+    for (const QCameraInfo &cameraInfo : m_camerasList) {
         if (g_verboseOutput) {
             qDebug() << "Found camera:" << cameraInfo.deviceName() << cameraInfo.description()
                      << cameraInfo.orientation() << cameraInfo.position();
@@ -101,7 +101,7 @@ void FormDiagnose::switchCamera(int index)
 
 void FormDiagnose::showCamera()
 {
-    if (m_dialogCamera != NULL) {
+    if (m_dialogCamera != nullptr) {
         qCritical() << "Trying to open dialog camera twice";
         Q_ASSERT(false);
         return;
@@ -154,7 +154,7 @@ void FormDiagnose::showCamera()
 
 void FormDiagnose::closeCamera()
 {
-    if (m_dialogCamera == NULL) {
+    if (m_dialogCamera == nullptr) {
         qCritical() << "Dialog camera is missed";
         Q_ASSERT(false);
         return;
@@ -162,12 +162,12 @@ void FormDiagnose::closeCamera()
     qDebug() << "Camera dialog is closing";
     m_dialogCamera->close();
     m_dialogCamera->deleteLater();
-    m_dialogCamera = NULL;
+    m_dialogCamera = nullptr;
 }
 
 void FormDiagnose::savePhoto(int id, const QImage &preview)
 {
-    Q_UNUSED(id);
+    Q_UNUSED(id)
     QFileDialog dialog(m_dialogCamera);
     dialog.setWindowTitle(tr("Save Photo"));
     dialog.setFileMode(QFileDialog::AnyFile);
@@ -234,14 +234,15 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
     QPixmap pix = QPixmap::fromImage(boardPhoto);
     
     TestpointsList testpoints;
-    foreach(const TestpointMeasure &meas, loadedTestpoints) {
+    for (const TestpointMeasure &meas : loadedTestpoints) {
         testpoints.insert(meas.id, meas.pos);
     }
     testpointSelect(-1);
     QMap<int, int> ids = ui->boardView->showBoard(pix, testpoints);
-    foreach (int uid, ids.keys()) {
+
+    for (int uid : ids.keys()) {
         int id = ids.value(uid);
-        foreach(const TestpointMeasure &meas, loadedTestpoints) {
+        for (const TestpointMeasure &meas : loadedTestpoints) {
             if (meas.id == id) {
                 m_testpoints.insert(uid, meas);
                 break;
@@ -254,7 +255,7 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
         Q_ASSERT(false);
         m_testpoints.clear();
     }
-    foreach (int uid, m_testpoints.keys()) {
+    for (int uid : m_testpoints.keys()) {
         const TestpointMeasure &meas = m_testpoints.value(uid);
         QString label = QString::number(meas.id);
         ui->boardView->testpointChangeText(uid, label);
@@ -264,7 +265,7 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
 void FormDiagnose::captureSignature()
 {
     bool found = false;
-    foreach (int uid, m_testpoints.keys()) {
+    for (int uid : m_testpoints.keys()) {
         TestpointMeasure &pt = m_testpoints[uid];
         if (pt.isCurrent) {
             SignalParameters params;
@@ -289,7 +290,7 @@ void FormDiagnose::testpointAdd(int uid, QPoint pos)
 
     QList<int> ids;
     ids.append(-1);
-    foreach (int key, m_testpoints.keys()) {
+    for (int key : m_testpoints.keys()) {
         const TestpointMeasure &meas = m_testpoints.value(key);
         ids.append(meas.id);
     }
@@ -314,8 +315,8 @@ void FormDiagnose::testpointAdd(int uid, QPoint pos)
 
 void FormDiagnose::testpointSelect(int uid)
 {
-    foreach (int uid, m_testpoints.keys()) {
-        TestpointMeasure &pt = m_testpoints[uid];
+    for (int id : m_testpoints.keys()) {
+        TestpointMeasure &pt = m_testpoints[id];
         pt.isCurrent = false;
     }
 
@@ -361,8 +362,8 @@ void FormDiagnose::testpointRemove(int uid)
     m_testpoints.remove(uid);
 
     // Reenumerate rest of testpoints - they have to had sequential number (for simplify TIFF store procedure)
-    foreach (int uid, m_testpoints.keys()) {
-        TestpointMeasure &curPt = m_testpoints[uid];
+    for (int id : m_testpoints.keys()) {
+        TestpointMeasure &curPt = m_testpoints[id];
         int curId = curPt.id;
         if (curId < removedId) {
             continue;
@@ -375,7 +376,7 @@ void FormDiagnose::testpointRemove(int uid)
         curId = curId - 1;
         curPt.id = curId;
         QString label = QString::number(curId);
-        ui->boardView->testpointChangeText(uid, label);
+        ui->boardView->testpointChangeText(id, label);
     }
 
     freezeForm(true);
@@ -415,7 +416,7 @@ void FormDiagnose::saveMeasures()
     ui->boardView->getBoardPhoto(boardPhoto, boardPhotoWithMarkers);
     // TODO display measure environment on the testpoint's signature
     QMap<int, TestpointMeasure> sortedTestpoints;
-    foreach (const TestpointMeasure &pt, m_testpoints.values()) {
+    for (const TestpointMeasure &pt : m_testpoints.values()) {
         sortedTestpoints.insert(pt.id, pt);
     }
     QList<TestpointMeasure> savedTestpoints;

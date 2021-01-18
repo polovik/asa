@@ -17,8 +17,8 @@ BoardView::BoardView(QWidget *parent = 0) :
     m_entireViewIsDragging = false;
     m_testpointDragging = false;
     m_lastMousePos = QPoint(0, 0);
-    m_boardPhoto = NULL;
-    m_currentTestpoint = NULL;
+    m_boardPhoto = nullptr;
+    m_currentTestpoint = nullptr;
     
     setTransformationAnchor(QGraphicsView::NoAnchor);
     setResizeAnchor(QGraphicsView::NoAnchor);
@@ -42,9 +42,9 @@ BoardView::~BoardView()
 QMap<int, int> BoardView::showBoard(QPixmap pixmap, TestpointsList testpoints)
 {
     QMap<int, int> ids;
-    m_boardPhoto = NULL;
+    m_boardPhoto = nullptr;
     stopAnimation();
-    m_currentTestpoint = NULL;
+    m_currentTestpoint = nullptr;
     scene()->clear();
     m_boardPhoto = scene()->addPixmap(pixmap);
     m_boardPhoto->setData(33, QVariant("BOARD_PHOTO"));
@@ -62,7 +62,7 @@ QMap<int, int> BoardView::showBoard(QPixmap pixmap, TestpointsList testpoints)
 
 void BoardView::getBoardPhoto(QImage &boardPhoto, QImage &boardPhotoWithMarkers)
 {
-    if (m_boardPhoto == NULL) {
+    if (m_boardPhoto == nullptr) {
         qCritical() << "There is no board photo for getting";
         Q_ASSERT(false);
         return;
@@ -75,7 +75,7 @@ void BoardView::getBoardPhoto(QImage &boardPhoto, QImage &boardPhotoWithMarkers)
     ensureVisible((QGraphicsItem *)m_boardPhoto, 0, 0);
     foreach(QGraphicsItem *item, scene()->items()) {
         QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
-        if (pin == NULL) {
+        if (pin == nullptr) {
             continue;
         }
         updateTestpointView(pin);
@@ -89,18 +89,18 @@ void BoardView::getBoardPhoto(QImage &boardPhoto, QImage &boardPhotoWithMarkers)
 void BoardView::testpointChangeText(int uid, QString text)
 {
     QGraphicsEllipseItem *pin = getPinByUid(uid);
-    if (pin == NULL) {
+    if (pin == nullptr) {
         qWarning() << "Testpoint" << uid << "isn't present";
         return;
     }
-    QGraphicsTextItem *itemId = NULL;
+    QGraphicsTextItem *itemId = nullptr;
     foreach(QGraphicsItem *item, pin->childItems()) {
         itemId = qgraphicsitem_cast<QGraphicsTextItem *>(item);
-        if (itemId != NULL) {
+        if (itemId != nullptr) {
             break;
         }
     }
-    if (itemId == NULL) {
+    if (itemId == nullptr) {
         qWarning() << "Testpoint view" << uid << "doesn't contain the ID item";
         return;
     }
@@ -115,7 +115,7 @@ void BoardView::mousePressEvent(QMouseEvent *event)
         m_lastMousePos = event->pos();
         QList<QGraphicsItem *> listItems = items(event->pos());
         bool dragEntireView = true;
-        QGraphicsEllipseItem *testpoint = NULL;
+        QGraphicsEllipseItem *testpoint = nullptr;
         if (listItems.isEmpty()) {
             dragEntireView = false;
         }
@@ -126,7 +126,7 @@ void BoardView::mousePressEvent(QMouseEvent *event)
 //                qDebug() << "There is the board photo:" << item->data(33).toString();
             }
             QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
-            if (pin != NULL) {
+            if (pin != nullptr) {
                 testpoint = pin;
                 continue;
             }
@@ -135,7 +135,7 @@ void BoardView::mousePressEvent(QMouseEvent *event)
 //            qDebug() << "Start view dragging";
             m_entireViewIsDragging = true;
         }
-        if (testpoint != NULL) {
+        if (testpoint != nullptr) {
             bool ok = false;
             int id = testpoint->data(DATA_TESTPOINT_UID).toInt(&ok);
             qDebug() << "Testpoint is" << id << "selected";
@@ -221,7 +221,7 @@ void BoardView::wheelEvent(QWheelEvent *event)
     
     foreach(QGraphicsItem *item, scene()->items()) {
         QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
-        if (pin == NULL) {
+        if (pin == nullptr) {
             continue;
         }
         updateTestpointView(pin);
@@ -246,7 +246,7 @@ QGraphicsEllipseItem *BoardView::getPinByUid(int uid)
 {
     foreach(QGraphicsItem *item, scene()->items()) {
         QGraphicsEllipseItem *testpoint = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
-        if (testpoint == NULL) {
+        if (testpoint == nullptr) {
             continue;
         }
         bool ok = false;
@@ -263,7 +263,7 @@ QGraphicsEllipseItem *BoardView::getPinByUid(int uid)
     }
     qCritical() << "Testpoint" << uid << "has not been found";
     Q_ASSERT(false);
-    return NULL;
+    return nullptr;
 }
 
 void BoardView::contextMenuEvent(QContextMenuEvent *event)
@@ -282,8 +282,8 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
     menu.addSeparator();
     menu.addAction(&actionFitBoardToView);
     
-    QGraphicsEllipseItem *testpoint = NULL;
-    if (m_boardPhoto != NULL) {
+    QGraphicsEllipseItem *testpoint = nullptr;
+    if (m_boardPhoto != nullptr) {
         QList<QGraphicsItem *> listItems = items(event->pos());
         bool cursorOverBoard = true;
         if (listItems.isEmpty()) {
@@ -294,14 +294,14 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
                 cursorOverBoard = false;
             }
             QGraphicsEllipseItem *ellipse = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
-            if (ellipse != NULL) {
+            if (ellipse != nullptr) {
                 testpoint = ellipse;
             }
         }
         if (cursorOverBoard) {
             actionAddTestpoint.setEnabled(true);
         }
-        if (testpoint != NULL) {
+        if (testpoint != nullptr) {
             actionRemoveTestpoint.setEnabled(true);
         }
         actionFitBoardToView.setEnabled(true);
@@ -313,7 +313,7 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
         ensureVisible((QGraphicsItem *)m_boardPhoto, 0, 0);
         foreach(QGraphicsItem *item, scene()->items()) {
             QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
-            if (pin == NULL) {
+            if (pin == nullptr) {
                 continue;
             }
             updateTestpointView(pin);
@@ -328,7 +328,7 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
         qDebug() << "remove testpoint" << id << "at" << event->pos();
         if (m_currentTestpoint == testpoint) {
             stopAnimation();
-            m_currentTestpoint = NULL;
+            m_currentTestpoint = nullptr;
         }
         scene()->removeItem(testpoint);
         delete testpoint;
@@ -376,14 +376,14 @@ void BoardView::updateTestpointView(QGraphicsEllipseItem *pin)
     pin->setPen(pen);
     pin->setRect(circleRect);
     
-    QGraphicsTextItem *itemId = NULL;
+    QGraphicsTextItem *itemId = nullptr;
     foreach(QGraphicsItem *item, pin->childItems()) {
         itemId = qgraphicsitem_cast<QGraphicsTextItem *>(item);
-        if (itemId != NULL) {
+        if (itemId != nullptr) {
             break;
         }
     }
-    if (itemId == NULL) {
+    if (itemId == nullptr) {
         qWarning() << "Testpoint view doesn't contain the ID item";
         return;
     }
@@ -397,7 +397,7 @@ void BoardView::updateTestpointView(QGraphicsEllipseItem *pin)
 
 void BoardView::startAnimation()
 {
-    if (m_currentTestpoint == NULL) {
+    if (m_currentTestpoint == nullptr) {
         qWarning() << "Try to start animation for missed testpoint";
         Q_ASSERT(false);
         return;
@@ -411,7 +411,7 @@ void BoardView::startAnimation()
 void BoardView::stopAnimation()
 {
     m_animationTimer->stop();
-    if (m_currentTestpoint == NULL) {
+    if (m_currentTestpoint == nullptr) {
         qWarning() << "Try to stop animation for missed testpoint";
 //        Q_ASSERT(false);
         return;
@@ -423,7 +423,7 @@ void BoardView::stopAnimation()
 
 void BoardView::timeslotAnimate()
 {
-    if (m_currentTestpoint == NULL) {
+    if (m_currentTestpoint == nullptr) {
         qWarning() << "Current testpoint is missed. Therefore stop animation";
         stopAnimation();
         Q_ASSERT(false);

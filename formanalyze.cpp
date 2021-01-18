@@ -137,8 +137,8 @@ void FormAnalyze::setVoltage(int vol10)
 void FormAnalyze::switchOutputWaveForm()
 {
     int index = ui->boxWaveForm->currentIndex();
-    QVariant data = ui->boxWaveForm->itemData(index);
-    ToneWaveForm form((ToneWaveForm::Id)data.toInt());
+    QVariant waveType = ui->boxWaveForm->itemData(index);
+    ToneWaveForm form((ToneWaveForm::Id)waveType.toInt());
     if (ui->buttonRun->isChecked()) {
         m_gen->switchWaveForm(form);
     }
@@ -164,8 +164,8 @@ void FormAnalyze::saveSignature()
 {
     SignalParameters params;
     int index = ui->boxWaveForm->currentIndex();
-    QVariant data = ui->boxWaveForm->itemData(index);
-    ToneWaveForm::Id signalType = (ToneWaveForm::Id)data.toInt();
+    QVariant waveType = ui->boxWaveForm->itemData(index);
+    ToneWaveForm::Id signalType = (ToneWaveForm::Id)waveType.toInt();
     params.type = ToneWaveForm::getName(signalType);
     params.voltage = ui->boxVoltage->value();
     params.frequency = ui->boxFrequency->value();

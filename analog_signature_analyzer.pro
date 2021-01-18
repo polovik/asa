@@ -116,7 +116,11 @@ win32-g++ {
 }
 win32-msvc* {
     # /W4 /Wall /WX
-    QMAKE_CXXFLAGS += /W3 /std:c11
+    QMAKE_CFLAGS_WARN_ON -= -W3
+    QMAKE_CFLAGS_WARN_ON += -W4
+    QMAKE_CXXFLAGS_WARN_ON -= -W3
+    QMAKE_CXXFLAGS_WARN_ON += -W4
+    QMAKE_CXXFLAGS += /std:c11
 }
 
 win32 {

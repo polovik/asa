@@ -65,7 +65,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::showForm(int formId)
 {
-    QWidget *newForm = NULL;
+    QWidget *newForm = nullptr;
     switch (formId) {
     case 0:
         newForm = m_formCalibration;

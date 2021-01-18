@@ -23,7 +23,7 @@ void SquareWidgetHolder::resizeEvent(QResizeEvent *event)
         return;
     }
     
-    foreach(QWidget *child, widgets) {
+    for (QWidget *child : widgets) {
         int width = 20;
         int height = 20;
         if (newSize.width() > newSize.height()) {

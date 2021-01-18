@@ -3,7 +3,7 @@
 
 OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
 {
-    m_movedStraightLine = NULL;
+    m_movedStraightLine = nullptr;
     
     m_graphChannelLeft = addGraph();
     m_graphChannelRight = addGraph();
@@ -56,9 +56,9 @@ OscilloscopeView::OscilloscopeView(QWidget *parent) : QCustomPlot(parent)
     m_pointUnderMouseText->setTextAlignment(Qt::AlignLeft);
     m_pointUnderMouseText->setFont(QFont(font().family(), 9));
     m_pointUnderMouseText->setPadding(QMargins(8, 0, 0, 0));
-    QCPData data = graph(0)->data()->lowerBound(0.0).value();
-    m_pointUnderMouseText->position->setCoords(data.key, data.value);
-    m_pointUnderMouseText->setText(tr("%1ms, %2V").arg(data.key, 0, 'f', 2).arg(data.value, 0, 'f', 1));
+    QCPData pointData = graph(0)->data()->lowerBound(0.0).value();
+    m_pointUnderMouseText->position->setCoords(pointData.key, pointData.value);
+    m_pointUnderMouseText->setText(tr("%1ms, %2V").arg(pointData.key, 0, 'f', 2).arg(pointData.value, 0, 'f', 1));
 //    m_pointUnderMouseText->setBrush(Qt::white);
     
     //  Measure time between two points
@@ -178,10 +178,10 @@ void OscilloscopeView::showPointToolTip(QMouseEvent *event)
     double plotX = xAxis->pixelToCoord(event->pos().x());
     double plotY = yAxis->pixelToCoord(event->pos().y());
     
-    QCPData data = graph(0)->data()->lowerBound(plotX).value();
+    QCPData pointData = graph(0)->data()->lowerBound(plotX).value();
     
-    double time = data.key;
-    double voltage = data.value;
+    double time = pointData.key;
+    double voltage = pointData.value;
     
     double closeness = qAbs(voltage - plotY);
     double percent = closeness / yAxis->range().size();
@@ -331,20 +331,20 @@ void OscilloscopeView::mousePressEvent(QMouseEvent *event)
     }
 
     QCPAbstractItem *selectedItem = itemAt(event->localPos(), true);
-    if (selectedItem == NULL) {
+    if (selectedItem == nullptr) {
         QCustomPlot::mousePressEvent(event);
         return;
     }
     qDebug() << "Selected item:" << selectedItem;
 
     QCPItemStraightLine *straightLine = qobject_cast<QCPItemStraightLine *>(selectedItem);
-    if (straightLine == NULL) {
+    if (straightLine == nullptr) {
         QCustomPlot::mousePressEvent(event);
         return;
     }
     
     if (!selectedItems().empty()) {
-        foreach(QCPAbstractItem *item, selectedItems()) {
+        for (QCPAbstractItem *item : selectedItems()) {
             item->setSelected(false);
         }
     }
@@ -354,9 +354,9 @@ void OscilloscopeView::mousePressEvent(QMouseEvent *event)
     
     double plotX = xAxis->pixelToCoord(event->pos().x());
     double plotY = yAxis->pixelToCoord(event->pos().y());
-    QCPData data = graph(0)->data()->lowerBound(plotX).value();
-    double time = data.key;
-    double voltage = data.value;
+    QCPData pointData = graph(0)->data()->lowerBound(plotX).value();
+    double time = pointData.key;
+    double voltage = pointData.value;
     
     if (m_movedStraightLine == m_triggerLevelLine) {
         QString triggerVoltage = QString::number(plotY, 'f', 3) + tr(" V");
@@ -386,7 +386,7 @@ void OscilloscopeView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void OscilloscopeView::mouseMoveEvent(QMouseEvent *event)
 {
-    if (m_movedStraightLine == NULL) {
+    if (m_movedStraightLine == nullptr) {
         QCustomPlot::mouseMoveEvent(event);
         showPointToolTip(event);
         return;
@@ -394,9 +394,9 @@ void OscilloscopeView::mouseMoveEvent(QMouseEvent *event)
     
     double plotX = xAxis->pixelToCoord(event->pos().x());
     double plotY = yAxis->pixelToCoord(event->pos().y());
-    QCPData data = graph(0)->data()->lowerBound(plotX).value();
-    double time = data.key;
-    double voltage = data.value;
+    QCPData pointData = graph(0)->data()->lowerBound(plotX).value();
+    double time = pointData.key;
+    double voltage = pointData.value;
     
 //    qDebug() << "move: time -" << plotX << time << "voltage -" << plotY << voltage;
 
@@ -437,11 +437,11 @@ void OscilloscopeView::mouseMoveEvent(QMouseEvent *event)
 void OscilloscopeView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (!selectedItems().empty()) {
-        foreach(QCPAbstractItem *item, selectedItems()) {
+        for (QCPAbstractItem *item : selectedItems()) {
             item->setSelected(false);
         }
     }
-    m_movedStraightLine = NULL;
+    m_movedStraightLine = nullptr;
     
     QCustomPlot::mouseReleaseEvent(event);
     replot();

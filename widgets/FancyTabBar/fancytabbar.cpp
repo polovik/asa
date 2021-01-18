@@ -35,6 +35,7 @@
 #include <QColor>
 #include <QStackedLayout>
 #include <QToolTip>
+#include <QtDebug>
 
 const int FancyTabBar::m_rounding = 22;
 const int FancyTabBar::m_textPadding = 4;
@@ -80,10 +81,10 @@ QSize FancyTabBar::tabSizeHint(bool minimum) const
     int spacing = 8;
     int width = 80 + spacing + 2;
     int maxLabelwidth = 0;
-    for (int tab=0 ; tab<count() ;++tab) {
-        int width = fm.width(tabText(tab));
-        if (width > maxLabelwidth)
-            maxLabelwidth = width;
+    for (int tab = 0; tab < count(); ++tab) {
+        int labelWidth = fm.width(tabText(tab));
+        if (labelWidth > maxLabelwidth)
+            maxLabelwidth = labelWidth;
     }
 
     int iconHeight = minimum ? 0 : 40;
@@ -122,7 +123,7 @@ QPoint FancyTabBar::getCorner(const QRect& rect, const Corner corner) const
         if(corner == Corner::InsideEnd) return rect.bottomLeft();
     }
 
-    Q_ASSERT("that's impossible!");
+    qFatal("that's impossible!");
     return QPoint();
 }
 
@@ -133,7 +134,7 @@ QRect FancyTabBar::adjustRect(const QRect& rect, const qint8 offsetOutside, cons
     else if(mPosition == TabBarPosition::Left) return rect.adjusted(-offsetOutside, -offsetBeginning, offsetInside, offsetEnd);
     else if(mPosition == TabBarPosition::Right) return rect.adjusted(-offsetInside, -offsetBeginning, offsetOutside, offsetEnd);
 
-    Q_ASSERT("that's impossible!");
+    qFatal("that's impossible!");
     return QRect();
 }
 
@@ -145,7 +146,7 @@ QPoint FancyTabBar::adjustPoint(const QPoint& point, const qint8 offsetInsideOut
     else if(mPosition == TabBarPosition::Left) return point + QPoint(-offsetInsideOutside, offsetBeginningEnd);
     else if(mPosition == TabBarPosition::Right) return point + QPoint(offsetInsideOutside, offsetBeginningEnd);
 
-    Q_ASSERT("that's impossible!");
+    qFatal("that's impossible!");
     return QPoint();
 }
 

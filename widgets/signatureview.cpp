@@ -42,7 +42,7 @@ void SignatureView::loadPreviousSignature(const QList<QPointF> &graphData)
 {
     QVector<double> keys;
     QVector<double> values;
-    foreach(const QPointF &point, graphData) {
+    for (const QPointF &point : graphData) {
         keys.append(point.x());
         values.append(point.y());
     }
@@ -108,7 +108,7 @@ void SignatureView::getView(SignalParameters params, QImage &renderedView, QList
     // Get data of current signature
     QCPDataMap *rawData = m_graphCurSignature->data();
     graphData.clear();
-    foreach(const QCPData &point, rawData->values()) {
+    for (const QCPData &point : rawData->values()) {
         QPointF pt(point.key, point.value);
         graphData.append(pt);
     }

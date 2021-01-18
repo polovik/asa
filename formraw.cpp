@@ -113,8 +113,8 @@ void FormRaw::startAudioCapture(bool start)
 void FormRaw::switchOutputWaveForm()
 {
     int index = ui->boxWaveForm->currentIndex();
-    QVariant data = ui->boxWaveForm->itemData(index);
-    ToneWaveForm form((ToneWaveForm::Id)data.toInt());
+    QVariant waveType = ui->boxWaveForm->itemData(index);
+    ToneWaveForm form((ToneWaveForm::Id)waveType.toInt());
     if (ui->buttonGenerate->isChecked()) {
         m_gen->switchWaveForm(form);
     }

@@ -14,7 +14,7 @@ extern "C" {
 #define TIFFTAG_TESTPOINT_DATA_X        60000
 #define TIFFTAG_TESTPOINT_DATA_Y        60001
 
-static TIFFExtendProc parent_extender = NULL;  // In case we want a chain of extensions
+static TIFFExtendProc parent_extender = nullptr;  // In case we want a chain of extensions
 static const TIFFFieldInfo xtiffFieldInfo[] = {
     { TIFFTAG_FILEFORMAT,           TIFF_VARIABLE, TIFF_VARIABLE, TIFF_ASCII,	FIELD_CUSTOM, 1,	0,	(char *)"FileFormat" },
     { TIFFTAG_TESTPOINT_DESCRIPTION,TIFF_VARIABLE, TIFF_VARIABLE, TIFF_ASCII,	FIELD_CUSTOM, 1,	0,	(char *)"Description" },
@@ -45,12 +45,15 @@ static void augment_libtiff_with_custom_tags() {
 tsize_t qtiffReadProc(thandle_t fd, tdata_t buf, tsize_t size)
 {
     QIODevice *device = static_cast<QIODevice *>(fd);
-    return device->isReadable() ? device->read(static_cast<char *>(buf), size) : -1;
+    const qint64 readBytes = device->read(static_cast<char *>(buf), size);
+    return device->isReadable() ? static_cast<tsize_t>(readBytes): -1;
 }
 
 tsize_t qtiffWriteProc(thandle_t fd, tdata_t buf, tsize_t size)
 {
-    return static_cast<QIODevice *>(fd)->write(static_cast<char *>(buf), size);
+    QIODevice *device = static_cast<QIODevice *>(fd);
+    const qint64 writtenBytes = device->write(static_cast<char *>(buf), size);
+    return static_cast<tsize_t>(writtenBytes);
 }
 
 toff_t qtiffSeekProc(thandle_t fd, toff_t off, int whence)
@@ -58,17 +61,17 @@ toff_t qtiffSeekProc(thandle_t fd, toff_t off, int whence)
     QIODevice *device = static_cast<QIODevice *>(fd);
     switch (whence) {
     case SEEK_SET:
-        device->seek(off);
+        device->seek(static_cast<qint64>(off));
         break;
     case SEEK_CUR:
-        device->seek(device->pos() + off);
+        device->seek(device->pos() + static_cast<qint64>(off));
         break;
     case SEEK_END:
-        device->seek(device->size() + off);
+        device->seek(device->size() + static_cast<qint64>(off));
         break;
     }
 
-    return device->pos();
+    return static_cast<toff_t>(device->pos());
 }
 
 int qtiffCloseProc(thandle_t /*fd*/)
@@ -78,7 +81,8 @@ int qtiffCloseProc(thandle_t /*fd*/)
 
 toff_t qtiffSizeProc(thandle_t fd)
 {
-    return static_cast<QIODevice *>(fd)->size();
+    QIODevice *device = static_cast<QIODevice *>(fd);
+    return static_cast<toff_t>(device->size());
 }
 
 int qtiffMapProc(thandle_t /*fd*/, tdata_t* /*pbase*/, toff_t* /*psize*/)
@@ -129,7 +133,7 @@ bool ImageTiff::readPage(QImage &image)
         || !TIFFGetField(m_tiff, TIFFTAG_PHOTOMETRIC, &photometric)) {
         return false;
     }
-    size = QSize(width, height);
+    size = QSize(static_cast<int>(width), static_cast<int>(height));
 
     uint16 orientationTag;
     TIFFGetField(m_tiff, TIFFTAG_ORIENTATION, &orientationTag);
@@ -180,7 +184,7 @@ bool ImageTiff::readPage(QImage &image)
 
         if (!image.isNull()) {
             for (uint32 y=0; y<height; ++y) {
-                if (TIFFReadScanline(m_tiff, image.scanLine(y), y, 0) < 0) {
+                if (TIFFReadScanline(m_tiff, image.scanLine(static_cast<int>(y)), y, 0) < 0) {
                     return false;
                 }
             }
@@ -197,9 +201,9 @@ bool ImageTiff::readPage(QImage &image)
                     }
                 } else {
                     // create the color table
-                    uint16 *redTable = 0;
-                    uint16 *greenTable = 0;
-                    uint16 *blueTable = 0;
+                    uint16 *redTable = nullptr;
+                    uint16 *greenTable = nullptr;
+                    uint16 *blueTable = nullptr;
                     if (!TIFFGetField(m_tiff, TIFFTAG_COLORMAP, &redTable, &greenTable, &blueTable)) {
                         return false;
                     }
@@ -217,7 +221,7 @@ bool ImageTiff::readPage(QImage &image)
 
                 image.setColorTable(qtColorTable);
                 for (uint32 y=0; y<height; ++y) {
-                    if (TIFFReadScanline(m_tiff, image.scanLine(y), y, 0) < 0) {
+                    if (TIFFReadScanline(m_tiff, image.scanLine(static_cast<int>(y)), y, 0) < 0) {
                         return false;
                     }
                 }
@@ -237,7 +241,7 @@ bool ImageTiff::readPage(QImage &image)
                 const int stopOnError = 1;
                 if (TIFFReadRGBAImageOriented(m_tiff, width, height, reinterpret_cast<uint32 *>(image.bits()), orientationTag, stopOnError)) {
                     for (uint32 y=0; y<height; ++y)
-                        convert32BitOrder(image.scanLine(y), width);
+                        convert32BitOrder(image.scanLine(static_cast<int>(y)), static_cast<int>(width));
                 } else {
                     return false;
                 }
@@ -264,8 +268,8 @@ bool ImageTiff::readPage(QImage &image)
             image.setDotsPerMeterY(qRound(resY * 100));
             break;
         case RESUNIT_INCH:
-            image.setDotsPerMeterX(qRound(resX * (100 / 2.54)));
-            image.setDotsPerMeterY(qRound(resY * (100 / 2.54)));
+            image.setDotsPerMeterX(qRound(resX * (100 / 2.54f)));
+            image.setDotsPerMeterY(qRound(resY * (100 / 2.54f)));
             break;
         default:
             // do nothing as defaults have already
@@ -333,7 +337,7 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
     }
 
     for (page = 0; page < totalPages; page++) {
-        if (!TIFFSetDirectory(m_tiff, page)) {
+        if (!TIFFSetDirectory(m_tiff, static_cast<uint16>(page))) {
             qWarning() << "Couldn't select page" << page << "for file" << filePath;
             goto error;
         }
@@ -377,7 +381,7 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         qreal volt = -1.;
         int samplesCount = -1;
         bool ok = false;
-        foreach (QString arg, args) {
+        for (const QString &arg : args) {
             QString key = arg.section(":", 0, 0);
             QString value = arg.section(":", 1, 1);
             if (key == "POINT") {
@@ -446,8 +450,8 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         QList<QPointF> samples;
         if (samplesCount > 0) {
             uint16 count = 0;
-            double *dataX = NULL;
-            double *dataY = NULL;
+            double *dataX = nullptr;
+            double *dataY = nullptr;
             TIFFGetField(m_tiff, TIFFTAG_TESTPOINT_DATA_X, &count, &dataX);
             TIFFGetField(m_tiff, TIFFTAG_TESTPOINT_DATA_Y, &count, &dataY);
             for (int t = 0; t < samplesCount; t++) {
@@ -889,8 +893,8 @@ bool ImageTiff::appendImage(const QImage &image)
                         && TIFFSetField(m_tiff, TIFFTAG_YRESOLUTION, dotPerMeterY/100.0);
     } else {
         resolutionSet = TIFFSetField(m_tiff, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH)
-                        && TIFFSetField(m_tiff, TIFFTAG_XRESOLUTION, static_cast<float>(image.logicalDpiX()))
-                        && TIFFSetField(m_tiff, TIFFTAG_YRESOLUTION, static_cast<float>(image.logicalDpiY()));
+                        && TIFFSetField(m_tiff, TIFFTAG_XRESOLUTION, static_cast<double>(image.logicalDpiX()))
+                        && TIFFSetField(m_tiff, TIFFTAG_YRESOLUTION, static_cast<double>(image.logicalDpiY()));
     }
     if (!resolutionSet) {
         qWarning() << "Can't set image's resolution:" << image;

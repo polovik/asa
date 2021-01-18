@@ -10,8 +10,8 @@
 #include "settings.h"
 
 bool g_verboseOutput = false;
-static QTextCodec *logCodec = NULL;
-static FILE *logStream = NULL;
+static QTextCodec *logCodec = nullptr;
+static FILE *logStream = nullptr;
 QString g_logFilePath = "";
 
 /** @brief For convenient parsing log files, messages have to be formatted as:
@@ -64,9 +64,13 @@ int main(int argc, char *argv[])
     //  Configure and redirect log output to stderr or in text file
     QByteArray envVar = qgetenv("RUN_IN_QTCREATOR");   //  this variable is only set when run application in QtCreator
     if (envVar.isEmpty()) {
-        g_logFilePath = QString("%1/log_InjectionPumpDiagnostic.txt").arg(QDir::currentPath());
+        g_logFilePath = QString("%1/log_asa.txt").arg(QDir::currentPath());
 #ifdef Q_OS_WIN
-        logStream = _wfopen(g_logFilePath.toStdWString().c_str(), L"w");
+        errno_t error = _wfopen_s(&logStream, g_logFilePath.toStdWString().c_str(), L"w");
+        if (error != 0) {
+            logStream = stderr;
+            qCritical() << "couldn't open log file" << g_logFilePath << "error:" << error << errno;
+        }
 #else
         // for Linux - log file will be put in a User's home directory
         logStream = fopen(g_logFilePath.toUtf8().data(), "w");

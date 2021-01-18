@@ -36,8 +36,8 @@ void FormOptions::switchApplicationLanguage(int index)
     Settings *settings = Settings::getSettings();
     QString locale = "";
     if (index >= 0) {
-        QVariant data = ui->boxLanguage->itemData(index);
-        locale = data.toString();
+        QVariant varData = ui->boxLanguage->itemData(index);
+        locale = varData.toString();
     } else {
         qWarning() << "Invalid application language index:" << index;
         return;

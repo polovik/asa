@@ -107,8 +107,8 @@ qint64 AudioInputDevice::writeData(const char *data, qint64 maxSize)
 //============================AudioInputThread================================//
 AudioInputThread::AudioInputThread()
 {
-    m_inputBuffer = NULL;
-    m_audioInput = NULL;
+    m_inputBuffer = nullptr;
+    m_audioInput = nullptr;
     m_capturedChannels = CHANNEL_NONE;
     m_captureEnabled = false;
     m_maxInputVoltage = 0.01;
@@ -153,7 +153,7 @@ void AudioInputThread::run()
                 m_audioInput->disconnect();
                 m_audioInput->stop();
                 m_audioInput->deleteLater();
-                m_audioInput = NULL;
+                m_audioInput = nullptr;
                 captureStarted = false;
                 setCapturedChannels(CHANNEL_NONE);
             }
@@ -244,7 +244,7 @@ QList<QPair<QString, QString>> AudioInputThread::enumerateDevices()
         }
     }
 #endif
-    foreach(const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
+    for (const QAudioDeviceInfo &info : QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
         if (info.isNull()) {
             continue;
         }
@@ -260,7 +260,7 @@ QList<QPair<QString, QString>> AudioInputThread::enumerateDevices()
             continue;
         }
 #if defined(_WIN32)
-        foreach (QString fullName, devicesFullNames) {
+        for (const QString &fullName : devicesFullNames) {
             if (fullName.startsWith(name)) {
                 description = fullName;
                 if (g_verboseOutput) {
@@ -510,8 +510,8 @@ QStringList AudioInputThread::getPortsList()
         qDebug() << "Audio device" << getDeviceName() << "has ports (Alsa):" << alsaPorts;
     }
 
-    foreach (QString alsaPort, alsaPorts) {
-        foreach (QString paPort, paPorts) {
+    for (const QString &alsaPort : alsaPorts) {
+        for (const QString &paPort, paPorts) {
             if (paPort.startsWith(alsaPort, Qt::CaseInsensitive)) {
                 m_portsMap.insert(alsaPort, QString("analog-input-%1").arg(paPort));
                 break;
@@ -556,8 +556,8 @@ QStringList AudioInputThread::getPortsList()
 void AudioInputThread::setMaxInputVoltage(qreal maxInputVoltage)
 {
     Q_ASSERT(m_inputBuffer);
-    if (m_inputBuffer == NULL) {
-        qCritical() << "Couldn't set capture max input voltage. m_inputBuffer is NULL";
+    if (m_inputBuffer == nullptr) {
+        qCritical() << "Couldn't set capture max input voltage. m_inputBuffer is nullptr";
         return;
     }
     m_maxInputVoltage = maxInputVoltage;
@@ -567,8 +567,8 @@ void AudioInputThread::setMaxInputVoltage(qreal maxInputVoltage)
 void AudioInputThread::setAmplifyFactor(qreal amplifyFactor)
 {
     Q_ASSERT(m_inputBuffer);
-    if (m_inputBuffer == NULL) {
-        qCritical() << "Couldn't set capture amplify factor. m_inputBuffer is NULL";
+    if (m_inputBuffer == nullptr) {
+        qCritical() << "Couldn't set capture amplify factor. m_inputBuffer is nullptr";
         return;
     }
     m_amplifyFactor = amplifyFactor;
@@ -585,8 +585,8 @@ qreal AudioInputThread::getAmplifyFactor()
 void AudioInputThread::setChannelOffset(AudioChannels channel, qreal offset)
 {
     Q_ASSERT(m_inputBuffer);
-    if (m_inputBuffer == NULL) {
-        qCritical() << "Couldn't set capture channel offset. m_inputBuffer is NULL";
+    if (m_inputBuffer == nullptr) {
+        qCritical() << "Couldn't set capture channel offset. m_inputBuffer is nullptr";
         return;
     }
     QString settingsItem;
@@ -624,12 +624,12 @@ DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd, 0x80, 0
 
 IAudioEndpointVolume *getAudioEndpointVolume(QString deviceName)
 {
-    IMMDeviceEnumerator *deviceEnumerator = NULL;
-    IMMDeviceCollection *pCollection = NULL;
+    IMMDeviceEnumerator *deviceEnumerator = nullptr;
+    IMMDeviceCollection *pCollection = nullptr;
     HRESULT hr;
-    IAudioEndpointVolume *endpointVolume = NULL;
+    IAudioEndpointVolume *endpointVolume = nullptr;
     bool foundEndpoint = false;
-    hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (LPVOID *)&deviceEnumerator);
+    hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (LPVOID *)&deviceEnumerator);
     if (FAILED(hr)) {
         qWarning() << "Couldn't create instance of MMDeviceEnumerator";
         goto clear_res;
@@ -646,10 +646,10 @@ IAudioEndpointVolume *getAudioEndpointVolume(QString deviceName)
         goto clear_res;
     }
     for (ULONG i = 0; i < count; i++) {
-        IMMDevice *pEndpoint = NULL;
-        IPropertyStore *pProps = NULL;
-        endpointVolume = NULL;
-        LPWSTR pwszID = NULL;
+        IMMDevice *pEndpoint = nullptr;
+        IPropertyStore *pProps = nullptr;
+        endpointVolume = nullptr;
+        LPWSTR pwszID = nullptr;
         PROPVARIANT varName;
         QString pointName;
         // Initialize container for property value.
@@ -678,7 +678,7 @@ IAudioEndpointVolume *getAudioEndpointVolume(QString deviceName)
         }
         pointName = QString::fromWCharArray(varName.pwszVal);
         if (pointName.startsWith(deviceName)) {
-            hr = pEndpoint->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID *)&endpointVolume);
+            hr = pEndpoint->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, nullptr, (LPVOID *)&endpointVolume);
             if (FAILED(hr)) {
                 qWarning() << "Couldn't get access to AudioEndpoint at" << i << "name:" << pointName;
                 goto endpoint_clear;
@@ -687,29 +687,29 @@ IAudioEndpointVolume *getAudioEndpointVolume(QString deviceName)
         }
 
 endpoint_clear:
-        if (pwszID != NULL) {
+        if (pwszID != nullptr) {
             CoTaskMemFree(pwszID);
         }
         PropVariantClear(&varName);
-        if (pProps != NULL) {
+        if (pProps != nullptr) {
             pProps->Release();
         }
-        if (pEndpoint != NULL) {
+        if (pEndpoint != nullptr) {
             pEndpoint->Release();
         }
         if (foundEndpoint) {
             break;
         } else {
-            if (endpointVolume != NULL) {
+            if (endpointVolume != nullptr) {
                 endpointVolume->Release();
             }
         }
     }
 clear_res:
-    if (deviceEnumerator != NULL) {
+    if (deviceEnumerator != nullptr) {
         deviceEnumerator->Release();
     }
-    if (pCollection != NULL) {
+    if (pCollection != nullptr) {
         pCollection->Release();
     }
     return endpointVolume;
@@ -724,7 +724,7 @@ void AudioInputThread::getVolume(int &baseVolume, int &curVolume, int &maxVolume
     maxVolume = -1;
 #if defined(_WIN32)
     IAudioEndpointVolume *endpointVolume = getAudioEndpointVolume(getDeviceName());
-    if (endpointVolume != NULL) {
+    if (endpointVolume != nullptr) {
         float currentVolume = 0;
         HRESULT hr = endpointVolume->GetMasterVolumeLevelScalar(&currentVolume);
         endpointVolume->Release();
@@ -736,7 +736,7 @@ void AudioInputThread::getVolume(int &baseVolume, int &curVolume, int &maxVolume
         } else {
             qDebug() << "Endpoint" << getDeviceName() << "- current volume as a scalar is:" << currentVolume;
             baseVolume = 1;
-            curVolume = currentVolume * 100;
+            curVolume = qRound(currentVolume * 100);
             maxVolume = 100;
         }
     } else {
@@ -857,9 +857,9 @@ void AudioInputThread::setVolume(int volume)
 
 #if defined(_WIN32)
     IAudioEndpointVolume *endpointVolume = getAudioEndpointVolume(getDeviceName());
-    if (endpointVolume != NULL) {
-        float newVolume = volume / 100.;
-        HRESULT hr = endpointVolume->SetMasterVolumeLevelScalar((float)newVolume, NULL);
+    if (endpointVolume != nullptr) {
+        float newVolume = volume / 100.f;
+        HRESULT hr = endpointVolume->SetMasterVolumeLevelScalar((float)newVolume, nullptr);
         endpointVolume->Release();
         if (FAILED(hr)) {
             qWarning() << "Couldn't get master volume level of AudioEndpoint"
@@ -908,7 +908,7 @@ void AudioInputThread::switchInputDevice(QString name)
         return;
     }
     qDebug() << "Switch audio input device to" << name;
-    foreach(const QAudioDeviceInfo &info, m_audioDeviceInfos) {
+    for (const QAudioDeviceInfo &info : m_audioDeviceInfos) {
         if (info.deviceName() == name) {
             m_curAudioDeviceInfo = info;
             break;
