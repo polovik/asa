@@ -11,7 +11,7 @@
 #include <QRandomGenerator>
 #include "boardview.h"
 
-BoardView::BoardView(QWidget *parent = 0) :
+BoardView::BoardView(QWidget *parent) :
     QGraphicsView(parent)
 {
     m_entireViewIsDragging = false;
@@ -48,11 +48,11 @@ QMap<int, int> BoardView::showBoard(QPixmap pixmap, TestpointsList testpoints)
     scene()->clear();
     m_boardPhoto = scene()->addPixmap(pixmap);
     m_boardPhoto->setData(33, QVariant("BOARD_PHOTO"));
-    fitInView((QGraphicsItem *)m_boardPhoto, Qt::KeepAspectRatio);
-    ensureVisible((QGraphicsItem *)m_boardPhoto, 0, 0);
+    fitInView(m_boardPhoto, Qt::KeepAspectRatio);
+    ensureVisible(m_boardPhoto, 0, 0);
 //    m_scene->setFocus();
 //    ui->boardView->setFocus();
-    foreach(int id, testpoints.keys()) {
+    for (int id : testpoints.keys()) {
         QPoint pos = testpoints.value(id);
         int uid = insertTestpoint(pos);
         ids.insert(uid, id);
@@ -71,9 +71,9 @@ void BoardView::getBoardPhoto(QImage &boardPhoto, QImage &boardPhotoWithMarkers)
     boardPhoto = origPhoto.toImage();
     
     stopAnimation();
-    fitInView((QGraphicsItem *)m_boardPhoto, Qt::KeepAspectRatio);
-    ensureVisible((QGraphicsItem *)m_boardPhoto, 0, 0);
-    foreach(QGraphicsItem *item, scene()->items()) {
+    fitInView(m_boardPhoto, Qt::KeepAspectRatio);
+    ensureVisible(m_boardPhoto, 0, 0);
+    for (QGraphicsItem *item : scene()->items()) {
         QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
         if (pin == nullptr) {
             continue;
@@ -94,7 +94,7 @@ void BoardView::testpointChangeText(int uid, QString text)
         return;
     }
     QGraphicsTextItem *itemId = nullptr;
-    foreach(QGraphicsItem *item, pin->childItems()) {
+    for (QGraphicsItem *item : pin->childItems()) {
         itemId = qgraphicsitem_cast<QGraphicsTextItem *>(item);
         if (itemId != nullptr) {
             break;
@@ -119,7 +119,7 @@ void BoardView::mousePressEvent(QMouseEvent *event)
         if (listItems.isEmpty()) {
             dragEntireView = false;
         }
-        foreach(QGraphicsItem *item, listItems) {
+        for (QGraphicsItem *item : listItems) {
             if (item != m_boardPhoto) {
                 dragEntireView = false;
             } else {
@@ -219,7 +219,7 @@ void BoardView::wheelEvent(QWheelEvent *event)
     QPointF newScenePos = mapToScene(cursorPos);
     translate(newScenePos.x() - oldScenePos.x(), newScenePos.y() - oldScenePos.y());
     
-    foreach(QGraphicsItem *item, scene()->items()) {
+    for (QGraphicsItem *item : scene()->items()) {
         QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
         if (pin == nullptr) {
             continue;
@@ -244,7 +244,7 @@ int BoardView::insertTestpoint(QPointF posOnScene)
 
 QGraphicsEllipseItem *BoardView::getPinByUid(int uid)
 {
-    foreach(QGraphicsItem *item, scene()->items()) {
+    for (QGraphicsItem *item : scene()->items()) {
         QGraphicsEllipseItem *testpoint = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
         if (testpoint == nullptr) {
             continue;
@@ -289,7 +289,7 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
         if (listItems.isEmpty()) {
             cursorOverBoard = false;
         }
-        foreach(QGraphicsItem *item, listItems) {
+        for (QGraphicsItem *item : listItems) {
             if (item != m_boardPhoto) {
                 cursorOverBoard = false;
             }
@@ -309,9 +309,9 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
     QAction *action = menu.exec(mapToGlobal(event->pos()));
     if (action == &actionFitBoardToView) {
 //        qDebug() << "fit to view";
-        fitInView((QGraphicsItem *)m_boardPhoto, Qt::KeepAspectRatio);
-        ensureVisible((QGraphicsItem *)m_boardPhoto, 0, 0);
-        foreach(QGraphicsItem *item, scene()->items()) {
+        fitInView(m_boardPhoto, Qt::KeepAspectRatio);
+        ensureVisible(m_boardPhoto, 0, 0);
+        for (QGraphicsItem *item : scene()->items()) {
             QGraphicsEllipseItem *pin = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
             if (pin == nullptr) {
                 continue;
@@ -345,24 +345,29 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
 int BoardView::fitLabelFontSize(QFont &currentFont, const QRect &rectToBeFit,
                                 const QString &text, int startFromSize)
 {
-    int currentFontHeight = startFromSize == 0 ? currentFont.pointSize() : startFromSize;
-    QRect currentBoundingRect;
-    
-    for (; currentFontHeight > 0;) {
-        currentFont.setPointSize(currentFontHeight);
+    // NOTE cache font size for labels with similar rect and numbers count
+    int topBound = startFromSize;
+    int bottomBound = 1;
+    int curHeight = qBound(bottomBound, bottomBound + qRound((topBound - bottomBound) / 2.), topBound);
+    while (true) {
+        currentFont.setPointSize(curHeight);
         QFontMetrics metrics(currentFont);
-        currentBoundingRect = metrics.boundingRect(rectToBeFit, Qt::TextWordWrap | Qt::AlignVCenter | Qt::AlignHCenter, text);
-        if ((currentBoundingRect.width() <= rectToBeFit.width())
-            && (currentBoundingRect.height() <= rectToBeFit.height())) {
+        QRect newRect = metrics.boundingRect(rectToBeFit,
+            Qt::TextWordWrap | Qt::AlignVCenter | Qt::AlignHCenter, text);
+        if ((newRect.width() <= rectToBeFit.width())
+            && (newRect.height() <= rectToBeFit.height())) {
+            bottomBound = curHeight;
+        } else {
+            topBound = curHeight;
+        }
+        if ((topBound - bottomBound) == 1) {
+            curHeight = bottomBound;
             break;
         }
-        if (currentFontHeight == 1) {
-            break;
-        }
-        currentFontHeight--;
+        curHeight = qBound(bottomBound, bottomBound + qRound((topBound - bottomBound) / 2.), topBound);
     }
-    
-    return currentFontHeight;
+//    qDebug() << "label" << text << "with rect" << rectToBeFit << "font:" << curHeight;
+    return curHeight;
 }
 
 void BoardView::updateTestpointView(QGraphicsEllipseItem *pin)
@@ -370,14 +375,14 @@ void BoardView::updateTestpointView(QGraphicsEllipseItem *pin)
     int radius = 15;
     QPointF pt1 = mapToScene(0, 0);
     QPointF pt2 = mapToScene(radius, radius);
-    int r = pt2.x() - pt1.x();
+    int r = qRound(pt2.x() - pt1.x());
     QRectF circleRect(-r, -r, r * 2, r * 2);
     QPen pen(QBrush(Qt::red), r * 0.3);
     pin->setPen(pen);
     pin->setRect(circleRect);
     
     QGraphicsTextItem *itemId = nullptr;
-    foreach(QGraphicsItem *item, pin->childItems()) {
+    for (QGraphicsItem *item : pin->childItems()) {
         itemId = qgraphicsitem_cast<QGraphicsTextItem *>(item);
         if (itemId != nullptr) {
             break;
@@ -387,6 +392,7 @@ void BoardView::updateTestpointView(QGraphicsEllipseItem *pin)
         qWarning() << "Testpoint view doesn't contain the ID item";
         return;
     }
+    // TODO use monospace font QFontDatabase::families QFontDialog::MonospacedFonts
     QFont idFont("Arial");
     int fontSize = fitLabelFontSize(idFont, circleRect.toRect(), itemId->toPlainText(), 200);
     idFont.setPixelSize(fontSize);

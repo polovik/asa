@@ -15,7 +15,7 @@ class BoardView : public QGraphicsView
 {
     Q_OBJECT
 public:
-    BoardView(QWidget *parent);
+    explicit BoardView(QWidget *parent);
     ~BoardView();
     QMap<int, int> showBoard(QPixmap pixmap, TestpointsList testpoints);
     void getBoardPhoto(QImage &boardPhoto, QImage &boardPhotoWithMarkers);
