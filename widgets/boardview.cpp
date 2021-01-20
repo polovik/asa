@@ -16,6 +16,7 @@ BoardView::BoardView(QWidget *parent) :
 {
     m_entireViewIsDragging = false;
     m_testpointDragging = false;
+    m_testpointActionsEnabled = false;
     m_lastMousePos = QPoint(0, 0);
     m_boardPhoto = nullptr;
     m_currentTestpoint = nullptr;
@@ -108,6 +109,15 @@ void BoardView::testpointChangeText(int uid, QString text)
     updateTestpointView(pin);
 }
 
+void BoardView::enableTestpointActions(bool enable)
+{
+    m_testpointActionsEnabled = enable;
+    if (m_testpointActionsEnabled) {
+        stopAnimation();
+        m_currentTestpoint = nullptr;
+    }
+}
+
 void BoardView::mousePressEvent(QMouseEvent *event)
 {
 //    qDebug() << "press" << event->button() << "at" << event->pos();
@@ -117,7 +127,11 @@ void BoardView::mousePressEvent(QMouseEvent *event)
         bool dragEntireView = true;
         QGraphicsEllipseItem *testpoint = nullptr;
         if (listItems.isEmpty()) {
+            // clicked outside of any item (outside boardPhoto too)
             dragEntireView = false;
+            stopAnimation();
+            m_currentTestpoint = nullptr;
+            emit testpointUnselected();
         }
         for (QGraphicsItem *item : listItems) {
             if (item != m_boardPhoto) {
@@ -142,9 +156,12 @@ void BoardView::mousePressEvent(QMouseEvent *event)
             if (ok) {
                 stopAnimation();
                 m_currentTestpoint = testpoint;
-                m_testpointDragging = true;
-                startAnimation();
-                emit testpointSelected(id);
+                if (m_testpointActionsEnabled) {
+                    m_testpointDragging = true;
+                } else {
+                    startAnimation();
+                    emit testpointSelected(id);
+                }
             } else {
                 qCritical() << "Testpoint have invalid ID:" << testpoint->data(DATA_TESTPOINT_UID);
                 Q_ASSERT(false);
@@ -180,7 +197,14 @@ void BoardView::mouseMoveEvent(QMouseEvent *event)
 void BoardView::mouseReleaseEvent(QMouseEvent *event)
 {
 //    qDebug() << "release" << "at" << event->pos();
-    m_entireViewIsDragging = false;
+    if (m_entireViewIsDragging) {
+        if (viewport()->cursor() != Qt::ClosedHandCursor) {
+            stopAnimation();
+            m_currentTestpoint = nullptr;
+            emit testpointUnselected();
+        }
+        m_entireViewIsDragging = false;
+    }
     if (m_testpointDragging) {
         bool ok = false;
         int id = m_currentTestpoint->data(DATA_TESTPOINT_UID).toInt(&ok);
@@ -231,7 +255,7 @@ void BoardView::wheelEvent(QWheelEvent *event)
 
 int BoardView::insertTestpoint(QPointF posOnScene)
 {
-    int uid = getUID();
+    int uid = generateUID();
     qDebug() << "add testpoint" << uid << "at" << posOnScene;
     QGraphicsEllipseItem *item = new QGraphicsEllipseItem();
     item->setData(DATA_TESTPOINT_UID, QVariant(uid));
@@ -298,10 +322,10 @@ void BoardView::contextMenuEvent(QContextMenuEvent *event)
                 testpoint = ellipse;
             }
         }
-        if (cursorOverBoard) {
+        if (m_testpointActionsEnabled && cursorOverBoard) {
             actionAddTestpoint.setEnabled(true);
         }
-        if (testpoint != nullptr) {
+        if (m_testpointActionsEnabled && (testpoint != nullptr)) {
             actionRemoveTestpoint.setEnabled(true);
         }
         actionFitBoardToView.setEnabled(true);
@@ -418,8 +442,6 @@ void BoardView::stopAnimation()
 {
     m_animationTimer->stop();
     if (m_currentTestpoint == nullptr) {
-        qWarning() << "Try to stop animation for missed testpoint";
-//        Q_ASSERT(false);
         return;
     }
     QPen pen = m_currentTestpoint->pen();
@@ -444,7 +466,7 @@ void BoardView::timeslotAnimate()
     m_currentTestpoint->setPen(pen);
 }
 
-int BoardView::getUID()
+int BoardView::generateUID()
 {
     int uid = 0;
     while (true) {

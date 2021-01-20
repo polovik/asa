@@ -46,6 +46,7 @@ private slots:
     void testpointSelect(int uid);
     void testpointMove(int uid, QPoint pos);
     void testpointRemove(int uid);
+    void testpointUnselect();
     
 private:
     typedef enum {

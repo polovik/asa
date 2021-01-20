@@ -20,12 +20,14 @@ public:
     QMap<int, int> showBoard(QPixmap pixmap, TestpointsList testpoints);
     void getBoardPhoto(QImage &boardPhoto, QImage &boardPhotoWithMarkers);
     void testpointChangeText(int uid, QString text);
+    void enableTestpointActions(bool enable);
     
 signals:
     void testpointAdded(int uid, QPoint pos);
     void testpointSelected(int uid);
     void testpointMoved(int uid, QPoint pos);
     void testpointRemoved(int uid);
+    void testpointUnselected();
     
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -45,10 +47,11 @@ private:
     void stopAnimation();
     int fitLabelFontSize(QFont &currentFont, const QRect &rectToBeFit,
                          const QString &text, int startFromSize);
-    int getUID();
+    int generateUID();
                          
     bool m_entireViewIsDragging;
     bool m_testpointDragging;
+    bool m_testpointActionsEnabled;
     QPoint m_lastMousePos;
     QGraphicsPixmapItem *m_boardPhoto;
     QGraphicsEllipseItem *m_currentTestpoint;

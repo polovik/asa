@@ -83,6 +83,7 @@ FormDiagnose::FormDiagnose(ToneGenerator *gen, AudioInputThread *capture, QWidge
     connect(ui->boardView, SIGNAL(testpointSelected(int)),       this, SLOT(testpointSelect(int)));
     connect(ui->boardView, SIGNAL(testpointMoved(int, QPoint)),  this, SLOT(testpointMove(int, QPoint)));
     connect(ui->boardView, SIGNAL(testpointRemoved(int)),        this, SLOT(testpointRemove(int)));
+    connect(ui->boardView, SIGNAL(testpointUnselected()),        this, SLOT(testpointUnselect()));
 
     m_boardPhotoPath = "";
     m_needSave = false;
@@ -104,6 +105,7 @@ void FormDiagnose::enterForm()
 
 void FormDiagnose::leaveForm()
 {
+    switchMode(MODE_EDIT_TESTPOINTS);
     if (m_needSave) {
         QMessageBox::information(this, tr("Unsaved changes"),
             tr("You have unsaved changes in diagnostics tab"));
@@ -264,7 +266,7 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
     for (const TestpointMeasure &meas : loadedTestpoints) {
         testpoints.insert(meas.id, meas.pos);
     }
-    testpointSelect(-1);
+    testpointUnselect();
     QMap<int, int> ids = ui->boardView->showBoard(pix, testpoints);
 
     for (int uid : ids.keys()) {
@@ -364,22 +366,20 @@ void FormDiagnose::testpointSelect(int uid)
         pt.isCurrent = false;
     }
 
-    if (uid == -1) {
-        QList<QPointF> graphData;
-        ui->viewSignature->loadPreviousSignature(graphData);
-        ui->buttonLockMeasure->setEnabled(false);
-        return;
-    }
-
     if (!m_testpoints.contains(uid)) {
         qWarning() << "Testpoint" << uid << "is missed in array for selecting";
         Q_ASSERT(false);
         return;
     }
-    ui->buttonLockMeasure->setEnabled(true);
     TestpointMeasure &selectedPoint = m_testpoints[uid];
     selectedPoint.isCurrent = true;
     ui->viewSignature->loadPreviousSignature(selectedPoint.data);
+    ui->buttonLockMeasure->setEnabled(true);
+    ui->boxWaveForm->setEnabled(true);
+    ui->boxVoltage->setEnabled(true);
+    ui->boxFrequency->setEnabled(true);
+    ui->sliderVoltage->setEnabled(true);
+    ui->sliderFrequency->setEnabled(true);
 }
 
 void FormDiagnose::testpointMove(int uid, QPoint pos)
@@ -427,6 +427,22 @@ void FormDiagnose::testpointRemove(int uid)
 
     m_needSave = true;
     ui->buttonSave->setEnabled(true);
+}
+
+void FormDiagnose::testpointUnselect()
+{
+    for (int id : m_testpoints.keys()) {
+        TestpointMeasure &pt = m_testpoints[id];
+        pt.isCurrent = false;
+    }
+    QList<QPointF> graphData;
+    ui->viewSignature->loadPreviousSignature(graphData);
+    ui->buttonLockMeasure->setEnabled(false);
+    ui->boxWaveForm->setEnabled(false);
+    ui->boxVoltage->setEnabled(false);
+    ui->boxFrequency->setEnabled(false);
+    ui->sliderVoltage->setEnabled(false);
+    ui->sliderFrequency->setEnabled(false);
 }
 
 void FormDiagnose::saveMeasures()
@@ -484,12 +500,6 @@ void FormDiagnose::switchMode(FormDiagnose::UiMode mode)
     qDebug() << "switch UI mode to:" << mode;
     switch (mode) {
     case MODE_EDIT_TESTPOINTS:
-        ui->boxWaveForm->setEnabled(false);
-        ui->boxVoltage->setEnabled(false);
-        ui->boxFrequency->setEnabled(false);
-        ui->sliderVoltage->setEnabled(false);
-        ui->sliderFrequency->setEnabled(false);
-        ui->buttonLockMeasure->setEnabled(false);
         ui->buttonOpenBoard->setEnabled(true);
         ui->buttonCamera->setEnabled(true);
         ui->boxCameras->setEnabled(true);
@@ -497,12 +507,15 @@ void FormDiagnose::switchMode(FormDiagnose::UiMode mode)
         if (m_boardPhotoPath.isEmpty()) {
             ui->buttonRun->setEnabled(false);
         }
+        testpointUnselect();
+        ui->boardView->enableTestpointActions(true);
         break;
     case MODE_ANALYZE_SIGNATURE:
         ui->buttonOpenBoard->setEnabled(false);
         ui->buttonCamera->setEnabled(false);
         ui->boxCameras->setEnabled(false);
         ui->buttonRun->setText(tr("Stop diagnose"));
+        ui->boardView->enableTestpointActions(false);
         break;
     default:
         qWarning() << "try to switch to unexpected UI mode:" << mode;

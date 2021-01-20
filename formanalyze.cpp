@@ -138,7 +138,7 @@ void FormAnalyze::switchOutputWaveForm()
 {
     int index = ui->boxWaveForm->currentIndex();
     QVariant waveType = ui->boxWaveForm->itemData(index);
-    ToneWaveForm form((ToneWaveForm::Id)waveType.toInt());
+    ToneWaveForm form(static_cast<ToneWaveForm::Id>(waveType.toInt()));
     if (ui->buttonRun->isChecked()) {
         m_gen->switchWaveForm(form);
     }
@@ -165,7 +165,7 @@ void FormAnalyze::saveSignature()
     SignalParameters params;
     int index = ui->boxWaveForm->currentIndex();
     QVariant waveType = ui->boxWaveForm->itemData(index);
-    ToneWaveForm::Id signalType = (ToneWaveForm::Id)waveType.toInt();
+    ToneWaveForm::Id signalType = static_cast<ToneWaveForm::Id>(waveType.toInt());
     params.type = ToneWaveForm::getName(signalType);
     params.voltage = ui->boxVoltage->value();
     params.frequency = ui->boxFrequency->value();
@@ -217,7 +217,7 @@ void FormAnalyze::saveSignature()
 
 void FormAnalyze::captureDeviceInitiated(int samplingRate)
 {
-    Q_UNUSED(samplingRate);
+    Q_UNUSED(samplingRate)
     if (!ui->buttonRun->isChecked()) {
         return;
     }
@@ -276,7 +276,7 @@ void FormAnalyze::openSignature()
     setFrequency(measure.signalFrequency);
     if (measure.signalVoltage > ui->boxVoltage->maximum()) {
         qWarning() << "Voltage is higher than available maximum:"
-                   << measure.signalVoltage, ui->boxVoltage->maximum();
+                   << measure.signalVoltage << ui->boxVoltage->maximum();
         measure.signalVoltage = ui->boxVoltage->maximum();
     }
     setVoltage(measure.signalVoltage);

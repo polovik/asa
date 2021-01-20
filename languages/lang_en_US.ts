@@ -4,17 +4,17 @@
 <context>
     <name>BoardView</name>
     <message>
-        <location filename="../widgets/boardview.cpp" line="274"/>
+        <location filename="../widgets/boardview.cpp" line="289"/>
         <source>Add testpoint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/boardview.cpp" line="275"/>
+        <location filename="../widgets/boardview.cpp" line="290"/>
         <source>Remove testpoint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/boardview.cpp" line="276"/>
+        <location filename="../widgets/boardview.cpp" line="291"/>
         <source>Fit to window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -285,7 +285,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="249"/>
+        <location filename="../formdiagnose.ui" line="252"/>
         <source>Select picture from file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -295,7 +295,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="285"/>
+        <location filename="../formdiagnose.ui" line="288"/>
         <source>Lock measure</source>
         <translation type="unfinished"></translation>
     </message>
@@ -315,30 +315,74 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="319"/>
+        <location filename="../formdiagnose.ui" line="322"/>
         <source>Save measures to file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="172"/>
+        <location filename="../formdiagnose.cpp" line="110"/>
+        <location filename="../formdiagnose.cpp" line="126"/>
+        <location filename="../formdiagnose.cpp" line="231"/>
+        <source>Unsaved changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="111"/>
+        <source>You have unsaved changes in diagnostics tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="127"/>
+        <location filename="../formdiagnose.cpp" line="232"/>
+        <source>You have unsaved changes. If you open new board, all unsaved changes will be lost</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="197"/>
         <source>Save Photo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="174"/>
-        <location filename="../formdiagnose.cpp" line="208"/>
-        <location filename="../formdiagnose.cpp" line="396"/>
+        <location filename="../formdiagnose.cpp" line="199"/>
+        <location filename="../formdiagnose.cpp" line="237"/>
+        <location filename="../formdiagnose.cpp" line="459"/>
         <source>Images (*.tif *.tiff)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="206"/>
+        <location filename="../formdiagnose.cpp" line="235"/>
         <source>Open board by photo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="393"/>
+        <location filename="../formdiagnose.cpp" line="302"/>
+        <source>No testpoints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="302"/>
+        <source>Add at least one testpoint for start signature analyze</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="456"/>
+        <location filename="../formdiagnose.cpp" line="493"/>
         <source>Save Diagnostic Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="494"/>
+        <source>Couldn&apos;t save diagnostic results. Please, check log-file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="506"/>
+        <source>Start testpoints diagnose</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="517"/>
+        <source>Stop diagnose</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
