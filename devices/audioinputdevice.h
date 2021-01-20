@@ -79,6 +79,7 @@ public slots:
 signals:
     void prepared();
     void initiated(int);
+    void captureStopped();
     void dataForOscilloscope(AudioChannels channel, SamplesList data);
     void dataForOscilloscope(SamplesList leftChannelData, SamplesList rightChannelData);
     

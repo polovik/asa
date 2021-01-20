@@ -47,7 +47,7 @@ private:
     void stopAnimation();
     int fitLabelFontSize(QFont &currentFont, const QRect &rectToBeFit,
                          const QString &text, int startFromSize);
-    int generateUID();
+    int generateUID() const;
                          
     bool m_entireViewIsDragging;
     bool m_testpointDragging;

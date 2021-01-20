@@ -35,5 +35,7 @@
         <file>icons/save.ico</file>
         <file>icons/calibrate.ico</file>
         <file>icons/open.ico</file>
+        <file>icons/eye_closed.ico</file>
+        <file>icons/eye_open.ico</file>
     </qresource>
 </RCC>

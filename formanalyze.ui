@@ -19,7 +19,7 @@
      <property name="title">
       <string>Probing signal</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,2,0">
       <item>
        <widget class="QComboBox" name="boxWaveForm"/>
       </item>
@@ -96,6 +96,27 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonShowStoredSignature">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Hidden</string>
+        </property>
+        <property name="icon">
+         <iconset resource="analog_signature_analyzer.qrc">
+          <normaloff>:/icons/eye_closed.ico</normaloff>
+          <normalon>:/icons/eye_open.ico</normalon>:/icons/eye_closed.ico</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -230,7 +251,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="buttonLockSignature">
+        <widget class="QPushButton" name="buttonHoldSignature">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -238,15 +259,11 @@
           </size>
          </property>
          <property name="text">
-          <string>Lock signature</string>
+          <string>Hold</string>
          </property>
          <property name="icon">
           <iconset resource="analog_signature_analyzer.qrc">
-           <normaloff>:/icons/locked.ico</normaloff>
-           <normalon>:/icons/unlocked.ico</normalon>:/icons/locked.ico</iconset>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
+           <normaloff>:/icons/locked.ico</normaloff>:/icons/locked.ico</iconset>
          </property>
         </widget>
        </item>
@@ -303,7 +320,7 @@
   <customwidget>
    <class>SignatureView</class>
    <extends>QGraphicsView</extends>
-   <header location="global">widgets/signatureview.h</header>
+   <header>widgets/signatureview.h</header>
   </customwidget>
   <customwidget>
    <class>SquareWidgetHolder</class>

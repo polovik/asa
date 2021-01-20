@@ -313,7 +313,7 @@ void FormDiagnose::captureSignature()
         TestpointMeasure &pt = m_testpoints[uid];
         if (pt.isCurrent) {
             SignalParameters params;
-            ui->viewSignature->getView(params, pt.signature, pt.data);
+            ui->viewSignature->getView(PREVIOUS_SIGNATURE, params, pt.signature, pt.data);
             found = true;
             break;
         }

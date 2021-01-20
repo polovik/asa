@@ -25,14 +25,19 @@ FormAnalyze::FormAnalyze(ToneGenerator *gen, AudioInputThread *capture, QWidget 
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_saw.png"), "Sawtooth", QVariant(ToneWaveForm::WAVE_SAWTOOTH));
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_triangle.png"), "Triangle", QVariant(ToneWaveForm::WAVE_TRIANGLE));
     connect(ui->boxWaveForm, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputWaveForm()));
-    
+    connect(ui->buttonShowStoredSignature, SIGNAL(clicked(bool)), this, SLOT(showStoredSignature(bool)));
+    ui->buttonShowStoredSignature->setChecked(true);
+    showStoredSignature(true);
+
     connect(ui->buttonRun, SIGNAL(clicked(bool)), this, SLOT(runAnalyze(bool)));
     connect(ui->buttonOpenSignature, SIGNAL(clicked()), this, SLOT(openSignature()));
-    connect(ui->buttonLockSignature, SIGNAL(clicked(bool)), this, SLOT(lockSignature(bool)));
+    connect(ui->buttonHoldSignature, SIGNAL(clicked()), this, SLOT(holdSignature()));
     connect(ui->buttonSave, SIGNAL(clicked()), this, SLOT(saveSignature()));
     
     connect(m_capture, SIGNAL(initiated(int)),
             SLOT(captureDeviceInitiated(int)), Qt::QueuedConnection);   // wait while main window initiated
+    connect(m_capture, SIGNAL(captureStopped()),
+            this, SLOT(captureDeviceStopped()));
     connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList, SamplesList)),
             this, SLOT(processOscilloscopeData(SamplesList, SamplesList)));
 }
@@ -171,7 +176,7 @@ void FormAnalyze::saveSignature()
     params.frequency = ui->boxFrequency->value();
     QImage image;
     QList<QPointF> graphData;
-    ui->viewSignature->getView(params, image, graphData);
+    ui->viewSignature->getView(PREVIOUS_SIGNATURE, params, image, graphData);
     
     QFileDialog dialog(this);
     dialog.setWindowTitle(tr("Save Signature"));
@@ -224,6 +229,12 @@ void FormAnalyze::captureDeviceInitiated(int samplingRate)
     // Audio device ready to capture - display this
     Q_ASSERT(m_capture);
     m_capture->setCapturedChannels(CHANNEL_BOTH);
+    ui->viewSignature->setCurrentSignatureVisible(true);
+}
+
+void FormAnalyze::captureDeviceStopped()
+{
+    ui->viewSignature->setCurrentSignatureVisible(false);
 }
 
 void FormAnalyze::processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData)
@@ -270,8 +281,9 @@ void FormAnalyze::openSignature()
     // Display signature
     TestpointMeasure measure = testpoints.first();
     ui->viewSignature->loadPreviousSignature(measure.data);
-    ui->buttonLockSignature->setChecked(true);
-    
+    ui->buttonShowStoredSignature->setChecked(true);
+    showStoredSignature(true);
+
     // Restore signature's test environment
     setFrequency(measure.signalFrequency);
     if (measure.signalVoltage > ui->boxVoltage->maximum()) {
@@ -294,17 +306,24 @@ void FormAnalyze::openSignature()
     }
 }
 
-void FormAnalyze::lockSignature(bool lock)
+void FormAnalyze::showStoredSignature(bool show)
 {
-    qDebug() << "Lock signature view:" << lock;
-    if (lock) {
-        SignalParameters params;
-        QImage image;
-        QList<QPointF> graphData;
-        ui->viewSignature->getView(params, image, graphData);
-        ui->viewSignature->loadPreviousSignature(graphData);
+    ui->viewSignature->setPreviousSignatureVisible(show);
+    if (show) {
+        ui->buttonShowStoredSignature->setText(tr("Stored signature is displayed"));
     } else {
-        QList<QPointF> graphData;
-        ui->viewSignature->loadPreviousSignature(graphData);
+        ui->buttonShowStoredSignature->setText(tr("Stored signature is hidden"));
     }
+}
+
+void FormAnalyze::holdSignature()
+{
+    qDebug() << "hold signature";
+    SignalParameters params;
+    QImage image;
+    QList<QPointF> graphData;
+    ui->viewSignature->getView(CURRENT_SIGNATURE, params, image, graphData);
+    ui->viewSignature->loadPreviousSignature(graphData);
+    ui->buttonShowStoredSignature->setChecked(true);
+    showStoredSignature(true);
 }

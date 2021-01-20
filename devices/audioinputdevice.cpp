@@ -139,7 +139,6 @@ void AudioInputThread::run()
 //    connect(m_inputBuffer, SIGNAL(samplesReceived(AudioChannels,SamplesList)), SLOT (updateBuffers(AudioChannels,SamplesList)), Qt::QueuedConnection);
 //    connect(m_inputBuffer, SIGNAL(samplesReceived(AudioChannels,SamplesList)), SIGNAL(dataForOscilloscope(AudioChannels,SamplesList)), Qt::QueuedConnection);
     m_inputBuffer->setOffsets(m_leftChannelOffset, m_rightChannelOffset);
-    connect(m_inputBuffer, SIGNAL(samplesReceived(SamplesList, SamplesList)), SIGNAL(dataForOscilloscope(SamplesList, SamplesList)), Qt::QueuedConnection);
     emit prepared();
 
     bool captureStarted = false;
@@ -150,17 +149,20 @@ void AudioInputThread::run()
         if (!m_captureEnabled) {
             if (captureStarted == true) {
                 qDebug() << "Stop audio capture";
+                m_inputBuffer->disconnect();
                 m_audioInput->disconnect();
                 m_audioInput->stop();
                 m_audioInput->deleteLater();
                 m_audioInput = nullptr;
                 captureStarted = false;
                 setCapturedChannels(CHANNEL_NONE);
+                emit captureStopped();
             }
             continue;
         }
         if (captureStarted == false) {
             qDebug() << "Start audio capture";
+            connect(m_inputBuffer, SIGNAL(samplesReceived(SamplesList, SamplesList)), SIGNAL(dataForOscilloscope(SamplesList, SamplesList)), Qt::QueuedConnection);
             setCapturedChannels(CHANNEL_NONE);
             m_audioInput = new QAudioInput(m_curAudioDeviceInfo, m_audioFormat);
             connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), SLOT(stateChanged(QAudio::State)));

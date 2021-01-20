@@ -466,7 +466,7 @@ void BoardView::timeslotAnimate()
     m_currentTestpoint->setPen(pen);
 }
 
-int BoardView::generateUID()
+int BoardView::generateUID() const
 {
     int uid = 0;
     while (true) {

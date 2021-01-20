@@ -57,3 +57,6 @@ Thanks to Deleket (Jojo Mendoza)
 
 Files "locked.ico" and "unlocked.ico" were obtained from http://findicons.com/icon/25023/lock_lock_01 and http://findicons.com/icon/24948/lock_unlock_01
 Thanks to Deleket (Jojo Mendoza)
+
+Files "eye_open.ico" and "eye_closed.ico" were obtained from https://findicons.com/icon/494564/eye_open and https://findicons.com/icon/502694/eye_closed
+Thanks to IconShock

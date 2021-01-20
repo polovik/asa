@@ -24,6 +24,9 @@ SignatureView::SignatureView(QWidget *parent) : QCustomPlot(parent)
     zeroLinePen.setWidth(2);
     xAxis->grid()->setZeroLinePen(zeroLinePen);
     yAxis->grid()->setZeroLinePen(zeroLinePen);
+
+    setPreviousSignatureVisible(false);
+    setCurrentSignatureVisible(false);
 }
 
 SignatureView::~SignatureView()
@@ -35,6 +38,20 @@ void SignatureView::setMaximumAmplitude(qreal voltage)
 {
     xAxis->setRange(-voltage * 1.1, voltage * 1.1);
     yAxis->setRange(-voltage * 1.1, voltage * 1.1);
+    replot();
+}
+
+void SignatureView::setPreviousSignatureVisible(bool show)
+{
+    m_showPrevSignature = show;
+    m_graphPrevSignature->setVisible(m_showPrevSignature);
+    replot();
+}
+
+void SignatureView::setCurrentSignatureVisible(bool show)
+{
+    m_showCurSignature = show;
+    m_graphCurSignature->setVisible(m_showCurSignature);
     replot();
 }
 
@@ -56,7 +73,7 @@ void SignatureView::draw(const QVector<double> &keys, const QVector<double> &val
     replot();
 }
 
-void SignatureView::getView(SignalParameters params, QImage &renderedView, QList<QPointF> &graphData)
+void SignatureView::getView(SelectedSignatures selects, SignalParameters params, QImage &renderedView, QList<QPointF> &graphData)
 {
     // Add text labels about tested signal parameters
     qreal textOffset = 0.01;
@@ -93,17 +110,19 @@ void SignatureView::getView(SignalParameters params, QImage &renderedView, QList
     signalFreq->setColor(textColor);
 
     // Render current view for store in image file.
-    m_graphPrevSignature->setVisible(false);
+    m_graphPrevSignature->setVisible(selects & PREVIOUS_SIGNATURE);
+    m_graphCurSignature->setVisible(selects & CURRENT_SIGNATURE);
     replot(QCustomPlot::rpImmediate);
     QPixmap view = toPixmap();
+    renderedView = view.toImage();
 
     // Remove temporaty text labels and unhide previous signature
-    m_graphPrevSignature->setVisible(true);
+    m_graphPrevSignature->setVisible(m_showPrevSignature);
+    m_graphCurSignature->setVisible(m_showCurSignature);
     removeItem(signalType);
     removeItem(signalVolt);
     removeItem(signalFreq);
     replot(QCustomPlot::rpImmediate);
-    renderedView = view.toImage();
     
     // Get data of current signature
     QCPDataMap *rawData = m_graphCurSignature->data();
