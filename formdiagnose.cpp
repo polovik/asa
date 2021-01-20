@@ -58,10 +58,19 @@ FormDiagnose::FormDiagnose(ToneGenerator *gen, AudioInputThread *capture, QWidge
     connect(ui->buttonCamera, SIGNAL(pressed()), this, SLOT(showCamera()));
     connect(ui->buttonOpenBoard, SIGNAL(pressed()), this, SLOT(selectBoard()));
     connect(ui->buttonSave, SIGNAL(pressed()), this, SLOT(saveMeasures()));
+    connect(ui->buttonRun, SIGNAL(clicked(bool)), this, SLOT(runAnalyze(bool)));
     connect(ui->buttonLockMeasure, SIGNAL(pressed()), this, SLOT(captureSignature()));
-    freezeForm(false);
-    ui->buttonLockMeasure->setEnabled(false);
-    
+
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_sine.png"), "Sine", QVariant(ToneWaveForm::WAVE_SINE));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_square.png"), "Square", QVariant(ToneWaveForm::WAVE_SQUARE));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_saw.png"), "Sawtooth", QVariant(ToneWaveForm::WAVE_SAWTOOTH));
+    ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_triangle.png"), "Triangle", QVariant(ToneWaveForm::WAVE_TRIANGLE));
+    connect(ui->boxWaveForm, SIGNAL(currentIndexChanged(int)), this, SLOT(switchOutputWaveForm()));
+    connect(ui->boxFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
+    connect(ui->sliderFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
+    connect(ui->boxVoltage, SIGNAL(valueChanged(double)), this, SLOT(setVoltage(double)));
+    connect(ui->sliderVoltage, SIGNAL(valueChanged(int)), this, SLOT(setVoltage(int)));
+
     ui->boardView->setAlignment(Qt::AlignCenter);
     ui->boardView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->boardView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -74,6 +83,11 @@ FormDiagnose::FormDiagnose(ToneGenerator *gen, AudioInputThread *capture, QWidge
     connect(ui->boardView, SIGNAL(testpointSelected(int)),       this, SLOT(testpointSelect(int)));
     connect(ui->boardView, SIGNAL(testpointMoved(int, QPoint)),  this, SLOT(testpointMove(int, QPoint)));
     connect(ui->boardView, SIGNAL(testpointRemoved(int)),        this, SLOT(testpointRemove(int)));
+
+    m_boardPhotoPath = "";
+    m_needSave = false;
+    ui->buttonSave->setEnabled(false);
+    switchMode(MODE_EDIT_TESTPOINTS);
 }
 
 FormDiagnose::~FormDiagnose()
@@ -83,12 +97,17 @@ FormDiagnose::~FormDiagnose()
 
 void FormDiagnose::enterForm()
 {
-    qreal max = m_gen->getMaxVoltageAmplitude();
-    ui->viewSignature->setMaximumAmplitude(max);
+    switchMode(MODE_EDIT_TESTPOINTS);
+//    qreal max = m_gen->getMaxVoltageAmplitude();
+//    ui->viewSignature->setMaximumAmplitude(max);
 }
 
 void FormDiagnose::leaveForm()
 {
+    if (m_needSave) {
+        QMessageBox::information(this, tr("Unsaved changes"),
+            tr("You have unsaved changes in diagnostics tab"));
+    }
     qDebug() << "Leave form \"Diagnose\"";
 }
 
@@ -101,6 +120,10 @@ void FormDiagnose::switchCamera(int index)
 
 void FormDiagnose::showCamera()
 {
+    if (m_needSave) {
+        QMessageBox::information(this, tr("Unsaved changes"),
+            tr("You have unsaved changes. If you open new board, all unsaved changes will be lost"));
+    }
     if (m_dialogCamera != nullptr) {
         qCritical() << "Trying to open dialog camera twice";
         Q_ASSERT(false);
@@ -202,6 +225,10 @@ void FormDiagnose::savePhoto(int id, const QImage &preview)
 
 void FormDiagnose::selectBoard()
 {
+    if (m_needSave) {
+        QMessageBox::information(this, tr("Unsaved changes"),
+            tr("You have unsaved changes. If you open new board, all unsaved changes will be lost"));
+    }
     QFileDialog dialog(this);
     dialog.setWindowTitle(tr("Open board by photo"));
     dialog.setFileMode(QFileDialog::ExistingFile);
@@ -260,6 +287,21 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
         QString label = QString::number(meas.id);
         ui->boardView->testpointChangeText(uid, label);
     }
+    ui->buttonRun->setEnabled(true);
+    m_needSave = false;
+    ui->buttonSave->setEnabled(false);
+}
+
+void FormDiagnose::runAnalyze(bool start)
+{
+    if (start) {
+        switchMode(MODE_ANALYZE_SIGNATURE);
+        if (m_testpoints.isEmpty()) {
+            QMessageBox::information(this, tr("No testpoints"), tr("Add at least one testpoint for start signature analyze"));
+        }
+    } else {
+        switchMode(MODE_EDIT_TESTPOINTS);
+    }
 }
 
 void FormDiagnose::captureSignature()
@@ -310,7 +352,9 @@ void FormDiagnose::testpointAdd(int uid, QPoint pos)
     m_testpoints.insert(uid, point);
     QString label = QString::number(testpointId);
     ui->boardView->testpointChangeText(uid, label);
-    freezeForm(true);
+
+    m_needSave = true;
+    ui->buttonSave->setEnabled(true);
 }
 
 void FormDiagnose::testpointSelect(int uid)
@@ -347,7 +391,9 @@ void FormDiagnose::testpointMove(int uid, QPoint pos)
     }
     TestpointMeasure &movedPoint = m_testpoints[uid];
     movedPoint.pos = pos;
-    freezeForm(true);
+
+    m_needSave = true;
+    ui->buttonSave->setEnabled(true);
 }
 
 void FormDiagnose::testpointRemove(int uid)
@@ -379,13 +425,14 @@ void FormDiagnose::testpointRemove(int uid)
         ui->boardView->testpointChangeText(id, label);
     }
 
-    freezeForm(true);
+    m_needSave = true;
+    ui->buttonSave->setEnabled(true);
 }
 
 void FormDiagnose::saveMeasures()
 {
     if (!m_needSave) {
-        qDebug() << "There are no changes. Do not store diagnostic data";
+        qWarning() << "There are no changes. Do not store diagnostic data";
         return;
     }
 
@@ -421,21 +468,45 @@ void FormDiagnose::saveMeasures()
     }
     QList<TestpointMeasure> savedTestpoints;
     savedTestpoints = sortedTestpoints.values();
-    tiff.writeImageSeries(filePath, boardPhoto, boardPhotoWithMarkers, savedTestpoints);
+    bool saved = tiff.writeImageSeries(filePath, boardPhoto, boardPhotoWithMarkers, savedTestpoints);
     
-    freezeForm(false);
+    if (saved) {
+        m_needSave = false;
+        ui->buttonSave->setEnabled(false);
+    } else {
+        QMessageBox::warning(this, tr("Save Diagnostic Results"),
+            tr("Couldn't save diagnostic results. Please, check log-file"));
+    }
 }
 
-void FormDiagnose::freezeForm(bool changesNotStored)
+void FormDiagnose::switchMode(FormDiagnose::UiMode mode)
 {
-    if (changesNotStored) {
-        ui->buttonCamera->setEnabled(false);
-        ui->buttonOpenBoard->setEnabled(false);
-        ui->buttonSave->setEnabled(true);
-    } else {
-        ui->buttonCamera->setEnabled(true);
+    qDebug() << "switch UI mode to:" << mode;
+    switch (mode) {
+    case MODE_EDIT_TESTPOINTS:
+        ui->boxWaveForm->setEnabled(false);
+        ui->boxVoltage->setEnabled(false);
+        ui->boxFrequency->setEnabled(false);
+        ui->sliderVoltage->setEnabled(false);
+        ui->sliderFrequency->setEnabled(false);
+        ui->buttonLockMeasure->setEnabled(false);
         ui->buttonOpenBoard->setEnabled(true);
-        ui->buttonSave->setEnabled(false);
+        ui->buttonCamera->setEnabled(true);
+        ui->boxCameras->setEnabled(true);
+        ui->buttonRun->setText(tr("Start testpoints diagnose"));
+        if (m_boardPhotoPath.isEmpty()) {
+            ui->buttonRun->setEnabled(false);
+        }
+        break;
+    case MODE_ANALYZE_SIGNATURE:
+        ui->buttonOpenBoard->setEnabled(false);
+        ui->buttonCamera->setEnabled(false);
+        ui->boxCameras->setEnabled(false);
+        ui->buttonRun->setText(tr("Stop diagnose"));
+        break;
+    default:
+        qWarning() << "try to switch to unexpected UI mode:" << mode;
+        break;
     }
-    m_needSave = changesNotStored;
+    m_uiMode = mode;
 }

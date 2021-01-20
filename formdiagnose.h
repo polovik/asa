@@ -39,6 +39,7 @@ private slots:
     void savePhoto(int id, const QImage &preview);
     void selectBoard();
     void loadBoardData(QString boardPhotoPath);
+    void runAnalyze(bool start);
     void captureSignature();
     
     void testpointAdd(int uid, QPoint pos);
@@ -47,7 +48,13 @@ private slots:
     void testpointRemove(int uid);
     
 private:
-    void freezeForm(bool changesNotStored);
+    typedef enum {
+        MODE_UNDEFINED          = 0,
+        MODE_EDIT_TESTPOINTS    = 1,
+        MODE_ANALYZE_SIGNATURE  = 2,
+    } UiMode;
+
+    void switchMode(UiMode mode);
     
     Ui::FormDiagnose *ui;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
@@ -61,6 +68,7 @@ private:
     QMap<int, TestpointMeasure> m_testpoints; // key is UID of QGraphicItem
     ToneGenerator *m_gen;
     AudioInputThread *m_capture;
+    FormDiagnose::UiMode m_uiMode;
 };
 
 #endif // FORMDIAGNOSE_H
