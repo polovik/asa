@@ -5,7 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 # /usr/bin/asa is already provided by ksh package (on opensuse it is installed by default)
 # TODO rename application's name and update packages rules
 TARGET = asa
-VERSION = 1.0.0
+VERSION = 1.0
 
 TEMPLATE = app
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"

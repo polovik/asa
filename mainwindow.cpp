@@ -107,6 +107,7 @@ void MainWindow::showForm(int formId)
         m_formDiagnose->leaveForm();
     } else if (m_currentForm == m_formOptions) {
         qDebug() << "Close form \"Options\"";
+        m_formOptions->leaveForm();
     } else if (m_currentForm == m_formAbout) {
         qDebug() << "Close form \"About\"";
     } else {
@@ -129,6 +130,7 @@ void MainWindow::showForm(int formId)
         m_formDiagnose->enterForm();
     } else if (m_currentForm == m_formOptions) {
         qDebug() << "Open form \"Options\"";
+        m_formOptions->enterForm();
     } else if (m_currentForm == m_formAbout) {
         qDebug() << "Open form \"About\"";
     } else {

@@ -4,17 +4,17 @@
 <context>
     <name>BoardView</name>
     <message>
-        <location filename="../widgets/boardview.cpp" line="289"/>
+        <location filename="../widgets/boardview.cpp" line="298"/>
         <source>Add testpoint</source>
         <translation>Добавить тестовую точку</translation>
     </message>
     <message>
-        <location filename="../widgets/boardview.cpp" line="290"/>
+        <location filename="../widgets/boardview.cpp" line="299"/>
         <source>Remove testpoint</source>
         <translation>Удалить тестовую точку</translation>
     </message>
     <message>
-        <location filename="../widgets/boardview.cpp" line="291"/>
+        <location filename="../widgets/boardview.cpp" line="300"/>
         <source>Fit to window</source>
         <translation>Отмасштабировать по размеру окна</translation>
     </message>
@@ -105,36 +105,55 @@
         <translation>Гц</translation>
     </message>
     <message>
-        <location filename="../formanalyze.ui" line="129"/>
+        <location filename="../formanalyze.ui" line="109"/>
+        <source>Hidden</source>
+        <translation>Скрыто</translation>
+    </message>
+    <message>
+        <location filename="../formanalyze.ui" line="150"/>
         <source>Run</source>
         <translation>Запуск</translation>
     </message>
     <message>
-        <location filename="../formanalyze.ui" line="211"/>
-        <location filename="../formanalyze.cpp" line="245"/>
+        <location filename="../formanalyze.ui" line="232"/>
+        <location filename="../formanalyze.cpp" line="256"/>
         <source>Open signature</source>
         <translation>Открыть сигнатуру</translation>
     </message>
     <message>
-        <location filename="../formanalyze.ui" line="241"/>
-        <source>Lock signature</source>
-        <translation>Удержать сигнатуру</translation>
+        <location filename="../formanalyze.ui" line="262"/>
+        <source>Hold</source>
+        <translation>Зафиксировать</translation>
     </message>
     <message>
-        <location filename="../formanalyze.ui" line="275"/>
+        <source>Lock signature</source>
+        <translation type="vanished">Удержать сигнатуру</translation>
+    </message>
+    <message>
+        <location filename="../formanalyze.ui" line="292"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../formanalyze.cpp" line="177"/>
+        <location filename="../formanalyze.cpp" line="182"/>
         <source>Save Signature</source>
         <translation>Сохранить сигнатуру</translation>
     </message>
     <message>
-        <location filename="../formanalyze.cpp" line="180"/>
-        <location filename="../formanalyze.cpp" line="247"/>
+        <location filename="../formanalyze.cpp" line="185"/>
+        <location filename="../formanalyze.cpp" line="258"/>
         <source>Images (*.tif *.tiff)</source>
         <translation>Изображения (*.tif *.tiff)</translation>
+    </message>
+    <message>
+        <location filename="../formanalyze.cpp" line="313"/>
+        <source>Stored signature is displayed</source>
+        <translation>Сохранённая сигнатура отображается</translation>
+    </message>
+    <message>
+        <location filename="../formanalyze.cpp" line="315"/>
+        <source>Stored signature is hidden</source>
+        <translation>Сохранённая сигнатура скрыта</translation>
     </message>
 </context>
 <context>
@@ -347,37 +366,46 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation>Получить картинку с камеры</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="252"/>
+        <location filename="../formdiagnose.ui" line="77"/>
+        <source>Hidden</source>
+        <translation>Скрыто</translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.ui" line="273"/>
         <source>Select picture from file</source>
         <translation>Выбрать картинку из файла</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="192"/>
+        <location filename="../formdiagnose.ui" line="213"/>
         <source>Run</source>
-        <translation type="unfinished">Запуск</translation>
+        <translation>Запуск</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="288"/>
         <source>Lock measure</source>
-        <translation>Удержать сигнатуру</translation>
+        <translation type="vanished">Удержать сигнатуру</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="73"/>
+        <location filename="../formdiagnose.ui" line="94"/>
         <source>Probing signal</source>
-        <translation type="unfinished">Тестирующий сигнал</translation>
+        <translation>Тестирующий сигнал</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="84"/>
+        <location filename="../formdiagnose.ui" line="105"/>
         <source>V</source>
-        <translation type="unfinished">В</translation>
+        <translation>В</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="103"/>
+        <location filename="../formdiagnose.ui" line="124"/>
         <source>Hz</source>
-        <translation type="unfinished">Гц</translation>
+        <translation>Гц</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.ui" line="322"/>
+        <location filename="../formdiagnose.ui" line="309"/>
+        <source>Hold</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.ui" line="339"/>
         <source>Save measures to file</source>
         <translation>Сохранить сигнатуру в файл</translation>
     </message>
@@ -386,70 +414,90 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation type="vanished">Отменить изменения</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="110"/>
-        <location filename="../formdiagnose.cpp" line="126"/>
-        <location filename="../formdiagnose.cpp" line="231"/>
+        <location filename="../formdiagnose.cpp" line="118"/>
+        <location filename="../formdiagnose.cpp" line="134"/>
+        <location filename="../formdiagnose.cpp" line="239"/>
         <source>Unsaved changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменения не сохранены</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="111"/>
+        <location filename="../formdiagnose.cpp" line="119"/>
         <source>You have unsaved changes in diagnostics tab</source>
-        <translation type="unfinished"></translation>
+        <translation>У вас есть несохранённые изменения на вкладке Диагностика</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="127"/>
-        <location filename="../formdiagnose.cpp" line="232"/>
+        <location filename="../formdiagnose.cpp" line="135"/>
+        <location filename="../formdiagnose.cpp" line="240"/>
         <source>You have unsaved changes. If you open new board, all unsaved changes will be lost</source>
-        <translation type="unfinished"></translation>
+        <translation>У вас есть несохранённые изменения. Если вы откроете новую плату, то все изменения будут утеряны</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="197"/>
+        <location filename="../formdiagnose.cpp" line="205"/>
         <source>Save Photo</source>
         <translation>Сохранить фотографию</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="199"/>
-        <location filename="../formdiagnose.cpp" line="237"/>
-        <location filename="../formdiagnose.cpp" line="459"/>
+        <location filename="../formdiagnose.cpp" line="207"/>
+        <location filename="../formdiagnose.cpp" line="245"/>
+        <location filename="../formdiagnose.cpp" line="675"/>
         <source>Images (*.tif *.tiff)</source>
         <translation>Изображения (*.tif *.tiff)</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="235"/>
+        <location filename="../formdiagnose.cpp" line="243"/>
         <source>Open board by photo</source>
         <translation>Открыть плату по фотографии</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="302"/>
+        <location filename="../formdiagnose.cpp" line="310"/>
         <source>No testpoints</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет тестовых точек</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="302"/>
+        <location filename="../formdiagnose.cpp" line="310"/>
         <source>Add at least one testpoint for start signature analyze</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавьте хотя бы одну тестовую точку чтобы приступить к анализу сигнатур</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="456"/>
-        <location filename="../formdiagnose.cpp" line="493"/>
+        <location filename="../formdiagnose.cpp" line="321"/>
+        <source>Stored signature is displayed</source>
+        <translation>Сохранённая сигнатура отображается</translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="323"/>
+        <source>Stored signature is hidden</source>
+        <translation>Сохранённая сигнатура скрыта</translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="506"/>
+        <source>Diagnoze configuration</source>
+        <translation>Настройки диагностики</translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="507"/>
+        <source>Default configuration for diagnoze test-point is missed. You may specify default settings on Options tab</source>
+        <translation>Настройки по умолчанию для тестовой точки отсутствуют. Вы можете задать настройки по умолчанию на вкладке Настройки</translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="672"/>
+        <location filename="../formdiagnose.cpp" line="709"/>
         <source>Save Diagnostic Results</source>
         <translation>Сохранить результаты диагностики</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="494"/>
+        <location filename="../formdiagnose.cpp" line="710"/>
         <source>Couldn&apos;t save diagnostic results. Please, check log-file</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось сохранить результаты диакностики. Пожалуйста, проверьте лог-файл</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="506"/>
+        <location filename="../formdiagnose.cpp" line="722"/>
         <source>Start testpoints diagnose</source>
-        <translation type="unfinished"></translation>
+        <translation>Запустить диагностику по тестовым точкам</translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="517"/>
+        <location filename="../formdiagnose.cpp" line="733"/>
         <source>Stop diagnose</source>
-        <translation type="unfinished"></translation>
+        <translation>Остановить диагностику</translation>
     </message>
 </context>
 <context>
@@ -465,22 +513,52 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation>Язык</translation>
     </message>
     <message>
-        <location filename="../formoptions.cpp" line="15"/>
+        <location filename="../formoptions.ui" line="34"/>
+        <source>Diagnostic default configuration</source>
+        <translation>Настройки по умолчанию для новых тестовых точек</translation>
+    </message>
+    <message>
+        <location filename="../formoptions.ui" line="42"/>
+        <source>Signal&apos;s wave form</source>
+        <translation>Форма сигнала</translation>
+    </message>
+    <message>
+        <location filename="../formoptions.ui" line="56"/>
+        <source>Signal&apos;s frequency</source>
+        <translation>Частота сигнала</translation>
+    </message>
+    <message>
+        <location filename="../formoptions.ui" line="63"/>
+        <source>Hz</source>
+        <translation>Гц</translation>
+    </message>
+    <message>
+        <location filename="../formoptions.ui" line="83"/>
+        <source>Signal&apos;s voltage</source>
+        <translation>Наряжение сигнала</translation>
+    </message>
+    <message>
+        <location filename="../formoptions.ui" line="90"/>
+        <source>V</source>
+        <translation>В</translation>
+    </message>
+    <message>
+        <location filename="../formoptions.cpp" line="16"/>
         <source>English</source>
         <translation>Английский</translation>
     </message>
     <message>
-        <location filename="../formoptions.cpp" line="16"/>
+        <location filename="../formoptions.cpp" line="17"/>
         <source>Russian</source>
         <translation>Русский</translation>
     </message>
     <message>
-        <location filename="../formoptions.cpp" line="47"/>
+        <location filename="../formoptions.cpp" line="95"/>
         <source>Language switching</source>
         <translation>Изменение языка</translation>
     </message>
     <message>
-        <location filename="../formoptions.cpp" line="47"/>
+        <location filename="../formoptions.cpp" line="95"/>
         <source>Language will be changed after the application restart</source>
         <translation>Язык будет изменён после перезапуска приложения</translation>
     </message>
@@ -731,12 +809,12 @@ p, li { white-space: pre-wrap; }
         <translation>Uисследуемой точки, Вольт</translation>
     </message>
     <message>
-        <location filename="../widgets/signatureview.cpp" line="76"/>
+        <location filename="../widgets/signatureview.cpp" line="93"/>
         <source>V</source>
         <translation>В</translation>
     </message>
     <message>
-        <location filename="../widgets/signatureview.cpp" line="86"/>
+        <location filename="../widgets/signatureview.cpp" line="103"/>
         <source>Hz</source>
         <translation>Гц</translation>
     </message>

@@ -39,10 +39,18 @@ private slots:
     void savePhoto(int id, const QImage &preview);
     void selectBoard();
     void loadBoardData(QString boardPhotoPath);
-    void runAnalyze(bool start);
+    void changeModeButton(bool pressed);
     void showStoredSignature(bool show);
     void captureSignature();
-    
+    void setFrequency(int frequency);
+    void setVoltage(double voltage);
+    void setVoltage(int vol10);
+    void switchOutputWaveForm();
+    void runAnalyze(bool start);
+    void captureDeviceInitiated(int samplingRate);
+    void captureDeviceStopped();
+    void processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData);
+
     void testpointAdd(int uid, QPoint pos);
     void testpointSelect(int uid);
     void testpointMove(int uid, QPoint pos);
@@ -57,6 +65,8 @@ private:
     } UiMode;
 
     void switchMode(UiMode mode);
+    int getCurrentTestpointUid() const;
+    bool isTestpointSelected() const;
     
     Ui::FormDiagnose *ui;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)

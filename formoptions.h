@@ -12,11 +12,18 @@ class FormOptions : public QWidget
     Q_OBJECT
 
 public:
-    explicit FormOptions(QWidget *parent = 0);
+    explicit FormOptions(QWidget *parent = nullptr);
     ~FormOptions();
 
 public slots:
+    void enterForm();
+    void leaveForm();
+
+private slots:
     void switchApplicationLanguage(int index);
+    void setFrequency(int frequency);
+    void setVoltage(double voltage);
+    void switchOutputWaveForm();
 
 private:
     Ui::FormOptions *ui;

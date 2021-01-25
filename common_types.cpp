@@ -28,7 +28,7 @@ ToneWaveForm::ToneWaveForm(QString name)
     }
 }
 
-ToneWaveForm::Id ToneWaveForm::id()
+ToneWaveForm::Id ToneWaveForm::id() const
 {
     return m_id;
 }

@@ -14,6 +14,7 @@
 #include <QCameraImageCapture>
 #include <QImageEncoderSettings>
 #include <QFileDialog>
+#include "settings.h"
 #include "tiff/imagetiff.h"
 #include "devices/tonegenerator.h"
 #include "devices/audioinputdevice.h"
@@ -58,7 +59,7 @@ FormDiagnose::FormDiagnose(ToneGenerator *gen, AudioInputThread *capture, QWidge
     connect(ui->buttonCamera, SIGNAL(pressed()), this, SLOT(showCamera()));
     connect(ui->buttonOpenBoard, SIGNAL(pressed()), this, SLOT(selectBoard()));
     connect(ui->buttonSave, SIGNAL(pressed()), this, SLOT(saveMeasures()));
-    connect(ui->buttonRun, SIGNAL(clicked(bool)), this, SLOT(runAnalyze(bool)));
+    connect(ui->buttonRun, SIGNAL(clicked(bool)), this, SLOT(changeModeButton(bool)));
     connect(ui->buttonHoldSignature, SIGNAL(pressed()), this, SLOT(captureSignature()));
 
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_sine.png"), "Sine", QVariant(ToneWaveForm::WAVE_SINE));
@@ -89,6 +90,13 @@ FormDiagnose::FormDiagnose(ToneGenerator *gen, AudioInputThread *capture, QWidge
     m_needSave = false;
     ui->buttonSave->setEnabled(false);
     switchMode(MODE_EDIT_TESTPOINTS);
+
+    connect(m_capture, SIGNAL(initiated(int)),
+            SLOT(captureDeviceInitiated(int)), Qt::QueuedConnection);   // wait while main window initiated
+    connect(m_capture, SIGNAL(captureStopped()),
+            this, SLOT(captureDeviceStopped()));
+    connect(m_capture, SIGNAL(dataForOscilloscope(SamplesList, SamplesList)),
+            this, SLOT(processOscilloscopeData(SamplesList, SamplesList)));
 }
 
 FormDiagnose::~FormDiagnose()
@@ -294,9 +302,9 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
     ui->buttonSave->setEnabled(false);
 }
 
-void FormDiagnose::runAnalyze(bool start)
+void FormDiagnose::changeModeButton(bool pressed)
 {
-    if (start) {
+    if (pressed) {
         switchMode(MODE_ANALYZE_SIGNATURE);
         if (m_testpoints.isEmpty()) {
             QMessageBox::information(this, tr("No testpoints"), tr("Add at least one testpoint for start signature analyze"));
@@ -318,24 +326,134 @@ void FormDiagnose::showStoredSignature(bool show)
 
 void FormDiagnose::captureSignature()
 {
-    bool found = false;
-    for (int uid : m_testpoints.keys()) {
-        TestpointMeasure &pt = m_testpoints[uid];
-        if (pt.isCurrent) {
-            qDebug() << "hold signature";
-            SignalParameters params;
-            ui->viewSignature->getView(CURRENT_SIGNATURE, params, pt.signature, pt.data);
-            ui->viewSignature->loadPreviousSignature(pt.data);
-            ui->buttonShowStoredSignature->setChecked(true);
-            showStoredSignature(true);
-            found = true;
-            break;
-        }
-    }
-    if (!found) {
-        qWarning() << "There is no selected testpoint";
+    const int uid = getCurrentTestpointUid();
+    if ((uid == -1) || !m_testpoints.contains(uid)) {
+        qWarning() << "couldn't store signature: there is no selected testpoint";
         Q_ASSERT(false);
+        return;
     }
+    TestpointMeasure &pt = m_testpoints[uid];
+    qDebug() << "hold signature for testpoint" << uid;
+
+    // Render signature view
+    SignalParameters params;
+    int index = ui->boxWaveForm->currentIndex();
+    QVariant waveType = ui->boxWaveForm->itemData(index);
+    ToneWaveForm::Id signalType = static_cast<ToneWaveForm::Id>(waveType.toInt());
+    params.type = ToneWaveForm::getName(signalType);
+    params.voltage = ui->boxVoltage->value();
+    params.frequency = ui->boxFrequency->value();
+    ui->viewSignature->getView(PREVIOUS_SIGNATURE, params, pt.signature, pt.data);
+
+    // Save signature's configuration
+    pt.signalType.setId(signalType);
+    pt.signalFrequency = ui->boxFrequency->value();
+    pt.signalVoltage = ui->boxVoltage->value();
+
+    // Update held signature on View
+    ui->viewSignature->loadPreviousSignature(pt.data);
+    ui->buttonShowStoredSignature->setChecked(true);
+    showStoredSignature(true);
+
+    m_needSave = true;
+    ui->buttonSave->setEnabled(true);
+}
+
+void FormDiagnose::setFrequency(int frequency)
+{
+    // for avoid recursion, stop processing signal "valueChanged" until UI boxes are updated
+    disconnect(ui->boxFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
+    disconnect(ui->sliderFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
+
+    if (ui->boxFrequency->value() != frequency) {
+        ui->boxFrequency->setValue(frequency);
+    }
+    if (ui->sliderFrequency->value() != frequency) {
+        ui->sliderFrequency->setValue(frequency);
+    }
+    m_gen->changeFrequency(frequency);
+
+    connect(ui->boxFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
+    connect(ui->sliderFrequency, SIGNAL(valueChanged(int)), this, SLOT(setFrequency(int)));
+}
+
+void FormDiagnose::setVoltage(double voltage)
+{
+    // for avoid recursion, stop processing signal "valueChanged" until UI boxes are updated
+    disconnect(ui->boxVoltage, SIGNAL(valueChanged(double)), this, SLOT(setVoltage(double)));
+    disconnect(ui->sliderVoltage, SIGNAL(valueChanged(int)), this, SLOT(setVoltage(int)));
+
+    int v = qRound(voltage * 10.);
+    double curV = v / 10.;
+    int prevV = qRound(ui->boxVoltage->value() * 10.);
+    if (prevV != v) {
+        ui->boxVoltage->setValue(curV);
+    }
+    if (ui->sliderVoltage->value() != v) {
+        ui->sliderVoltage->setValue(v);
+    }
+    m_gen->setCurVoltageAmplitude(curV);
+
+    ui->viewSignature->setMaximumAmplitude(curV);
+
+    connect(ui->boxVoltage, SIGNAL(valueChanged(double)), this, SLOT(setVoltage(double)));
+    connect(ui->sliderVoltage, SIGNAL(valueChanged(int)), this, SLOT(setVoltage(int)));
+}
+
+void FormDiagnose::setVoltage(int vol10)
+{
+    setVoltage(vol10 / 10.);
+}
+
+void FormDiagnose::switchOutputWaveForm()
+{
+    int index = ui->boxWaveForm->currentIndex();
+    QVariant waveType = ui->boxWaveForm->itemData(index);
+    ToneWaveForm form(static_cast<ToneWaveForm::Id>(waveType.toInt()));
+    m_gen->switchWaveForm(form);
+}
+
+void FormDiagnose::runAnalyze(bool start)
+{
+    qDebug() << "Run analyze:" << start;
+    if (start) {
+        switchOutputWaveForm();
+        int frequency = ui->boxFrequency->value();
+        m_gen->changeFrequency(frequency);
+        m_gen->setActiveChannels(CHANNEL_BOTH);
+        m_gen->setCurVoltageAmplitude(ui->boxVoltage->value());
+    }
+    m_gen->runGenerator(start);
+    m_capture->startCapturing(start);
+}
+
+void FormDiagnose::captureDeviceInitiated(int samplingRate)
+{
+    Q_UNUSED(samplingRate)
+    if (!ui->buttonRun->isChecked()) {
+        return;
+    }
+    // Audio device ready to capture - display this
+    Q_ASSERT(m_capture);
+    m_capture->setCapturedChannels(CHANNEL_BOTH);
+    ui->viewSignature->setCurrentSignatureVisible(true);
+}
+
+void FormDiagnose::captureDeviceStopped()
+{
+    ui->viewSignature->setCurrentSignatureVisible(false);
+}
+
+void FormDiagnose::processOscilloscopeData(SamplesList leftChannelData, SamplesList rightChannelData)
+{
+    if (!ui->buttonRun->isChecked()) {
+        return;
+    }
+    QVector<double> voltage;
+    voltage = QVector<double>::fromList(rightChannelData);
+    QVector<double> current;
+    current = QVector<double>::fromList(leftChannelData);
+    ui->viewSignature->draw(voltage, current);
 }
 
 void FormDiagnose::testpointAdd(int uid, QPoint pos)
@@ -346,6 +464,7 @@ void FormDiagnose::testpointAdd(int uid, QPoint pos)
         return;
     }
 
+    // Set sequential number for new testpoint
     QList<int> ids;
     ids.append(-1);
     for (int key : m_testpoints.keys()) {
@@ -355,12 +474,46 @@ void FormDiagnose::testpointAdd(int uid, QPoint pos)
     qSort(ids);
     int testpointId = ids.last() + 1;
 
+    // Set default settings for new testpoint
+    bool noDefaults = false;
+    Settings *settings = Settings::getSettings();
+    QVariant storedValue = settings->value("DiagnoseDefaults/SignalAmplitude");
+    if (!storedValue.isValid()) {
+        storedValue = QVariant(0.4);
+        noDefaults = true;
+    }
+    const qreal defaultVoltage = storedValue.toDouble();
+
+    storedValue = settings->value("DiagnoseDefaults/SignalFrequency");
+    if (!storedValue.isValid()) {
+        storedValue = QVariant(440);
+        noDefaults = true;
+    }
+    const int defaultFrequency = storedValue.toInt();
+
+    storedValue = settings->value("DiagnoseDefaults/SignalForm");
+    if (!storedValue.isValid()) {
+        storedValue = QVariant(ToneWaveForm::getName(ToneWaveForm::WAVE_SINE));
+        noDefaults = true;
+    }
+    const QString defaultWaveName = storedValue.toString();
+    ToneWaveForm waveForm(defaultWaveName);
+    if (waveForm.id() == ToneWaveForm::WAVE_UNKNOWN) {
+        qWarning() << "Invalid format of signal form:" << defaultWaveName << ". Select \"sine\"";
+        waveForm.setId(ToneWaveForm::WAVE_SINE);
+    }
+    if (noDefaults) {
+        QMessageBox::information(this, tr("Diagnoze configuration"),
+                                 tr("Default configuration for diagnoze test-point is missed. You may specify default settings on Options tab"));
+    }
+
+    // Add new testpoint to Board
     TestpointMeasure point;
     point.id = testpointId;
     point.pos = pos;
-    point.signalType.setId(ToneWaveForm::WAVE_SINE);
-    point.signalFrequency = 0;
-    point.signalVoltage = 0;
+    point.signalType.setId(waveForm.id());
+    point.signalFrequency = defaultFrequency;
+    point.signalVoltage = defaultVoltage;
     point.isCurrent = false;
     point.signature = QImage(5, 5, QImage::Format_RGB32);
     point.signature.fill(Qt::white);
@@ -394,6 +547,34 @@ void FormDiagnose::testpointSelect(int uid)
     ui->boxFrequency->setEnabled(true);
     ui->sliderVoltage->setEnabled(true);
     ui->sliderFrequency->setEnabled(true);
+
+    // Display stored signature
+    ui->viewSignature->loadPreviousSignature(selectedPoint.data);
+    ui->buttonShowStoredSignature->setChecked(true);
+    showStoredSignature(true);
+
+    // Restore signature's test environment
+    setFrequency(selectedPoint.signalFrequency);
+    if (selectedPoint.signalVoltage > ui->boxVoltage->maximum()) {
+        qWarning() << "Voltage is higher than available maximum:"
+                   << selectedPoint.signalVoltage << ui->boxVoltage->maximum();
+        selectedPoint.signalVoltage = ui->boxVoltage->maximum();
+    }
+    setVoltage(selectedPoint.signalVoltage);
+    if (selectedPoint.signalType.id() == ToneWaveForm::WAVE_SINE) {
+        ui->boxWaveForm->setCurrentIndex(0);
+    } else if (selectedPoint.signalType.id() == ToneWaveForm::WAVE_SQUARE) {
+        ui->boxWaveForm->setCurrentIndex(1);
+    } else if (selectedPoint.signalType.id() == ToneWaveForm::WAVE_SAWTOOTH) {
+        ui->boxWaveForm->setCurrentIndex(2);
+    } else if (selectedPoint.signalType.id() == ToneWaveForm::WAVE_TRIANGLE) {
+        ui->boxWaveForm->setCurrentIndex(3);
+    } else {
+        qWarning() << "Invalid format of signal form:" << selectedPoint.signalType << ". Select \"sine\"";
+        ui->boxWaveForm->setCurrentIndex(0);
+    }
+
+    runAnalyze(true);
 }
 
 void FormDiagnose::testpointMove(int uid, QPoint pos)
@@ -445,6 +626,7 @@ void FormDiagnose::testpointRemove(int uid)
 
 void FormDiagnose::testpointUnselect()
 {
+    runAnalyze(false);
     for (int id : m_testpoints.keys()) {
         TestpointMeasure &pt = m_testpoints[id];
         pt.isCurrent = false;
@@ -457,6 +639,26 @@ void FormDiagnose::testpointUnselect()
     ui->boxFrequency->setEnabled(false);
     ui->sliderVoltage->setEnabled(false);
     ui->sliderFrequency->setEnabled(false);
+}
+
+int FormDiagnose::getCurrentTestpointUid() const
+{
+    for (int id : m_testpoints.keys()) {
+        if (m_testpoints[id].isCurrent) {
+            return id;
+        }
+    }
+    return -1;
+}
+
+bool FormDiagnose::isTestpointSelected() const
+{
+    const int uid = getCurrentTestpointUid();
+    if (uid != -1) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void FormDiagnose::saveMeasures()
@@ -491,7 +693,7 @@ void FormDiagnose::saveMeasures()
     QImage boardPhoto;
     QImage boardPhotoWithMarkers;
     ui->boardView->getBoardPhoto(boardPhoto, boardPhotoWithMarkers);
-    // TODO display measure environment on the testpoint's signature
+
     QMap<int, TestpointMeasure> sortedTestpoints;
     for (const TestpointMeasure &pt : m_testpoints.values()) {
         sortedTestpoints.insert(pt.id, pt);

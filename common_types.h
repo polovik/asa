@@ -22,7 +22,7 @@ public:
     ToneWaveForm(Id id);
     ToneWaveForm(QString name);
     
-    Id id();
+    Id id() const;
     void setId(Id id);
     
     QString getName() const;
