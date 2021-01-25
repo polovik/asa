@@ -59,7 +59,7 @@ FormDiagnose::FormDiagnose(ToneGenerator *gen, AudioInputThread *capture, QWidge
     connect(ui->buttonOpenBoard, SIGNAL(pressed()), this, SLOT(selectBoard()));
     connect(ui->buttonSave, SIGNAL(pressed()), this, SLOT(saveMeasures()));
     connect(ui->buttonRun, SIGNAL(clicked(bool)), this, SLOT(runAnalyze(bool)));
-    connect(ui->buttonLockMeasure, SIGNAL(pressed()), this, SLOT(captureSignature()));
+    connect(ui->buttonHoldSignature, SIGNAL(pressed()), this, SLOT(captureSignature()));
 
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_sine.png"), "Sine", QVariant(ToneWaveForm::WAVE_SINE));
     ui->boxWaveForm->addItem(QIcon(":/icons/oscillator_square.png"), "Square", QVariant(ToneWaveForm::WAVE_SQUARE));
@@ -306,14 +306,28 @@ void FormDiagnose::runAnalyze(bool start)
     }
 }
 
+void FormDiagnose::showStoredSignature(bool show)
+{
+    ui->viewSignature->setPreviousSignatureVisible(show);
+    if (show) {
+        ui->buttonShowStoredSignature->setText(tr("Stored signature is displayed"));
+    } else {
+        ui->buttonShowStoredSignature->setText(tr("Stored signature is hidden"));
+    }
+}
+
 void FormDiagnose::captureSignature()
 {
     bool found = false;
     for (int uid : m_testpoints.keys()) {
         TestpointMeasure &pt = m_testpoints[uid];
         if (pt.isCurrent) {
+            qDebug() << "hold signature";
             SignalParameters params;
-            ui->viewSignature->getView(PREVIOUS_SIGNATURE, params, pt.signature, pt.data);
+            ui->viewSignature->getView(CURRENT_SIGNATURE, params, pt.signature, pt.data);
+            ui->viewSignature->loadPreviousSignature(pt.data);
+            ui->buttonShowStoredSignature->setChecked(true);
+            showStoredSignature(true);
             found = true;
             break;
         }
@@ -374,7 +388,7 @@ void FormDiagnose::testpointSelect(int uid)
     TestpointMeasure &selectedPoint = m_testpoints[uid];
     selectedPoint.isCurrent = true;
     ui->viewSignature->loadPreviousSignature(selectedPoint.data);
-    ui->buttonLockMeasure->setEnabled(true);
+    ui->buttonHoldSignature->setEnabled(true);
     ui->boxWaveForm->setEnabled(true);
     ui->boxVoltage->setEnabled(true);
     ui->boxFrequency->setEnabled(true);
@@ -437,7 +451,7 @@ void FormDiagnose::testpointUnselect()
     }
     QList<QPointF> graphData;
     ui->viewSignature->loadPreviousSignature(graphData);
-    ui->buttonLockMeasure->setEnabled(false);
+    ui->buttonHoldSignature->setEnabled(false);
     ui->boxWaveForm->setEnabled(false);
     ui->boxVoltage->setEnabled(false);
     ui->boxFrequency->setEnabled(false);

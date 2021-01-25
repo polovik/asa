@@ -40,6 +40,7 @@ private slots:
     void selectBoard();
     void loadBoardData(QString boardPhotoPath);
     void runAnalyze(bool start);
+    void showStoredSignature(bool show);
     void captureSignature();
     
     void testpointAdd(int uid, QPoint pos);
