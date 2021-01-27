@@ -204,7 +204,7 @@ void FormDiagnose::savePhoto(int id, const QImage &preview)
     QFileDialog dialog(m_dialogCamera);
     dialog.setWindowTitle(tr("Save Photo"));
     dialog.setFileMode(QFileDialog::AnyFile);
-    dialog.setNameFilter(tr("Images (*.tif *.tiff)"));
+    dialog.setNameFilter(tr("Images (*.png)"));
     
     if (dialog.exec() != QDialog::Accepted) {
         qDebug() << "Photo" << preview.size() << "is discarded";
@@ -217,19 +217,16 @@ void FormDiagnose::savePhoto(int id, const QImage &preview)
         return;
     }
     QString filePath = files.first();
-    if (!filePath.endsWith(".tif", Qt::CaseInsensitive)
-        && !filePath.endsWith(".tiff", Qt::CaseInsensitive)) {
-        filePath.append(".tiff");
+    if (!filePath.endsWith(".png", Qt::CaseInsensitive)) {
+        filePath.append(".png");
     }
     
-    ImageTiff tiff;
-    QList<TestpointMeasure> testpoints;
-    if (tiff.writeImageSeries(filePath, preview, QImage(), testpoints)) {
+    if (preview.save(filePath, "PNG")) {
         qDebug() << "photo" << preview.size() << "is stored to" << filePath;
         loadBoardData(filePath);
     } else {
         qWarning() << "photo" << preview.size() << "couldn't be stored to" << filePath;
-        QMessageBox::critical(this, "Save Signature", "Signature couldn't be stored to " + filePath);
+        QMessageBox::critical(this, tr("Save photo"), tr("Photo from camera couldn't be stored to ") + filePath);
     }
 }
 
@@ -242,7 +239,10 @@ void FormDiagnose::selectBoard()
     QFileDialog dialog(this);
     dialog.setWindowTitle(tr("Open board by photo"));
     dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setNameFilter(tr("Images (*.tif *.tiff)"));
+    QStringList nameFilters;
+    nameFilters << tr("Images with signatures (*.tif *.tiff)");
+    nameFilters << tr("All images (*.jpeg *.jpg *.bmp *.gif *.png *.jpe *.tif *.tiff)");
+    dialog.setNameFilters(nameFilters);
     if (dialog.exec() != QDialog::Accepted) {
         return;
     }
@@ -264,12 +264,20 @@ void FormDiagnose::loadBoardData(QString boardPhotoPath)
     QVector<double> keys, values;
     ui->viewSignature->draw(keys, values);
     
-    ImageTiff tiff;
     QImage boardPhoto;
     QList<TestpointMeasure> loadedTestpoints;
-    tiff.readImageSeries(m_boardPhotoPath, boardPhoto, loadedTestpoints);
+    if (boardPhotoPath.endsWith(".tif") || boardPhotoPath.endsWith(".tiff")) {
+        ImageTiff tiff;
+        tiff.readImageSeries(m_boardPhotoPath, boardPhoto, loadedTestpoints);
+    } else {
+        if (!boardPhoto.load(m_boardPhotoPath)) {
+            qWarning() << "couldn't load board photo from file" << m_boardPhotoPath;
+            m_boardPhotoPath.clear();
+            return;
+        }
+    }
     QPixmap pix = QPixmap::fromImage(boardPhoto);
-    
+
     TestpointsList testpoints;
     for (const TestpointMeasure &meas : loadedTestpoints) {
         testpoints.insert(meas.id, meas.pos);

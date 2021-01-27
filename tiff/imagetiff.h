@@ -31,6 +31,7 @@ signals:
 private:
     void convert32BitOrder(void *buffer, int width);
     bool readPage(QImage &image);
+    bool decodeTestpointData(QString fileformat, TestpointMeasure &testpoint);
     bool appendImage(const QImage &image);
 
     TIFF *m_tiff;

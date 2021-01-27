@@ -342,7 +342,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
     <message>
         <location filename="../formdiagnose.cpp" line="118"/>
         <location filename="../formdiagnose.cpp" line="134"/>
-        <location filename="../formdiagnose.cpp" line="239"/>
+        <location filename="../formdiagnose.cpp" line="236"/>
         <source>Unsaved changes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -353,7 +353,7 @@ Tone is Sine 50Hz with maximal amplitude.</source>
     </message>
     <message>
         <location filename="../formdiagnose.cpp" line="135"/>
-        <location filename="../formdiagnose.cpp" line="240"/>
+        <location filename="../formdiagnose.cpp" line="237"/>
         <source>You have unsaved changes. If you open new board, all unsaved changes will be lost</source>
         <translation type="unfinished"></translation>
     </message>
@@ -363,65 +363,88 @@ Tone is Sine 50Hz with maximal amplitude.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="207"/>
-        <location filename="../formdiagnose.cpp" line="245"/>
-        <location filename="../formdiagnose.cpp" line="675"/>
+        <location filename="../formdiagnose.cpp" line="683"/>
         <source>Images (*.tif *.tiff)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="243"/>
+        <location filename="../formdiagnose.cpp" line="240"/>
         <source>Open board by photo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="310"/>
+        <location filename="../formdiagnose.cpp" line="207"/>
+        <source>Images (*.png)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="229"/>
+        <source>Save photo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="229"/>
+        <source>Photo from camera couldn&apos;t be stored to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="243"/>
+        <source>Images with signatures (*.tif *.tiff)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="244"/>
+        <source>All images (*.jpeg *.jpg *.bmp *.gif *.png *.jpe *.tif *.tiff)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formdiagnose.cpp" line="318"/>
         <source>No testpoints</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="310"/>
+        <location filename="../formdiagnose.cpp" line="318"/>
         <source>Add at least one testpoint for start signature analyze</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="321"/>
+        <location filename="../formdiagnose.cpp" line="329"/>
         <source>Stored signature is displayed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="323"/>
+        <location filename="../formdiagnose.cpp" line="331"/>
         <source>Stored signature is hidden</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="506"/>
+        <location filename="../formdiagnose.cpp" line="514"/>
         <source>Diagnoze configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="507"/>
+        <location filename="../formdiagnose.cpp" line="515"/>
         <source>Default configuration for diagnoze test-point is missed. You may specify default settings on Options tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="672"/>
-        <location filename="../formdiagnose.cpp" line="709"/>
+        <location filename="../formdiagnose.cpp" line="680"/>
+        <location filename="../formdiagnose.cpp" line="717"/>
         <source>Save Diagnostic Results</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="710"/>
+        <location filename="../formdiagnose.cpp" line="718"/>
         <source>Couldn&apos;t save diagnostic results. Please, check log-file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="722"/>
+        <location filename="../formdiagnose.cpp" line="730"/>
         <source>Start testpoints diagnose</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formdiagnose.cpp" line="733"/>
+        <location filename="../formdiagnose.cpp" line="741"/>
         <source>Stop diagnose</source>
         <translation type="unfinished"></translation>
     </message>

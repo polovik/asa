@@ -281,6 +281,122 @@ bool ImageTiff::readPage(QImage &image)
     return true;
 }
 
+bool ImageTiff::decodeTestpointData(QString fileformat, TestpointMeasure &testpoint)
+{
+    Q_UNUSED(fileformat)
+    char *rawDescription;
+    if (!TIFFGetField(m_tiff, TIFFTAG_TESTPOINT_DESCRIPTION, &rawDescription)) {
+        qWarning() << "Couldn't obtain testpoint's description";
+        return false;
+    }
+    // Example: "POINT:10, X:232, Y:6522, SIG:sine, FREQ:1000, VOLT:2.6, SAMPLES:1000"
+    QString description = QString::fromLatin1(rawDescription);
+    QStringList args = description.split(", ");
+    int id = -1;
+    int x = -1;
+    int y = -1;
+    ToneWaveForm type;
+    int freq = -1;
+    qreal volt = -1.;
+    int samplesCount = -1;
+    bool ok = false;
+    for (const QString &arg : args) {
+        QString key = arg.section(":", 0, 0);
+        QString value = arg.section(":", 1, 1);
+        if (key == "POINT") {
+            id = value.toInt(&ok);
+            if (!ok) {
+                qWarning() << "Invalid format of testpoint's descrtiption:" << description;
+                return false;
+            }
+            continue;
+        }
+        if (key == "X") {
+            x = value.toInt(&ok);
+            if (!ok) {
+                qWarning() << "Invalid format of testpoint's descrtiption:" << description;
+                return false;
+            }
+            continue;
+        }
+        if (key == "Y") {
+            y = value.toInt(&ok);
+            if (!ok) {
+                qWarning() << "Invalid format of testpoint's descrtiption:" << description;
+                return false;
+            }
+            continue;
+        }
+        if (key == "SIG") {
+            type = ToneWaveForm(value);
+            if (type.id() == ToneWaveForm::WAVE_UNKNOWN) {
+                qWarning() << "Invalid format of testpoint's descrtiption:" << description;
+                return false;
+            }
+            continue;
+        }
+        if (key == "FREQ") {
+            freq = value.toInt(&ok);
+            if (!ok) {
+                qWarning() << "Invalid format of testpoint's descrtiption:" << description;
+                return false;
+            }
+            continue;
+        }
+        if (key == "VOLT") {
+            volt = value.toDouble(&ok);
+            if (!ok) {
+                qWarning() << "Invalid format of testpoint's descrtiption:" << description;
+                return false;
+            }
+            continue;
+        }
+        if (key == "SAMPLES") {
+            samplesCount = value.toInt(&ok);
+            if (!ok) {
+                qWarning() << "Invalid format of testpoint's descrtiption:" << description;
+                return false;
+            }
+            continue;
+        }
+    }
+    if ((id < 0) || (x < 0) || (y < 0) || (type.id() == ToneWaveForm::WAVE_UNKNOWN) || (freq < 0) || (volt < 0.) || (samplesCount < 0)) {
+        qWarning() << "Some fields is missed in testpoint's description:" << description;
+        qWarning() << id << x << y << type << freq << volt << samplesCount;
+        return false;
+    }
+
+    QList<QPointF> samples;
+    if (samplesCount > 0) {
+        uint16 count = 0;
+        double *dataX = nullptr;
+        double *dataY = nullptr;
+        TIFFGetField(m_tiff, TIFFTAG_TESTPOINT_DATA_X, &count, &dataX);
+        TIFFGetField(m_tiff, TIFFTAG_TESTPOINT_DATA_Y, &count, &dataY);
+        for (int t = 0; t < samplesCount; t++) {
+            QPointF point(dataX[t], dataY[t]);
+            samples.append(point);
+        }
+    }
+
+    QImage signatureImage;
+    if (!readPage(signatureImage)) {
+        qWarning() << "Can't read signature image";
+        return false;
+    }
+
+    testpoint.id = id;
+    testpoint.pos = QPoint(x, y);
+    testpoint.signalType = type;
+    testpoint.signalFrequency = freq;
+    testpoint.signalVoltage = volt;
+    testpoint.isCurrent = false;
+    testpoint.signature = signatureImage;
+    testpoint.data = samples;
+
+    return true;
+}
+
 bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<TestpointMeasure> &testpoints)
 {
     QFile file(filePath);
@@ -317,14 +433,21 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
 
     unsigned int totalPages = 0;
     unsigned int page = 0;
-    int fileType = -1;
-    if (!TIFFGetField(m_tiff, TIFFTAG_SUBFILETYPE, &fileType)) {
-        qWarning() << "Couldn't obtain tag" << TIFFTAG_SUBFILETYPE << "from file" << filePath;
-        goto error;
-    }
-    if (fileType != FILETYPE_PAGE) {
-        qWarning() << "Couldn't obtain tag" << TIFFTAG_SUBFILETYPE << "from file" << filePath;
-        goto error;
+    int fileType = 0;
+    bool typeRead = TIFFGetField(m_tiff, TIFFTAG_SUBFILETYPE, &fileType);
+    if (!typeRead || (fileType != FILETYPE_PAGE)) {
+        qWarning() << "Tag" << TIFFTAG_SUBFILETYPE << "is missed or have unsupported type"
+                   << fileType << "in file" << filePath;
+        // Treat entire file as single photo - use it as board's photo
+        if (!TIFFSetDirectory(m_tiff, 0)) {
+            qWarning() << "Couldn't select first page in file" << filePath;
+            goto error;
+        }
+        if (!readPage(boardPhoto)) {
+            qWarning() << "Can't read board phoro from file:" << filePath;
+            goto error;
+        }
+        goto success;
     }
     if (!TIFFGetField(m_tiff, TIFFTAG_PAGENUMBER, &page, &totalPages)) {
         qWarning() << "Couldn't obtain tag" << TIFFTAG_PAGENUMBER << "from file" << filePath;
@@ -341,10 +464,9 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
             qWarning() << "Couldn't select page" << page << "for file" << filePath;
             goto error;
         }
-        // TODO does it need to free char* rawFileformat?
-        char *rawFileformat;// = (char *)calloc(100, sizeof(char));
+
+        char *rawFileformat;
         if (!TIFFGetField(m_tiff, TIFFTAG_FILEFORMAT, &rawFileformat)) {
-            qDebug() << "Page" << page << "doesn't containt testpoint's signature";
             if (page == 0) {
                 qDebug() << "Read board's photo from page" << page;
                 if (!readPage(boardPhoto)) {
@@ -363,125 +485,16 @@ bool ImageTiff::readImageSeries(QString filePath, QImage &boardPhoto, QList<Test
         QString fileformat = QString::fromLatin1(rawFileformat);
         qDebug() << "Testpoint at" << page << "have format:" << fileformat;
 
-        // TODO does it need to free char* rawDescription?
-        char *rawDescription;// = (char *)calloc(1000, sizeof(char));
-        if (!TIFFGetField(m_tiff, TIFFTAG_TESTPOINT_DESCRIPTION, &rawDescription)) {
-            qWarning() << "Couldn't obtain testpoint's description at" << page << "from file" << filePath;
-            goto error;
-        }
-        // Example: "POINT:10, X:232, Y:6522, SIG:sine, FREQ:1000, VOLT:2.6, SAMPLES:1000"
-        QString description = QString::fromLatin1(rawDescription);
-        qDebug() << "Testpoint at" << page << "have description:" << description;
-        QStringList args = description.split(", ");
-        int id = -1;
-        int x = -1;
-        int y = -1;
-        ToneWaveForm type;
-        int freq = -1;
-        qreal volt = -1.;
-        int samplesCount = -1;
-        bool ok = false;
-        for (const QString &arg : args) {
-            QString key = arg.section(":", 0, 0);
-            QString value = arg.section(":", 1, 1);
-            if (key == "POINT") {
-                id = value.toInt(&ok);
-                if (!ok) {
-                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
-                    goto error;
-                }
-                continue;
-            }
-            if (key == "X") {
-                x = value.toInt(&ok);
-                if (!ok) {
-                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
-                    goto error;
-                }
-                continue;
-            }
-            if (key == "Y") {
-                y = value.toInt(&ok);
-                if (!ok) {
-                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
-                    goto error;
-                }
-                continue;
-            }
-            if (key == "SIG") {
-                type = ToneWaveForm(value);
-                if (type.id() == ToneWaveForm::WAVE_UNKNOWN) {
-                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
-                    goto error;
-                }
-                continue;
-            }
-            if (key == "FREQ") {
-                freq = value.toInt(&ok);
-                if (!ok) {
-                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
-                    goto error;
-                }
-                continue;
-            }
-            if (key == "VOLT") {
-                volt = value.toDouble(&ok);
-                if (!ok) {
-                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
-                    goto error;
-                }
-                continue;
-            }
-            if (key == "SAMPLES") {
-                samplesCount = value.toInt(&ok);
-                if (!ok) {
-                    qWarning() << "Invalid format of testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
-                    goto error;
-                }
-                continue;
-            }
-        }
-        if ((id < 0) || (x < 0) || (y < 0) || (type.id() == ToneWaveForm::WAVE_UNKNOWN) || (freq < 0) || (volt < 0.) || (samplesCount < 0)) {
-            qWarning() << "Some fields is missed in testpoint's descrtiption:" << description << "at" << page << "from file" << filePath;
-            goto error;
-        }
-        qDebug() << id << x << y << type << freq << volt << samplesCount;
-
-        QList<QPointF> samples;
-        if (samplesCount > 0) {
-            uint16 count = 0;
-            double *dataX = nullptr;
-            double *dataY = nullptr;
-            TIFFGetField(m_tiff, TIFFTAG_TESTPOINT_DATA_X, &count, &dataX);
-            TIFFGetField(m_tiff, TIFFTAG_TESTPOINT_DATA_Y, &count, &dataY);
-            for (int t = 0; t < samplesCount; t++) {
-                QPointF point(dataX[t], dataY[t]);
-                samples.append(point);
-            }
-            // TODO does it need to free double *dataX and *dataY?
-//            free(dataX);
-//            free(dataY);
-        }
-
-        QImage signatureImage;
-        if (!readPage(signatureImage)) {
-            qWarning() << "Can't read signature image from file:"
+        TestpointMeasure measure;
+        if (!decodeTestpointData(fileformat, measure)) {
+            qWarning() << "Can't decode signature data from file:"
                        << filePath << "at page" << page;
             goto error;
         }
-
-        TestpointMeasure measure;
-        measure.id = id;
-        measure.pos = QPoint(x, y);
-        measure.signalType = type;
-        measure.signalFrequency = freq;
-        measure.signalVoltage = volt;
-        measure.isCurrent = false;
-        measure.signature = signatureImage;
-        measure.data = samples;
         testpoints.append(measure);
     }
 
+success:
     qDebug() << "File" << filePath << "has been successfully read";
     TIFFClose(m_tiff);
     return true;
